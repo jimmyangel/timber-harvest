@@ -1,0 +1,3 @@
+## Interactive map to visualize National Forest timber harvest data
+
+Currently under development, not ready for use. Stay tuned...

@@ -1,0 +1,44 @@
+@import "~leaflet/dist/leaflet.css";
+@import "~leaflet-fullscreen/dist/leaflet.fullscreen.css";
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+.info {
+  padding: 6px 8px;
+  max-width: 400px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 0 15px
+  rgba(0,0,0,0.2);
+  border-radius: 5px;
+  overflow: auto;
+}
+
+.info h4 {
+  margin: 0 0 5px;
+  color: #777;
+}
+
+#overlay {
+  background: #ffffff;
+  color: #666666;
+  opacity: 0.4;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  z-index: 5000;
+  top: 0;
+  left: 0;
+  float: left;
+  text-align: center;
+  padding-top: 25%;
+}

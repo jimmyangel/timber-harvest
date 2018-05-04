@@ -1,0 +1,38 @@
+{
+  "name": "timber-harvest",
+  "version": "0.0.1",
+  "description": "Interactive map to visualize National Forest timber harvest data",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rm -rf public; mkdir public && mkdir public/data && cp -r ./data/* ./public/data/",
+    "build": "npm run clean && webpack --mode \"development\"",
+    "buildp": "npm run clean && webpack --mode \"production\"",
+    "dev": "webpack-dev-server --hot --inline --mode \"development\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ricardo Morin",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "css-loader": "^0.28.11",
+    "eslint": "^4.19.1",
+    "eslint-loader": "^2.0.0",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "file-loader": "^1.1.11",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "style-loader": "^0.21.0",
+    "url-loader": "^1.0.1",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.1.2",
+    "webpack-dev-server": "^3.1.4"
+  },
+  "dependencies": {
+    "@mapbox/leaflet-pip": "^1.1.0",
+    "jquery": "^3.3.1",
+    "leaflet": "^1.3.1",
+    "leaflet-fullscreen": "^1.0.2"
+  }
+}
