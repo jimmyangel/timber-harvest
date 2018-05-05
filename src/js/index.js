@@ -7,6 +7,8 @@ import 'leaflet-fullscreen';
 import leafletPip from '@mapbox/leaflet-pip';
 import 'multirange';
 
+import {config} from './config.js';
+
 var esri = require('esri-leaflet');
 
 var map = L.map('map', {fullscreenControl: true, center: [-122.0031, 44.2274], zoom: 8, minZoom: 8, maxBounds: [[40, -129], [50, -109]]});
@@ -14,18 +16,9 @@ var map = L.map('map', {fullscreenControl: true, center: [-122.0031, 44.2274], z
 map.createPane('trgrid');
 map.getPane('trgrid').style.zIndex = 650;
 
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-  maxZoom: 19,
-  attribution: 'Tiles © Esri — Source: <a href="http://www.arcgis.com/home/item.html?id=30e5fe3149c34df1ba922e6f5bbf808f">ArcGIS World Topographic Map</a> - <a href="https://data.fs.usda.gov/geodata/edw/datasets.php?xmlKeyword=Timber+Harvests">U.S. Forest Service</a>'
-}).addTo(map);
+L.tileLayer(config.baseMapLayers[0].url, config.baseMapLayers[0].options).addTo(map);
 
-//esri.basemapLayer("Topographic").addTo(map);
-var t = esri.dynamicMapLayer({
-  url: 'https://gis.blm.gov/orarcgis/rest/services/Land_Status/BLM_OR_PLSS/MapServer',
-  layers: [2],
-  opacity: 0.8,
-  pane: 'trgrid'
-}).addTo(map);
+var t = esri.dynamicMapLayer(config.esriDynamicMapLayers[0]).addTo(map);
 
 var info = L.control();
 
@@ -142,7 +135,7 @@ function showLayers(lg, fromYear, toYear) {
   t.bringToFront();
 }
 
-$.getJSON( "data/timber-harvest-willamette-nf.json", function( data ) {
+$.getJSON(config.dataPaths.willamette, function( data ) {
 
   geojson = L.geoJson(data, {
     style: style,
