@@ -5,6 +5,7 @@ import '../favicon.ico';
 import L from 'leaflet';
 import 'leaflet-fullscreen';
 import leafletPip from '@mapbox/leaflet-pip';
+import 'multirange';
 
 var esri = require('esri-leaflet');
 
@@ -35,8 +36,7 @@ var geojson;
 info.onAdd = function () {
   this._div = L.DomUtil.create('div', 'info');
   this._div.innerHTML = '<h4>Willamette NF Timber Harvest Records</h4>' +
-                        '<input type="range" min="1890" max="2018" value="1890" id="fromYear"> From: <span id="fromLabel"></span><br>' +
-                        '<input type="range" min="1890" max="2018" value="2018" id="toYear"> To: <span id="toLabel"></span><br><hr>' +
+                        '<span id="fromLabel"> </span> <input type="range" multiple min="1900" max="2018" value="1900,2018" class="fromToYear" /> <span id="toLabel"></span><br>' +
                         '<div id="infoContent"></div>';
   L.DomEvent.disableClickPropagation(this._div);
   return this._div;
@@ -124,11 +124,10 @@ function onEachFeature(feature, layer) {
 }
 
 function updateFromYear() {
-  var fromYear = $('#fromYear').val();
-  var toYear = $('#toYear').val();
-  $('#fromLabel').text(fromYear);
-  $('#toLabel').text(toYear);
-  showLayers(geojson, fromYear, toYear);
+  var fromToYear = $('.fromToYear').val().split(',');
+  $('#fromLabel').text(fromToYear[0]);
+  $('#toLabel').text(fromToYear[1]);
+  showLayers(geojson, fromToYear[0], fromToYear[1]);
 }
 
 function showLayers(lg, fromYear, toYear) {
@@ -152,15 +151,12 @@ $.getJSON( "data/timber-harvest-willamette-nf.json", function( data ) {
 
   map.fitBounds(geojson.getBounds());
 
-  $('#fromYear').on('input', function() {
-    updateFromYear();
-  });
-
-  $('#toYear').on('input', function() {
+  $('.fromToYear').on('input', function() {
     updateFromYear();
   });
 
   updateFromYear();
+
   $('#overlay').fadeOut();
 
   map.on('click', resetHighlight);
