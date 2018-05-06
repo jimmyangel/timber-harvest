@@ -11,6 +11,9 @@ import {config} from './config.js';
 
 var esri = require('esri-leaflet');
 
+import infoHeader from '../templates/infoHeader.hbs';
+import infoContentItem from '../templates/infoContentItem.hbs';
+
 var map = L.map('map', {fullscreenControl: true, center: [-122.0031, 44.2274], zoom: 8, minZoom: 8, maxBounds: [[40, -129], [50, -109]]});
 
 map.createPane('trgrid');
@@ -28,9 +31,7 @@ var geojson;
 
 info.onAdd = function () {
   this._div = L.DomUtil.create('div', 'info');
-  this._div.innerHTML = '<h4>Willamette NF Timber Harvest Records</h4>' +
-                        '<span id="fromLabel"> </span> <input type="range" multiple min="1900" max="2018" value="1900,2018" class="fromToYear" /> <span id="toLabel"></span><br>' +
-                        '<div id="infoContent"></div>';
+  this._div.innerHTML = infoHeader();
   L.DomEvent.disableClickPropagation(this._div);
   return this._div;
 };
@@ -40,20 +41,21 @@ info.update = function (layers) {
   if (layers) {
     infoItems = '';
     layers.forEach(function(l) {
-      infoItems +=
-        '<b>' +
-        'Sale Name: ' + (l.feature.properties.SALE_NAME ? l.feature.properties.SALE_NAME : 'N/A') + '</b><br>' +
-        'Activity: ' + l.feature.properties.ACTIVITY_N.replace(/ *\([^)]*\) */g, '') + '<br>' +
-        'Area: ' + l.feature.properties.GIS_ACRES + ' Acres<br>' +
-        'Date Planned: ' + (new Date(l.feature.properties.DATE_PLANN).toLocaleDateString()) + '<br>' +
-        'Date Accomplished: ' + (new Date(l.feature.properties.DATE_ACCOM).toLocaleDateString()) + '<br>' +
-        'Date Completed: ' + (new Date(l.feature.properties.DATE_COMPL).toLocaleDateString()) + '<br>'
-
+      infoItems += infoContentItem({
+        saleName: (l.feature.properties.SALE_NAME ? l.feature.properties.SALE_NAME : 'N/A'),
+        activity: l.feature.properties.ACTIVITY_N.replace(/ *\([^)]*\) */g, ''),
+        acres: l.feature.properties.GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
+        datePlanned: (new Date(l.feature.properties.DATE_PLANN).toLocaleDateString()),
+        dateAccomplished: (new Date(l.feature.properties.DATE_ACCOM).toLocaleDateString()),
+        dateCompleted: (new Date(l.feature.properties.DATE_COMPL).toLocaleDateString())
+      });
     });
+    $('#tipToClick').hide();
+    $('#infoContent').html(infoItems);
   } else {
-    infoItems = 'Click on a shape to view details<hr>';
+    $('#infoContent').empty()
+    $('#tipToClick').show();
   }
-  $('#infoContent').html(infoItems);
 };
 
 info.addTo(map);

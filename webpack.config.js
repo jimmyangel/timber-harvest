@@ -54,6 +54,11 @@ module.exports = {
         test: /\.html$/,
         use: 'html-loader'
       },
+      {
+        test: /\.hbs$/,
+        loader: "handlebars-loader",
+        query: {inlineRequires: 'images/'}
+      }
     ]
   }
 };
