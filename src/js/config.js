@@ -22,5 +22,18 @@ export var config = {
   ],
   dataPaths: {
     willamette: 'data/timber-harvest-willamette-nf.json'
+  },
+  styles: {
+    featureStyle: {
+      weight: 0,
+      opacity: 1,
+      color: 'gray',
+      dashArray: '3',
+      fillOpacity: 0.7,
+      fillColor: '#FF0000'
+    },
+    highlightedFeatureStyle: {
+      weight: 3
+    }
   }
 }
