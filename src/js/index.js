@@ -19,9 +19,9 @@ var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [-1
 map.createPane('trgrid');
 map.getPane('trgrid').style.zIndex = 650;
 
-L.tileLayer(config.baseMapLayers[0].url, config.baseMapLayers[0].options).addTo(map);
+//L.tileLayer(config.baseMapLayers[0].url, config.baseMapLayers[0].options).addTo(map);
 
-var townshipRangeLayer = esri.dynamicMapLayer(config.esriDynamicMapLayers[0]).addTo(map);
+//var townshipRangeLayer = esri.dynamicMapLayer(config.overlayLayers[0]).addTo(map);
 
 var info = L.control();
 var highlightedFeature;
@@ -75,21 +75,20 @@ function setUpInfoPanel() {
 }
 
 function setUpLayerControl() {
-  /*var layerArray = tmBaseMapLayers;
-
+  var baseMaps = {};
+  var overlayLayers = {};
   // Iterate through list of base layers and add to layer control
-  for (var k=0; k<layerArray.length; k++) {
-    var bl = L.tileLayer(layerArray[k].layerUrl, {minZoom: 1, maxZoom: layerArray[k].maxZoom, attribution: layerArray[k].attribution, ext: 'png'});
-    layerControl.addBaseLayer(bl, layerArray[k].layerName);
-    // Wire the spinner handlers
-    bl.on('loading', spinHandler);
-    bl.on('load', spinHandler);
-
-    // First layer is the one displayed by default
+  for (var k=0; k<config.baseMapLayers.length; k++) {
+    var bl = baseMaps[config.baseMapLayers[k].name] = L.tileLayer(config.baseMapLayers[k].url, config.baseMapLayers[k].options);
     if (k === 0) {
       map.addLayer(bl);
     }
-  } */
+  }
+  // Iterate through list of overlay layers and add to layer control
+  for (k=0; k<config.overlayLayers.length; k++) {
+    overlayLayers[config.overlayLayers[k].name] = esri.dynamicMapLayer(config.overlayLayers[k].options);
+  }
+  L.control.layers(baseMaps, overlayLayers, {position: 'topleft', collapsed: true}).addTo(map);
 }
 
 function highlightFeature(e) {
@@ -140,7 +139,8 @@ function displayTimberHarvestDataLayer() {
   $.getJSON(config.dataPaths.willamette, function(data) {
     timberHarvestDataLayer = L.geoJson(data, {
       style: config.styles.featureStyle,
-      onEachFeature: onEachFeature
+      onEachFeature: onEachFeature,
+      attribution: '<a href="https://data.fs.usda.gov/geodata/edw/datasets.php?xmlKeyword=Timber+Harvests">U.S. Forest Service</a>'
     });
     map.fitBounds(timberHarvestDataLayer.getBounds());
     $('.fromToYear').on('input', function() {
