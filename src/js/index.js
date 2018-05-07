@@ -6,17 +6,19 @@ import L from 'leaflet';
 import 'leaflet-fullscreen';
 import leafletPip from '@mapbox/leaflet-pip';
 import 'multirange';
+import 'leaflet-modal';
 import Spinner from 'spin';
 
 import {config} from './config.js';
 
 import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
+import aboutModal from '../templates/aboutModal.hbs';
 
 var esri = require('esri-leaflet');
 
-window.spinner = new Spinner(config.spinnerOpts);
-window.spinner.spin($('#spinner')[0]);
+var spinner = new Spinner(config.spinnerOpts);
+spinner.spin($('#spinner')[0]);
 
 var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [-122.0252, 44.5357], zoom: 9, minZoom: 8, maxBounds: [[40, -129], [50, -109]]});
 
@@ -33,7 +35,7 @@ var timberHarvestDataLayer;
 
 setUpInfoPanel();
 setUpLayerControl();
-//setUpAboutControl();
+setUpAboutControl();
 
 displayTimberHarvestDataLayer();
 
@@ -96,15 +98,21 @@ function setUpLayerControl() {
   L.control.layers(baseMaps, overlayLayers, {position: 'topleft', collapsed: true}).addTo(map);
 }
 
-/*function setUpAboutControl() {
+function setUpAboutControl() {
   var aboutControl = L.control({position: 'bottomright'});
   aboutControl.onAdd = function () {
     this._div = L.DomUtil.create('div', 'leaflet-control leaflet-bar about');
-    this._div.innerHTML = '<a id="terrainControl" style="font-size: large;" href="#" title="About">&#9432;</a>';
+    this._div.innerHTML = '<a id="aboutControl" style="font-size: large;" href="#" title="About">&#9432;</a>';
     return this._div;
   };
   aboutControl.addTo(map);
-}*/
+  $('#aboutControl').click(function() {
+    map.fire('modal', {
+      content: aboutModal()
+    });
+    return false;
+  });
+}
 
 function highlightFeature(e) {
   if (highlightedFeature) {
@@ -162,7 +170,10 @@ function displayTimberHarvestDataLayer() {
       showFeaturesForRange();
     });
     showFeaturesForRange();
-    window.spinner.stop();
+    spinner.stop();
     map.on('click', resetHighlight);
+    $(document).keyup(function(e) {
+      if (highlightedFeature && e.which == 27) resetHighlight();
+    });
   });
 }
