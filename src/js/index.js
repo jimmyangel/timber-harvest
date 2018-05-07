@@ -21,13 +21,14 @@ map.getPane('trgrid').style.zIndex = 650;
 
 L.tileLayer(config.baseMapLayers[0].url, config.baseMapLayers[0].options).addTo(map);
 
-var t = esri.dynamicMapLayer(config.esriDynamicMapLayers[0]).addTo(map);
+var townshipRangeLayer = esri.dynamicMapLayer(config.esriDynamicMapLayers[0]).addTo(map);
 
 var info = L.control();
 var highlightedFeature;
 var timberHarvestDataLayer;
 
 setUpInfoPanel();
+setUpLayerControl();
 
 displayTimberHarvestDataLayer();
 
@@ -73,6 +74,24 @@ function setUpInfoPanel() {
   info.update();
 }
 
+function setUpLayerControl() {
+  /*var layerArray = tmBaseMapLayers;
+
+  // Iterate through list of base layers and add to layer control
+  for (var k=0; k<layerArray.length; k++) {
+    var bl = L.tileLayer(layerArray[k].layerUrl, {minZoom: 1, maxZoom: layerArray[k].maxZoom, attribution: layerArray[k].attribution, ext: 'png'});
+    layerControl.addBaseLayer(bl, layerArray[k].layerName);
+    // Wire the spinner handlers
+    bl.on('loading', spinHandler);
+    bl.on('load', spinHandler);
+
+    // First layer is the one displayed by default
+    if (k === 0) {
+      map.addLayer(bl);
+    }
+  } */
+}
+
 function highlightFeature(e) {
   if (highlightedFeature) {
     resetHighlight();
@@ -103,23 +122,18 @@ function onEachFeature(feature, layer) {
   });
 }
 
-function updateFromYear() {
+function showFeaturesForRange() {
   var fromToYear = $('.fromToYear').val().split(',');
   $('#fromLabel').text(fromToYear[0]);
   $('#toLabel').text(fromToYear[1]);
-  showLayers(timberHarvestDataLayer, fromToYear[0], fromToYear[1]);
-}
-
-function showLayers(lg, fromYear, toYear) {
-  lg.eachLayer(function(layer) {
+  timberHarvestDataLayer.eachLayer(function(layer) {
     var y = (new Date(layer.feature.properties.DATE_ACCOM)).getFullYear();
-    if ((y >= fromYear) && (y<=toYear)) {
+    if ((y >= fromToYear[0]) && (y<=fromToYear[1])) {
       map.addLayer(layer);
     } else {
       map.removeLayer(layer);
     }
   });
-  t.bringToFront();
 }
 
 function displayTimberHarvestDataLayer() {
@@ -130,9 +144,9 @@ function displayTimberHarvestDataLayer() {
     });
     map.fitBounds(timberHarvestDataLayer.getBounds());
     $('.fromToYear').on('input', function() {
-      updateFromYear();
+      showFeaturesForRange();
     });
-    updateFromYear();
+    showFeaturesForRange();
     $('#overlay').fadeOut();
     map.on('click', resetHighlight);
   });
