@@ -6,6 +6,7 @@ import L from 'leaflet';
 import 'leaflet-fullscreen';
 import leafletPip from '@mapbox/leaflet-pip';
 import 'multirange';
+import Spinner from 'spin';
 
 import {config} from './config.js';
 
@@ -13,6 +14,9 @@ import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
 
 var esri = require('esri-leaflet');
+
+window.spinner = new Spinner(config.spinnerOpts);
+window.spinner.spin($('#spinner')[0]);
 
 var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [-122.0252, 44.5357], zoom: 9, minZoom: 8, maxBounds: [[40, -129], [50, -109]]});
 
@@ -29,6 +33,7 @@ var timberHarvestDataLayer;
 
 setUpInfoPanel();
 setUpLayerControl();
+//setUpAboutControl();
 
 displayTimberHarvestDataLayer();
 
@@ -91,6 +96,16 @@ function setUpLayerControl() {
   L.control.layers(baseMaps, overlayLayers, {position: 'topleft', collapsed: true}).addTo(map);
 }
 
+/*function setUpAboutControl() {
+  var aboutControl = L.control({position: 'bottomright'});
+  aboutControl.onAdd = function () {
+    this._div = L.DomUtil.create('div', 'leaflet-control leaflet-bar about');
+    this._div.innerHTML = '<a id="terrainControl" style="font-size: large;" href="#" title="About">&#9432;</a>';
+    return this._div;
+  };
+  aboutControl.addTo(map);
+}*/
+
 function highlightFeature(e) {
   if (highlightedFeature) {
     resetHighlight();
@@ -147,7 +162,7 @@ function displayTimberHarvestDataLayer() {
       showFeaturesForRange();
     });
     showFeaturesForRange();
-    $('#overlay').fadeOut();
+    window.spinner.stop();
     map.on('click', resetHighlight);
   });
 }

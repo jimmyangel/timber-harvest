@@ -54,5 +54,10 @@ export var config = {
     highlightedFeatureStyle: {
       weight: 3
     }
+  },
+  spinnerOpts : {
+    color: '#939393',
+    opacity: 0.1,
+    shadow: true
   }
 }
