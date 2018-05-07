@@ -14,7 +14,7 @@ var esri = require('esri-leaflet');
 import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
 
-var map = L.map('map', {fullscreenControl: true, center: [-122.0031, 44.2274], zoom: 8, minZoom: 8, maxBounds: [[40, -129], [50, -109]]});
+var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [-122.0031, 44.2274], zoom: 8, minZoom: 8, maxBounds: [[40, -129], [50, -109]]});
 
 map.createPane('trgrid');
 map.getPane('trgrid').style.zIndex = 650;
