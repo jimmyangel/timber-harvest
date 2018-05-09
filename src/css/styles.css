@@ -2,6 +2,7 @@
 @import "~leaflet-fullscreen/dist/leaflet.fullscreen.css";
 @import "~multirange/multirange.css";
 @import "~leaflet-modal/dist/leaflet.modal.css";
+@import "~nprogress/nprogress.css";
 
 html, body {
   height: 100%;
@@ -62,4 +63,67 @@ input[type="range"].multirange.ghost {
   position: absolute;
   top: 50%;
   left: 50%;
+}
+
+/* Animation widget styling */
+
+.playback-controls {
+  /* margin: 0 auto; */
+}
+
+.playback-controls div {
+  margin: auto;
+  padding: 0;
+  list-style: none;
+}
+
+.playback-controls div div {
+  display: inline-block;
+  margin: auto;
+  padding: 0;
+  list-style: none;
+}
+
+.howl-control {
+	/*box-shadow: 0 1px 5px rgba(0,0,0,0.65);*/
+	border-radius: 10px;
+  z-index: 1000;
+}
+
+.howl-control a {
+  opacity: 0.8;
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+  border-radius: 4px;
+}
+
+.howl-control a:hover {
+	background-color: #f4f4f4;
+}
+
+.howl-control a img {
+  width: 16px;
+}
+
+.blink {
+  animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+  50% { opacity: 0.3; }
+}
+
+.legend-explanation {
+  margin-bottom: 4px;
+  margin-left: 4px;
+  margin-right: 4px;
+  font-size: 80%;
+  /*text-align: left;*/
 }

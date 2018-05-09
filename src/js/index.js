@@ -10,13 +10,17 @@ import 'leaflet-modal';
 import Spinner from 'spin';
 
 import {config} from './config.js';
+import * as utils from './utils.js';
 
 import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
 
+var NProgress = require('nprogress');
 var esri = require('esri-leaflet');
 
+NProgress.configure({showSpinner: false});
+//NProgress.start();
 var spinner = new Spinner(config.spinnerOpts);
 spinner.spin($('#spinner')[0]);
 
@@ -108,7 +112,7 @@ function setUpAboutControl() {
   aboutControl.addTo(map);
   $('#aboutControl').click(function() {
     map.fire('modal', {
-      content: aboutModal()
+      content: aboutModal({version: config.versionString})
     });
     return false;
   });
@@ -145,6 +149,7 @@ function onEachFeature(feature, layer) {
 }
 
 function showFeaturesForRange() {
+  //$('.fromToYear').val('1921,1930');
   var fromToYear = $('.fromToYear').val().split(',');
   $('#fromLabel').text(fromToYear[0]);
   $('#toLabel').text(fromToYear[1]);
@@ -165,12 +170,36 @@ function displayTimberHarvestDataLayer() {
       onEachFeature: onEachFeature,
       attribution: '<a href="https://data.fs.usda.gov/geodata/edw/datasets.php?xmlKeyword=Timber+Harvests">U.S. Forest Service</a>'
     });
+
+    var startValue;
+    var stopValue;
+    var movingValue;
+    utils.setupPlaybackControlActions(function() {
+      var values = $('.fromToYear').val().split(',');
+      startValue = parseInt(values[0]);
+      stopValue = parseInt(values[1]);
+      movingValue = startValue;
+    },function() {
+      if (movingValue < stopValue) {
+        $('.fromToYear.multirange.original').val(startValue + ',' + movingValue++);
+      } else {
+        movingValue = parseInt(startValue);
+      }
+      showFeaturesForRange();
+      console.log(movingValue);
+    }, function() {
+      $('.fromToYear.multirange.original').val(startValue + ',' + stopValue);
+      showFeaturesForRange();
+    });
+
     map.fitBounds(timberHarvestDataLayer.getBounds());
     $('.fromToYear').on('input', function() {
+      utils.resetPlaybackControl()
       showFeaturesForRange();
     });
     showFeaturesForRange();
     spinner.stop();
+    //NProgress.done();
     map.on('click', resetHighlight);
     $(document).keyup(function(e) {
       if (highlightedFeature && e.which == 27) resetHighlight();
