@@ -159,7 +159,7 @@ function showFeaturesForRange() {
   $('#fromLabel').text(fromToYear[0]);
   $('#toLabel').text(fromToYear[1]);
   timberHarvestDataLayer.eachLayer(function(layer) {
-    var y = (new Date(layer.feature.properties.DATE_ACCOM)).getFullYear();
+    var y = (new Date(layer.feature.properties.DATE_COMPL)).getFullYear();
     if ((y >= fromToYear[0]) && (y<=fromToYear[1])) {
       map.addLayer(layer);
     } else {
