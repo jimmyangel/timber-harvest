@@ -31,12 +31,33 @@ export var config = {
   overlayLayers: [
     {
       options: {
-        url: 'https://gis.blm.gov/orarcgis/rest/services/Land_Status/BLM_OR_PLSS/MapServer',
-        layers: [2],
+        url: 'https://gis.blm.gov/arcgis/rest/services/Cadastral/BLM_Natl_PLSS_CadNSDI/MapServer',
+        layers: [1],
         opacity: 0.8,
         pane: 'trgrid'
       },
-      name: 'Township and Range Grid'
+      name: 'Township and Range Grid',
+      type: 'esri'
+    },
+    {
+      url: 'https://tiles.oregonhowl.org/unharvested/willamette/{z}/{x}/{y}.pbf',
+      options: {
+        vectorTileLayerStyles: {
+          vegetation: {
+            weight: 1,
+            opacity: 1,
+            color: '#009E73',
+            fillColor: '#009E73',
+            fillOpacity: 0.7,
+            fill: true
+          }
+        },
+        pane: 'overlayPane',
+        maxNativeZoom: 14,
+        minNativeZoom: 9
+      },
+      name: 'Unharvested Forest Land',
+      type: 'vectorgrid'
     }
   ],
   dataPaths: {
@@ -44,14 +65,15 @@ export var config = {
   },
   styles: {
     featureStyle: {
-      weight: 0,
+      weight: 1,
       opacity: 1,
-      color: 'gray',
+      color: '#d55e00',
       dashArray: '3',
       fillOpacity: 0.7,
-      fillColor: '#FF0000'
+      fillColor: '#d55e00'
     },
     highlightedFeatureStyle: {
+      color: 'gray',
       weight: 3
     }
   },

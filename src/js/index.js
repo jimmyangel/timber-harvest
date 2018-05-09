@@ -5,6 +5,7 @@ import '../favicon.ico';
 import L from 'leaflet';
 import 'leaflet-fullscreen';
 import leafletPip from '@mapbox/leaflet-pip';
+import 'leaflet.vectorgrid';
 import 'multirange';
 import 'leaflet-modal';
 import Spinner from 'spin';
@@ -28,10 +29,6 @@ var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [-1
 
 map.createPane('trgrid');
 map.getPane('trgrid').style.zIndex = 650;
-
-//L.tileLayer(config.baseMapLayers[0].url, config.baseMapLayers[0].options).addTo(map);
-
-//var townshipRangeLayer = esri.dynamicMapLayer(config.overlayLayers[0]).addTo(map);
 
 var info = L.control();
 var highlightedFeature;
@@ -97,7 +94,15 @@ function setUpLayerControl() {
   }
   // Iterate through list of overlay layers and add to layer control
   for (k=0; k<config.overlayLayers.length; k++) {
-    overlayLayers[config.overlayLayers[k].name] = esri.dynamicMapLayer(config.overlayLayers[k].options);
+    switch (config.overlayLayers[k].type) {
+      case 'esri':
+        overlayLayers[config.overlayLayers[k].name] = esri.dynamicMapLayer(config.overlayLayers[k].options);
+        break;
+      case 'vectorgrid':
+        config.overlayLayers[k].options.rendererFactory = L.canvas.tile;
+        overlayLayers[config.overlayLayers[k].name] = L.vectorGrid.protobuf(config.overlayLayers[k].url, config.overlayLayers[k].options)
+        break;
+    }
   }
   L.control.layers(baseMaps, overlayLayers, {position: 'topleft', collapsed: true}).addTo(map);
 }
