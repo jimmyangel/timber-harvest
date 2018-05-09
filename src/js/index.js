@@ -186,7 +186,6 @@ function displayTimberHarvestDataLayer() {
         movingValue = parseInt(startValue);
       }
       showFeaturesForRange();
-      console.log(movingValue);
     }, function() {
       $('.fromToYear.multirange.original').val(startValue + ',' + stopValue);
       showFeaturesForRange();
