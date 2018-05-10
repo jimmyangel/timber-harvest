@@ -120,10 +120,99 @@ input[type="range"].multirange.ghost {
   50% { opacity: 0.3; }
 }
 
+/* Legend styling */
+
+.legend-box {
+  border: 1px solid black;
+  overflow: hidden;
+}
+
+.legend-title {
+  margin-bottom: 4px;
+  margin-top: 4px;
+  font-weight: bold;
+  font-size: 90%;
+}
+
+.legend-entry {
+  margin-bottom: 4px;
+  margin-top: 4px;
+  font-size: 90%;
+}
+
+.legend-subtitle {
+  margin-bottom: 4px;
+  margin-top: 4px;
+  font-size: 80%;
+}
+
 .legend-explanation {
   margin-bottom: 4px;
   margin-left: 4px;
   margin-right: 4px;
   font-size: 80%;
   /*text-align: left;*/
+}
+
+.legend-scale {
+  margin: 0 auto;
+}
+
+.legend-scale ul {
+  margin: auto;
+  padding: 0;
+  list-style: none;
+}
+
+.legend-scale ul li {
+  display: inline-block;
+  margin-right: -4px;
+  width: 50px;
+  margin-bottom: 6px;
+  text-align: center;
+  font-size: 80%;
+  list-style: none;
+}
+
+ul.legend-items li span {
+  display: inline-block;
+  height: 15px;
+  width: 50px;
+  opacity:0.8;
+}
+
+.hidden-legend-item {
+  height: 12px;
+  width: 20px;
+  display: none;
+}
+
+.legend-item {
+  height: 12px;
+  width: 20px;
+  display: inline-block;
+}
+
+.overlay-legend-item {
+  display: inline-block;
+  margin-bottom: -3px;
+  height: 14px;
+  width: 14px;
+}
+
+.v-legend-items {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.v-legend-items li {
+  margin: auto;
+  padding: 0;
+  list-style: none;
+}
+
+.v-legend-item-sel:hover {
+  background-color:#E0E0E0;
+  cursor: pointer;
 }

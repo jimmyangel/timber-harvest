@@ -36,7 +36,10 @@ export var config = {
         opacity: 0.8,
         pane: 'trgrid'
       },
-      name: 'Township and Range Grid',
+      color: '#FB3231',
+      get name () {
+        return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> Township and Range Grid'
+      },
       type: 'esri'
     },
     {
@@ -56,7 +59,10 @@ export var config = {
         maxNativeZoom: 14,
         minNativeZoom: 9
       },
-      name: 'Unharvested Forest Land',
+      color: '#009E73',
+      get name () {
+        return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> Unharvested Forest Land'
+      },
       type: 'vectorgrid'
     }
   ],

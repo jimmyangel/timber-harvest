@@ -43,7 +43,7 @@ displayTimberHarvestDataLayer();
 function setUpInfoPanel() {
   info.onAdd = function () {
     this._div = L.DomUtil.create('div', 'info');
-    this._div.innerHTML = infoHeader();
+    this._div.innerHTML = infoHeader({layerColor: config.styles.featureStyle.fillColor});
     L.DomEvent.disableClickPropagation(this._div);
     return this._div;
   };
