@@ -1,5 +1,5 @@
 <div style="text-align: center">
-  <h4>Willamette NF Timber Harvest Records</h4>
+  <h4>Timber Harvest Records - Willamette NF</h4>
   <small><span id="tipToClick">(Click on a shape to view details)</span></small>
 </div>
 <hr>
@@ -10,13 +10,14 @@
     </ul>
   </div>
 </div>
+<div style="margin: 4px;"><input style="width: 100%;" id="transparency" type="range" min="0" max="100" value="{{layerOpacity}}" /></div>
+<div style="text-align: center;" class="legend-explanation">Move the slider to adjust transparency</div>
 <hr>
 <div style="padding-left: 2px; padding-right: 2px;">
-  <div style="margin: 0 auto; max-width: 400px; text-align: center;">
-    Range<br>
-    <span id="fromLabel"> </span> <input type="range" multiple min="1900" max="2018" value="1900,2018" class="fromToYear" /> <span id="toLabel"></span><br>
-  </div>
+  <div style="text-align: center" class="legend-title">Timeline playback</div>
+  <div style="text-align: center"><span id="fromLabel"></span> <input type="range" multiple min="1900" max="2018" value="1900,2018" class="fromToYear" /> <span id="toLabel"></span></div>
 </div>
+<div style="text-align: center;" class="legend-explanation">Move sliders to adjust time range</div>
 <hr>
 <div style="text-align: center" class="legend-title">Timeline playback</div>
 <div style="text-align: center" class="playback-controls">

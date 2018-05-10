@@ -43,7 +43,10 @@ displayTimberHarvestDataLayer();
 function setUpInfoPanel() {
   info.onAdd = function () {
     this._div = L.DomUtil.create('div', 'info');
-    this._div.innerHTML = infoHeader({layerColor: config.styles.featureStyle.fillColor});
+    this._div.innerHTML = infoHeader({
+      layerColor: config.styles.featureStyle.fillColor,
+      layerOpacity: (config.styles.featureStyle.fillOpacity * 100).toFixed()
+    });
     L.DomEvent.disableClickPropagation(this._div);
     return this._div;
   };
@@ -168,6 +171,13 @@ function showFeaturesForRange() {
   });
 }
 
+function setDataLayerOpacity() {
+  var opacity = $('#transparency').val() / 100;
+  timberHarvestDataLayer.setStyle({
+    fillOpacity: opacity,
+    opacity: Math.min(opacity * (config.styles.featureStyle.opacity/config.styles.featureStyle.fillOpacity), 1)});
+}
+
 function displayTimberHarvestDataLayer() {
   $.getJSON(config.dataPaths.willamette, function(data) {
     timberHarvestDataLayer = L.geoJson(data, {
@@ -201,6 +211,10 @@ function displayTimberHarvestDataLayer() {
       utils.resetPlaybackControl()
       showFeaturesForRange();
     });
+    $('#transparency').on('input', function() {
+      setDataLayerOpacity();
+    });
+    setDataLayerOpacity();
     showFeaturesForRange();
     spinner.stop();
     //NProgress.done();
