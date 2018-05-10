@@ -26,6 +26,15 @@ export var config = {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       },
       name: 'OpenStreetMap'
+    },
+    {
+      url: 'https://a.tiles.mapbox.com/v4/mapbox.landsat-live/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiamltbXlhbmdlbCIsImEiOiJjaW5sMGR0cDkweXN2dHZseXl6OWM4YnloIn0.v2Sv_ODztWuLuk78rUoiqg',
+      options: {
+        tileSize: 256,
+        maxZoom: 12,
+        attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox Landsat Live</a>'
+      },
+      name: 'Landsat Live'
     }
   ],
   overlayLayers: [
