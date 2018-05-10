@@ -20,8 +20,8 @@ import aboutModal from '../templates/aboutModal.hbs';
 var NProgress = require('nprogress');
 var esri = require('esri-leaflet');
 
-NProgress.configure({showSpinner: false});
-//NProgress.start();
+NProgress.configure({showSpinner: false, trickle: false, minimum: 0.001});
+
 var spinner = new Spinner(config.spinnerOpts);
 spinner.spin($('#spinner')[0]);
 
@@ -190,24 +190,29 @@ function displayTimberHarvestDataLayer() {
     var stopValue;
     var movingValue;
     utils.setupPlaybackControlActions(function() {
+      NProgress.set(0.0);
       var values = $('.fromToYear').val().split(',');
       startValue = parseInt(values[0]);
       stopValue = parseInt(values[1]);
       movingValue = startValue;
     },function() {
+      NProgress.set((movingValue - startValue) /(stopValue - startValue));
       if (movingValue < stopValue) {
         $('.fromToYear.multirange.original').val(startValue + ',' + movingValue++);
       } else {
-        movingValue = parseInt(startValue);
+        movingValue = startValue;
       }
       showFeaturesForRange();
     }, function() {
+      NProgress.done();
+      NProgress.remove();
       $('.fromToYear.multirange.original').val(startValue + ',' + stopValue);
       showFeaturesForRange();
     });
 
     map.fitBounds(timberHarvestDataLayer.getBounds());
     $('.fromToYear').on('input', function() {
+      NProgress.remove();
       utils.resetPlaybackControl()
       showFeaturesForRange();
     });
