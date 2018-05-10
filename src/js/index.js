@@ -190,21 +190,20 @@ function displayTimberHarvestDataLayer() {
     var stopValue;
     var movingValue;
     utils.setupPlaybackControlActions(function() {
-      NProgress.set(0.0);
+      NProgress.start();
       var values = $('.fromToYear').val().split(',');
       startValue = parseInt(values[0]);
       stopValue = parseInt(values[1]);
       movingValue = startValue;
     },function() {
       NProgress.set((movingValue - startValue) /(stopValue - startValue));
-      if (movingValue < stopValue) {
+      if (movingValue <= stopValue) {
         $('.fromToYear.multirange.original').val(startValue + ',' + movingValue++);
       } else {
         movingValue = startValue;
       }
       showFeaturesForRange();
     }, function() {
-      NProgress.done();
       NProgress.remove();
       $('.fromToYear.multirange.original').val(startValue + ',' + stopValue);
       showFeaturesForRange();
