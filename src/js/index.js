@@ -99,7 +99,10 @@ function setUpLayerControl() {
   for (k=0; k<config.overlayLayers.length; k++) {
     switch (config.overlayLayers[k].type) {
       case 'esri':
-        overlayLayers[config.overlayLayers[k].name] = esri.dynamicMapLayer(config.overlayLayers[k].options);
+        var overlayLayer = overlayLayers[config.overlayLayers[k].name] = esri.featureLayer(config.overlayLayers[k].options);
+        if (config.overlayLayers[k].isTownshipAndRange) {
+          setUpTownshipAndRangeLabels(overlayLayer)
+        }
         break;
       case 'vectorgrid':
         config.overlayLayers[k].options.rendererFactory = L.canvas.tile;
@@ -107,7 +110,54 @@ function setUpLayerControl() {
         break;
     }
   }
+
   L.control.layers(baseMaps, overlayLayers, {position: 'topleft', collapsed: true}).addTo(map);
+}
+
+function setUpTownshipAndRangeLabels(overlayLayer) {
+  var labels = {};
+
+  overlayLayer.on('createfeature', function(e){
+    var id = e.feature.id;
+    var feature = this.getFeature(id);
+    var center = feature.getBounds().getCenter();
+    var label = L.marker(center, {
+      icon: L.divIcon({
+        iconSize: [100,20],
+        className: 'toRaLabel',
+        html: e.feature.properties.TWNSHPLAB
+      })
+    }).addTo(map);
+    labels[id] = label;
+  });
+
+  map.on('zoomstart', function() {
+    $('.toRaLabel').hide();
+  });
+
+  map.on('zoomend', function() {
+    var zoom = map.getZoom();
+    if (zoom > 10) {
+      $('.toRaLabel').show();
+      $('.toRaLabel').removeClass('leaflet-interactive');
+    } else {
+      $('.toRaLabel').hide();
+    }
+  });
+
+  overlayLayer.on('addfeature', function(e){
+    var label = labels[e.feature.id];
+    if(label){
+      label.addTo(map);
+    }
+  });
+
+  overlayLayer.on('removefeature', function(e){
+    var label = labels[e.feature.id];
+    if(label){
+      map.removeLayer(label);
+    }
+  });
 }
 
 function setUpAboutControl() {

@@ -40,15 +40,20 @@ export var config = {
   overlayLayers: [
     {
       options: {
-        url: 'https://gis.blm.gov/arcgis/rest/services/Cadastral/BLM_Natl_PLSS_CadNSDI/MapServer',
+        url: 'https://gis.blm.gov/arcgis/rest/services/Cadastral/BLM_Natl_PLSS_CadNSDI/MapServer/1',
+        style: function() {
+          return {
+            color: 'grey',
+            fill: false
+          }
+        },
         layers: [1],
         opacity: 0.8,
         pane: 'trgrid'
       },
       color: '#FB3231',
-      get name () {
-        return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> Township and Range Grid'
-      },
+      name: 'Township and Range Grid',
+      isTownshipAndRange: true,
       type: 'esri'
     },
     {
