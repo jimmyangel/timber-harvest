@@ -47,7 +47,7 @@ export var config = {
             fill: false
           }
         },
-        layers: [1],
+        minZoom: 11,
         opacity: 0.8,
         pane: 'trgrid'
       },

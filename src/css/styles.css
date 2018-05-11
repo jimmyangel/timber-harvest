@@ -218,7 +218,18 @@ ul.legend-items li span {
 }
 
 .toRaLabel {
-  display: none;
   text-align: center;
   font-size: 14px;
 }
+
+*.leaflet-control-layers-selector[disabled] + span {
+  color: gray;
+}
+
+/*.leaflet-control-layers-selector[disabled] + span {
+  display: none;
+}
+
+.leaflet-control-layers-selector[disabled] {
+  display: none;
+}*/

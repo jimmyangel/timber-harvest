@@ -99,9 +99,9 @@ function setUpLayerControl() {
   for (k=0; k<config.overlayLayers.length; k++) {
     switch (config.overlayLayers[k].type) {
       case 'esri':
-        var overlayLayer = overlayLayers[config.overlayLayers[k].name] = esri.featureLayer(config.overlayLayers[k].options);
+        var oLayer = overlayLayers[config.overlayLayers[k].name] = esri.featureLayer(config.overlayLayers[k].options);
         if (config.overlayLayers[k].isTownshipAndRange) {
-          setUpTownshipAndRangeLabels(overlayLayer)
+            setUpTownshipAndRangeLabels(oLayer);
         }
         break;
       case 'vectorgrid':
@@ -129,20 +129,6 @@ function setUpTownshipAndRangeLabels(overlayLayer) {
       })
     }).addTo(map);
     labels[id] = label;
-  });
-
-  map.on('zoomstart', function() {
-    $('.toRaLabel').hide();
-  });
-
-  map.on('zoomend', function() {
-    var zoom = map.getZoom();
-    if (zoom > 10) {
-      $('.toRaLabel').show();
-      $('.toRaLabel').removeClass('leaflet-interactive');
-    } else {
-      $('.toRaLabel').hide();
-    }
   });
 
   overlayLayer.on('addfeature', function(e){
@@ -259,7 +245,7 @@ function displayTimberHarvestDataLayer() {
       showFeaturesForRange();
     });
 
-    map.flyToBounds(timberHarvestDataLayer.getBounds());
+    map.fitBounds(timberHarvestDataLayer.getBounds());
     $('.fromToYear').on('input', function() {
       NProgress.remove();
       utils.resetPlaybackControl()
