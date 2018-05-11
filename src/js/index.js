@@ -25,7 +25,7 @@ NProgress.configure({showSpinner: false, trickle: false, minimum: 0.001});
 var spinner = new Spinner(config.spinnerOpts);
 spinner.spin($('#spinner')[0]);
 
-var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [-122.0252, 44.5357], zoom: 9, minZoom: 8, maxBounds: [[40, -129], [50, -109]]});
+var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [-119, 45], zoom: 9, minZoom: 8, maxBounds: [[40, -129], [50, -109]]});
 
 map.createPane('trgrid');
 map.getPane('trgrid').style.zIndex = 650;
