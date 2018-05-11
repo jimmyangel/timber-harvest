@@ -14,7 +14,7 @@ import {config} from './config.js';
 import * as utils from './utils.js';
 
 import infoHeader from '../templates/infoHeader.hbs';
-import infoContentItem from '../templates/infoContentItem.hbs';
+import infoContent from '../templates/infoContent.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
 
 var NProgress = require('nprogress');
@@ -52,21 +52,21 @@ function setUpInfoPanel() {
   };
 
   info.update = function (layers) {
-    var infoItems;
     if (layers) {
-      infoItems = '';
+      var infoItems = [];
       layers.forEach(function(l) {
-        infoItems += infoContentItem({
+        infoItems.push({
           saleName: (l.feature.properties.SALE_NAME ? l.feature.properties.SALE_NAME : 'N/A'),
           activity: l.feature.properties.ACTIVITY_N.replace(/ *\([^)]*\) */g, ''),
           acres: l.feature.properties.GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
           datePlanned: (new Date(l.feature.properties.DATE_PLANN).toLocaleDateString()),
           dateAccomplished: (new Date(l.feature.properties.DATE_ACCOM).toLocaleDateString()),
-          dateCompleted: (new Date(l.feature.properties.DATE_COMPL).toLocaleDateString())
+          dateCompleted: (new Date(l.feature.properties.DATE_COMPL).toLocaleDateString()),
+          sortDate: new Date(l.feature.properties.DATE_COMPL)
         });
       });
       $('#tipToClick').hide();
-      $('#infoContent').html(infoItems);
+      $('#infoContent').html(infoContent({records: infoItems.sort(function(a, b) {return a.sortDate - b.sortDate;})}));
     } else {
       $('#infoContent').empty()
       $('#tipToClick').show();
@@ -223,12 +223,15 @@ function displayTimberHarvestDataLayer() {
       attribution: '<a href="https://data.fs.usda.gov/geodata/edw/datasets.php?xmlKeyword=Timber+Harvests">U.S. Forest Service</a>'
     });
 
-    var startValue;
-    var stopValue;
-    var movingValue;
+    // Must initialize these in case stop is pressed before play
+    var values = $('.fromToYear').val().split(',');
+    var startValue = parseInt(values[0]);
+    var stopValue = parseInt(values[1]);
+    var movingValue = startValue;
     utils.setupPlaybackControlActions(function() {
       NProgress.start();
-      var values = $('.fromToYear').val().split(',');
+      // Update values
+      values = $('.fromToYear').val().split(',');
       startValue = parseInt(values[0]);
       stopValue = parseInt(values[1]);
       movingValue = startValue;
