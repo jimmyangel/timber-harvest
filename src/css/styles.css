@@ -222,6 +222,21 @@ ul.legend-items li span {
   font-size: 14px;
 }
 
+.leaflet-control-layers-toggle {
+	 width: 26px;
+	 height: 26px;
+   background-size: 20px 20px;
+}
+.leaflet-retina .leaflet-control-layers-toggle {
+  width: 26px;
+  height: 26px;
+  background-size: 20px 20px;
+}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 30px;
+  height: 30px;
+}
+
 *.leaflet-control-layers-selector[disabled] + span {
   color: gray;
 }
