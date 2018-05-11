@@ -35,6 +35,7 @@ var highlightedFeature;
 var timberHarvestDataLayer;
 
 setUpInfoPanel();
+setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
 
@@ -159,6 +160,20 @@ function setUpAboutControl() {
     map.fire('modal', {
       content: aboutModal({version: config.versionString})
     });
+    return false;
+  });
+}
+
+function setUpResetControl() {
+  var resetControl = L.control({position: 'topleft'});
+  resetControl.onAdd = function () {
+    this._div = L.DomUtil.create('div', 'leaflet-control leaflet-bar reset');
+    this._div.innerHTML = '<a id="resetControl" style="font-size: large;" href="#" title="Reset View"><i class="fa fa-refresh"></i></a>';
+    return this._div;
+  };
+  resetControl.addTo(map);
+  $('#resetControl').click(function() {
+    map.flyToBounds(timberHarvestDataLayer.getBounds());
     return false;
   });
 }
