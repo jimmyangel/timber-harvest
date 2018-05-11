@@ -126,7 +126,8 @@ function setUpTownshipAndRangeLabels(overlayLayer) {
         iconSize: [100,20],
         className: 'toRaLabel',
         html: e.feature.properties.TWNSHPLAB
-      })
+      }),
+      interactive: false
     }).addTo(map);
     labels[id] = label;
   });

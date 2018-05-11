@@ -49,6 +49,7 @@ export var config = {
         },
         minZoom: 11,
         opacity: 0.8,
+        interactive: false,
         pane: 'trgrid'
       },
       color: '#FB3231',
