@@ -25,7 +25,7 @@ NProgress.configure({showSpinner: false, trickle: false, minimum: 0.001});
 var spinner = new Spinner(config.spinnerOpts);
 spinner.spin($('#spinner')[0]);
 
-var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [-119, 45], zoom: 9, minZoom: 8, maxBounds: [[40, -129], [50, -109]]});
+var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [44.04382, -120.58593], zoom: 9, minZoom: 8, maxBounds: [[41, -126], [47, -115]]});
 
 map.createPane('trgrid');
 map.getPane('trgrid').style.zIndex = 650;
@@ -259,7 +259,7 @@ function displayTimberHarvestDataLayer() {
       showFeaturesForRange();
     });
 
-    map.fitBounds(timberHarvestDataLayer.getBounds());
+    map.flyToBounds(timberHarvestDataLayer.getBounds());
     $('.fromToYear').on('input', function() {
       NProgress.remove();
       utils.resetPlaybackControl()
