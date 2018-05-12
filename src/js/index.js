@@ -16,6 +16,7 @@ import * as utils from './utils.js';
 import infoHeader from '../templates/infoHeader.hbs';
 import infoContent from '../templates/infoContent.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
+import standPopUp from '../templates/standPopUp.hbs';
 
 var NProgress = require('nprogress');
 var esri = require('esri-leaflet');
@@ -27,19 +28,46 @@ spinner.spin($('#spinner')[0]);
 
 var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [44.04382, -120.58593], zoom: 9, minZoom: 8, maxBounds: [[41, -126], [47, -115]]});
 
-map.createPane('trgrid');
-map.getPane('trgrid').style.zIndex = 650;
-
 var info = L.control();
 var highlightedFeature;
 var timberHarvestDataLayer;
 
+setUpCustomPanes();
 setUpInfoPanel();
 setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
 
 displayTimberHarvestDataLayer();
+
+function setUpCustomPanes() {
+  map.createPane('trgrid');
+  map.getPane('trgrid').style.zIndex = 650;
+  var mainPane = map.createPane('mainpane');
+  map.getPane('mainpane').style.zIndex = 400;
+
+  // The below is a hack to handle click throughs (https://gist.github.com/perliedman/84ce01954a1a43252d1b917ec925b3dd)
+  L.DomEvent.on(mainPane, 'click', function(e) {
+    if (e._stopped) { return; }
+
+    var target = e.target;
+    var stopped;
+    var removed;
+    var ev = new MouseEvent(e.type, e)
+
+    removed = {node: target, display: target.style.display};
+    target.style.display = 'none';
+    target = document.elementFromPoint(e.clientX, e.clientY);
+
+    if (target && target !== mainPane) {
+      stopped = !target.dispatchEvent(ev);
+      if (stopped || ev._stopped) {
+        L.DomEvent.stop(e);
+      }
+    }
+    removed.node.style.display = removed.display;
+  });
+}
 
 function setUpInfoPanel() {
   info.onAdd = function () {
@@ -107,7 +135,15 @@ function setUpLayerControl() {
         break;
       case 'vectorgrid':
         config.overlayLayers[k].options.rendererFactory = L.canvas.tile;
-        overlayLayers[config.overlayLayers[k].name] = L.vectorGrid.protobuf(config.overlayLayers[k].url, config.overlayLayers[k].options)
+        var gLayer = overlayLayers[config.overlayLayers[k].name] = L.vectorGrid.protobuf(config.overlayLayers[k].url, config.overlayLayers[k].options);
+        gLayer.bindPopup(function(l) {
+          // We need to see if the stand is on top of a harvest polygon to update info
+          var p = leafletPip.pointInLayer(this.getLatLng(), timberHarvestDataLayer);
+          if (p) {
+            info.update(p);
+          }
+          return standPopUp({standId: l.properties.STAND, year: l.properties.YR_ORIGIN, size: config.treeSizeClass[l.properties.SIZE_CLASS]});
+        });
         break;
     }
   }
@@ -213,6 +249,7 @@ function showFeaturesForRange() {
   var fromToYear = $('.fromToYear').val().split(',');
   $('#fromLabel').text(fromToYear[0]);
   $('#toLabel').text(fromToYear[1]);
+
   timberHarvestDataLayer.eachLayer(function(layer) {
     var y = (new Date(layer.feature.properties.DATE_COMPL)).getFullYear();
     if ((y >= fromToYear[0]) && (y<=fromToYear[1])) {
@@ -234,6 +271,7 @@ function displayTimberHarvestDataLayer() {
   $.getJSON(config.dataPaths.willamette, function(data) {
     timberHarvestDataLayer = L.geoJson(data, {
       style: config.styles.featureStyle,
+      pane: 'mainpane',
       onEachFeature: onEachFeature,
       attribution: '<a href="https://data.fs.usda.gov/geodata/edw/datasets.php?xmlKeyword=Timber+Harvests">U.S. Forest Service</a>'
     });
@@ -276,7 +314,7 @@ function displayTimberHarvestDataLayer() {
     setDataLayerOpacity();
     showFeaturesForRange();
     spinner.stop();
-    //NProgress.done();
+    NProgress.done();
     map.on('click', resetHighlight);
     $(document).keyup(function(e) {
       if (highlightedFeature && e.which == 27) resetHighlight();

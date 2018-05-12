@@ -58,6 +58,7 @@ export var config = {
       type: 'esri'
     },
     {
+      //url: 'http://127.0.0.1:9090/{z}/{x}/{y}.pbf',
       url: 'https://tiles.oregonhowl.org/unharvested/willamette/{z}/{x}/{y}.pbf',
       options: {
         vectorTileLayerStyles: {
@@ -70,7 +71,8 @@ export var config = {
             fill: true
           }
         },
-        pane: 'overlayPane',
+        interactive: true,
+        pane: 'mainpane',
         maxNativeZoom: 14,
         minNativeZoom: 9
       },
@@ -98,9 +100,26 @@ export var config = {
       weight: 3
     }
   },
-  spinnerOpts : {
+  spinnerOpts: {
     color: '#939393',
     opacity: 0.1,
     shadow: true
+  },
+  treeSizeClass: {
+    0.0: 'N/A',
+    1.0: 'Seedlings',
+    1.5: 'Seedlings and saplings mixed',
+    2.0: 'Saplings, trees 1.0 to 4.9 inches DBH',
+    2.5: 'Saplings and poles mixed',
+    3.0: 'Poles, trees 5.0 to 8.9 inches DBH',
+    3.5: 'Poles and small trees mixed',
+    4.0: 'Small trees, 9.0 to 20.9 inches DBH',
+    4.5: 'Small trees and medium trees mixed',
+    5.0: 'Medium trees, 21.0 to 31.9 inches DBH',
+    5.5: 'Medium trees and large trees mixed',
+    6.0: 'Large trees, 32.0 to 47.9 inches DBH',
+    6.5: 'Large trees and giant trees mixed',
+    7.0: 'Giant trees, 48.0 or greater inches DBH',
+    9.9: 'Trees 21.0 inches DBH and larger'
   }
 }
