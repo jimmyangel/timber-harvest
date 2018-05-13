@@ -26,11 +26,13 @@ NProgress.configure({showSpinner: false, trickle: false, minimum: 0.001});
 var spinner = new Spinner(config.spinnerOpts);
 spinner.spin($('#spinner')[0]);
 
-var map = L.map('map', {preferCanvas: true, fullscreenControl: true, center: [44.04382, -120.58593], zoom: 9, minZoom: 8, maxBounds: [[41, -126], [47, -115]]});
+var map = L.map('map', {fullscreenControl: true, center: [44.04382, -120.58593], zoom: 9, minZoom: 8, maxBounds: [[41, -126], [47, -115]]});
 
 var info = L.control();
 var highlightedFeature;
 var timberHarvestDataLayer;
+
+var timberHarvestPbfLayer;
 
 setUpCustomPanes();
 setUpInfoPanel();
@@ -136,14 +138,20 @@ function setUpLayerControl() {
       case 'vectorgrid':
         config.overlayLayers[k].options.rendererFactory = L.canvas.tile;
         var gLayer = overlayLayers[config.overlayLayers[k].name] = L.vectorGrid.protobuf(config.overlayLayers[k].url, config.overlayLayers[k].options);
-        gLayer.bindPopup(function(l) {
+        gLayer.on({
+          click: function (e) {
+            map.openPopup('hola', e.latlng);
+            console.log('unharvested', e);
+          }
+        });
+        /*gLayer.bindPopup(function(l) {
           // We need to see if the stand is on top of a harvest polygon to update info
-          var p = leafletPip.pointInLayer(this.getLatLng(), timberHarvestDataLayer);
+          //var p = leafletPip.pointInLayer(this.getLatLng(), timberHarvestDataLayer);
           if (p) {
             info.update(p);
           }
           return standPopUp({standId: l.properties.STAND, year: l.properties.YR_ORIGIN, size: config.treeSizeClass[l.properties.SIZE_CLASS]});
-        });
+        });*/
         break;
     }
   }
@@ -268,6 +276,39 @@ function setDataLayerOpacity() {
 }
 
 function displayTimberHarvestDataLayer() {
+  var vectorTileOptions = {
+    vectorTileLayerStyles: {
+      timberharvest: {
+        weight: 1,
+        opacity: 1,
+        color: '#FF0000',
+        fillColor: '#FF0000',
+        fillOpacity: 0.7,
+        fill: true,
+        className: 'timberharvest'
+      }
+    },
+    interactive: true,
+    pane: 'mainpane',
+    maxNativeZoom: 14,
+    minNativeZoom: 9,
+    rendererFactory: L.canvas.tile,
+    getFeatureId: function(f) {
+      return f.properties.assignedId;
+    }
+  }
+
+  timberHarvestPbfLayer = L.vectorGrid.protobuf('http://10.0.0.70:9090/{z}/{x}/{y}.pbf', vectorTileOptions).addTo(map);
+
+  timberHarvestPbfLayer.on({
+    click: function (e) {
+      console.log('timberharvest', e);
+      map.openPopup('hola', e.latlng);
+    }
+  });
+
+  spinner.stop();
+  /*
   $.getJSON(config.dataPaths.willamette, function(data) {
     timberHarvestDataLayer = L.geoJson(data, {
       style: config.styles.featureStyle,
@@ -320,4 +361,5 @@ function displayTimberHarvestDataLayer() {
       if (highlightedFeature && e.which == 27) resetHighlight();
     });
   });
+  */
 }

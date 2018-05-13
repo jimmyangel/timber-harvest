@@ -248,3 +248,7 @@ ul.legend-items li span {
 .leaflet-control-layers-selector[disabled] {
   display: none;
 }*/
+
+/*.leaflet-mainpane-pane>.leaflet-layer>.leaflet-tile-container>canvas.leaflet-tile {
+  cursor: crosshair;
+}*/

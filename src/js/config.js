@@ -68,7 +68,8 @@ export var config = {
             color: '#009E73',
             fillColor: '#009E73',
             fillOpacity: 0.7,
-            fill: true
+            fill: true,
+            className: 'vegetation'
           }
         },
         interactive: true,
