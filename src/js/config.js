@@ -84,6 +84,10 @@ export var config = {
       type: 'vectorgrid'
     }
   ],
+  initialBounds: [
+    [43.35683, -122.74594],
+    [44.85711, -121.84289]
+  ],
   dataPaths: {
     willamette: 'data/timber-harvest-willamette-nf.json'
   },

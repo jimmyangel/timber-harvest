@@ -218,7 +218,8 @@ function setUpResetControl() {
   };
   resetControl.addTo(map);
   $('#resetControl').click(function() {
-    map.flyToBounds(timberHarvestDataLayer.getBounds());
+    map.closePopup();
+    map.flyToBounds(config.initialBounds);
     return false;
   });
 }
@@ -277,6 +278,9 @@ function setDataLayerOpacity() {
 }
 
 function displayTimberHarvestDataLayer() {
+
+  map.fitBounds(config.initialBounds);
+
   var vectorTileOptions = {
     vectorTileLayerStyles: {
       timberharvest: {
