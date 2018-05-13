@@ -51,6 +51,7 @@ function setUpCustomPanes() {
   // The below is a hack to handle click throughs (https://gist.github.com/perliedman/84ce01954a1a43252d1b917ec925b3dd)
   L.DomEvent.on(mainPane, 'click', function(e) {
     if (e._stopped) { return; }
+    console.log(e);
 
     var target = e.target;
     var stopped;
@@ -140,7 +141,7 @@ function setUpLayerControl() {
         var gLayer = overlayLayers[config.overlayLayers[k].name] = L.vectorGrid.protobuf(config.overlayLayers[k].url, config.overlayLayers[k].options);
         gLayer.on({
           click: function (e) {
-            map.openPopup('hola', e.latlng);
+            map.openPopup(standPopUp({standId: e.layer.properties.STAND, year: e.layer.properties.YR_ORIGIN, size: config.treeSizeClass[e.layer.properties.SIZE_CLASS]}), e.latlng, {closeOnClick: false});
             console.log('unharvested', e);
           }
         });
@@ -288,11 +289,12 @@ function displayTimberHarvestDataLayer() {
         className: 'timberharvest'
       }
     },
+    zIndex: 10,
     interactive: true,
     pane: 'mainpane',
     maxNativeZoom: 14,
     minNativeZoom: 9,
-    rendererFactory: L.canvas.tile,
+    rendererFactory: L.svg.tile,
     getFeatureId: function(f) {
       return f.properties.assignedId;
     }
@@ -302,8 +304,9 @@ function displayTimberHarvestDataLayer() {
 
   timberHarvestPbfLayer.on({
     click: function (e) {
+      //map.closePopup();
       console.log('timberharvest', e);
-      map.openPopup('hola', e.latlng);
+      //map.openPopup('hola', e.latlng);
     }
   });
 
