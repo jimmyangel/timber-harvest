@@ -34,6 +34,8 @@ var timberHarvestSelectData;
 
 var timberHarvestPbfLayer;
 
+var lastLayerEventTimeStamp;
+
 setUpCustomPanes();
 setUpInfoPanel();
 setUpResetControl();
@@ -51,7 +53,6 @@ function setUpCustomPanes() {
   // The below is a hack to handle click throughs (https://gist.github.com/perliedman/84ce01954a1a43252d1b917ec925b3dd)
   L.DomEvent.on(mainPane, 'click', function(e) {
     if (e._stopped) { return; }
-    console.log(e);
 
     var target = e.target;
     var stopped;
@@ -62,12 +63,13 @@ function setUpCustomPanes() {
     target.style.display = 'none';
     target = document.elementFromPoint(e.clientX, e.clientY);
 
-    if (target && target !== mainPane) { //TODO: do not punch through map -- add  && map
+    if (target && target !== mainPane) {
       stopped = !target.dispatchEvent(ev);
       if (stopped || ev._stopped) {
         L.DomEvent.stop(e);
       }
     }
+
     removed.node.style.display = removed.display;
   });
 }
@@ -142,17 +144,9 @@ function setUpLayerControl() {
         gLayer.on({
           click: function (e) {
             map.openPopup(standPopUp({standId: e.layer.properties.STAND, year: e.layer.properties.YR_ORIGIN, size: config.treeSizeClass[e.layer.properties.SIZE_CLASS]}), e.latlng, {closeOnClick: false});
-            console.log('unharvested', e);
+            lastLayerEventTimeStamp = e.originalEvent.timeStamp;
           }
         });
-        /*gLayer.bindPopup(function(l) {
-          // We need to see if the stand is on top of a harvest polygon to update info
-          //var p = leafletPip.pointInLayer(this.getLatLng(), timberHarvestDataLayer);
-          if (p) {
-            info.update(p);
-          }
-          return standPopUp({standId: l.properties.STAND, year: l.properties.YR_ORIGIN, size: config.treeSizeClass[l.properties.SIZE_CLASS]});
-        });*/
         break;
     }
   }
@@ -233,17 +227,6 @@ function highlightFeature(id) {
   highlightedFeature = id;
 
   timberHarvestPbfLayer.setFeatureStyle(id, getTimberHarvestLayerStyle(config.timberHarvestLayer.highlightedFeatureStyle));
-  /*highlightedFeature = e.target;
-  var layer = e.target;
-
-  layer.setStyle(config.styles.highlightedFeatureStyle);
-
-  if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-    layer.bringToFront();
-  }
-
-  //info.update(leafletPip.pointInLayer(e.latlng, timberHarvestDataLayer));
-  L.DomEvent.stopPropagation(e);*/
 }
 
 function resetHighlight() {
@@ -266,7 +249,6 @@ function showFeaturesForRange() {
     if ((y >= fromToYear[0]) && (y <= fromToYear[1])) {
       timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
     } else {
-      //console.log(s.assignedId);
       timberHarvestPbfLayer.setFeatureStyle(s.assignedId, {weight:0, fill: false});
     }
   });
@@ -286,7 +268,6 @@ function displaytimberHarvestPbfLayer() {
   $.getJSON('http://10.0.0.70:9090/timber-or-s-selection-data.json', function(data) {
 
     timberHarvestSelectData = data;
-    console.log(data.length);
 
     map.fitBounds(config.initialBounds);
 
@@ -295,10 +276,9 @@ function displaytimberHarvestPbfLayer() {
 
     timberHarvestPbfLayer.on({
       click: function (e) {
+        console.log('timberharvest', e.originalEvent.timeStamp);
         highlightFeature(e.layer.properties.assignedId);
-        //map.closePopup();
-        console.log('timberharvest', e);
-        //map.openPopup('hola', e.latlng);
+        lastLayerEventTimeStamp = e.originalEvent.timeStamp;
       }
     });
 
@@ -341,7 +321,13 @@ function displaytimberHarvestPbfLayer() {
     spinner.stop();
     NProgress.done();
 
-    //map.on('click', resetHighlight);
+    map.on('click', function(e) {
+      // This is a hack but is the only way I found to deal with canvas layer event bubbling issues
+      if ((e.originalEvent.timeStamp - lastLayerEventTimeStamp) > 1) {
+        map.closePopup();
+        resetHighlight();
+      }
+    });
     $(document).keyup(function(e) {
       if ((highlightedFeature !== undefined) && (e.which == 27)) resetHighlight();
     });
