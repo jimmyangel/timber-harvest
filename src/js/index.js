@@ -30,7 +30,7 @@ var map = L.map('map', {fullscreenControl: true, center: [44.04382, -120.58593],
 
 var info = L.control();
 var highlightedFeature;
-var timberHarvestDataLayer;
+var timberHarvestSelectData;
 
 var timberHarvestPbfLayer;
 
@@ -40,7 +40,7 @@ setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
 
-displayTimberHarvestDataLayer();
+displaytimberHarvestPbfLayer();
 
 function setUpCustomPanes() {
   map.createPane('trgrid');
@@ -62,7 +62,7 @@ function setUpCustomPanes() {
     target.style.display = 'none';
     target = document.elementFromPoint(e.clientX, e.clientY);
 
-    if (target && target !== mainPane) {
+    if (target && target !== mainPane) { //TODO: do not punch through map -- add  && map
       stopped = !target.dispatchEvent(ev);
       if (stopped || ev._stopped) {
         L.DomEvent.stop(e);
@@ -76,8 +76,8 @@ function setUpInfoPanel() {
   info.onAdd = function () {
     this._div = L.DomUtil.create('div', 'info');
     this._div.innerHTML = infoHeader({
-      layerColor: config.styles.featureStyle.fillColor,
-      layerOpacity: (config.styles.featureStyle.fillOpacity * 100).toFixed()
+      layerColor: config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillColor,
+      layerOpacity: (config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillOpacity * 100).toFixed()
     });
     L.DomEvent.disableClickPropagation(this._div);
     return this._div;
@@ -219,16 +219,21 @@ function setUpResetControl() {
   resetControl.addTo(map);
   $('#resetControl').click(function() {
     map.closePopup();
+    resetHighlight();
     map.flyToBounds(config.initialBounds);
     return false;
   });
 }
 
-function highlightFeature(e) {
-  if (highlightedFeature) {
+function highlightFeature(id) {
+  // Unfortunately id can be 0, so we need to test for undefined
+  if (highlightedFeature !== undefined) {
     resetHighlight();
   }
-  highlightedFeature = e.target;
+  highlightedFeature = id;
+
+  timberHarvestPbfLayer.setFeatureStyle(id, getTimberHarvestLayerStyle(config.timberHarvestLayer.highlightedFeatureStyle));
+  /*highlightedFeature = e.target;
   var layer = e.target;
 
   layer.setStyle(config.styles.highlightedFeatureStyle);
@@ -237,21 +242,16 @@ function highlightFeature(e) {
     layer.bringToFront();
   }
 
-  info.update(leafletPip.pointInLayer(e.latlng, timberHarvestDataLayer));
-  L.DomEvent.stopPropagation(e);
+  //info.update(leafletPip.pointInLayer(e.latlng, timberHarvestDataLayer));
+  L.DomEvent.stopPropagation(e);*/
 }
 
 function resetHighlight() {
-  if (highlightedFeature) {
-    timberHarvestDataLayer.resetStyle(highlightedFeature);
+  if (highlightedFeature !== undefined) {
+    timberHarvestPbfLayer.setFeatureStyle(highlightedFeature, getTimberHarvestLayerStyle(config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest));
     info.update();
   }
-}
-
-function onEachFeature(feature, layer) {
-  layer.on({
-    click: highlightFeature
-  });
+  highlightedFeature = undefined;
 }
 
 function showFeaturesForRange() {
@@ -260,68 +260,46 @@ function showFeaturesForRange() {
   $('#fromLabel').text(fromToYear[0]);
   $('#toLabel').text(fromToYear[1]);
 
-  timberHarvestDataLayer.eachLayer(function(layer) {
-    var y = (new Date(layer.feature.properties.DATE_COMPL)).getFullYear();
-    if ((y >= fromToYear[0]) && (y<=fromToYear[1])) {
-      map.addLayer(layer);
+  var style = getTimberHarvestLayerStyle(config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest);
+  timberHarvestSelectData.forEach(function(s) {
+    var y = (new Date(s.DATE_COMPL)).getFullYear();
+    if ((y >= fromToYear[0]) && (y <= fromToYear[1])) {
+      timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
     } else {
-      map.removeLayer(layer);
+      //console.log(s.assignedId);
+      timberHarvestPbfLayer.setFeatureStyle(s.assignedId, {weight:0, fill: false});
     }
   });
 }
 
-function setDataLayerOpacity() {
-  var opacity = $('#transparency').val() / 100;
-  timberHarvestDataLayer.setStyle({
-    fillOpacity: opacity,
-    opacity: Math.min(opacity * (config.styles.featureStyle.opacity/config.styles.featureStyle.fillOpacity), 1)});
+function getTimberHarvestLayerStyle(sourceStyle) {
+  var s = Object.assign({}, sourceStyle);
+  s.fillOpacity = $('#transparency').val() / 100;
+  s.opacity = Math.min(s.fillOpacity *
+    (config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.opacity /
+      config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillOpacity), 1);
+  return s;
 }
 
-function displayTimberHarvestDataLayer() {
+function displaytimberHarvestPbfLayer() {
 
-  map.fitBounds(config.initialBounds);
+  $.getJSON('http://10.0.0.70:9090/timber-or-s-selection-data.json', function(data) {
 
-  var vectorTileOptions = {
-    vectorTileLayerStyles: {
-      timberharvest: {
-        weight: 1,
-        opacity: 1,
-        color: '#FF0000',
-        fillColor: '#FF0000',
-        fillOpacity: 0.7,
-        fill: true,
-        className: 'timberharvest'
+    timberHarvestSelectData = data;
+    console.log(data.length);
+
+    map.fitBounds(config.initialBounds);
+
+    config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
+    timberHarvestPbfLayer = L.vectorGrid.protobuf(config.timberHarvestLayer.url, config.timberHarvestLayer.options).addTo(map);
+
+    timberHarvestPbfLayer.on({
+      click: function (e) {
+        highlightFeature(e.layer.properties.assignedId);
+        //map.closePopup();
+        console.log('timberharvest', e);
+        //map.openPopup('hola', e.latlng);
       }
-    },
-    zIndex: 10,
-    interactive: true,
-    pane: 'mainpane',
-    maxNativeZoom: 14,
-    minNativeZoom: 9,
-    rendererFactory: L.svg.tile,
-    getFeatureId: function(f) {
-      return f.properties.assignedId;
-    }
-  }
-
-  timberHarvestPbfLayer = L.vectorGrid.protobuf('http://10.0.0.70:9090/{z}/{x}/{y}.pbf', vectorTileOptions).addTo(map);
-
-  timberHarvestPbfLayer.on({
-    click: function (e) {
-      //map.closePopup();
-      console.log('timberharvest', e);
-      //map.openPopup('hola', e.latlng);
-    }
-  });
-
-  spinner.stop();
-  /*
-  $.getJSON(config.dataPaths.willamette, function(data) {
-    timberHarvestDataLayer = L.geoJson(data, {
-      style: config.styles.featureStyle,
-      pane: 'mainpane',
-      onEachFeature: onEachFeature,
-      attribution: '<a href="https://data.fs.usda.gov/geodata/edw/datasets.php?xmlKeyword=Timber+Harvests">U.S. Forest Service</a>'
     });
 
     // Must initialize these in case stop is pressed before play
@@ -350,23 +328,23 @@ function displayTimberHarvestDataLayer() {
       showFeaturesForRange();
     });
 
-    map.fitBounds(timberHarvestDataLayer.getBounds());
     $('.fromToYear').on('input', function() {
       NProgress.remove();
       utils.resetPlaybackControl()
       showFeaturesForRange();
     });
     $('#transparency').on('input', function() {
-      setDataLayerOpacity();
+      showFeaturesForRange();
     });
-    setDataLayerOpacity();
     showFeaturesForRange();
+
     spinner.stop();
     NProgress.done();
-    map.on('click', resetHighlight);
+
+    //map.on('click', resetHighlight);
     $(document).keyup(function(e) {
-      if (highlightedFeature && e.which == 27) resetHighlight();
+      if ((highlightedFeature !== undefined) && (e.which == 27)) resetHighlight();
     });
+
   });
-  */
 }

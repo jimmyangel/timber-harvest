@@ -91,18 +91,37 @@ export var config = {
   dataPaths: {
     willamette: 'data/timber-harvest-willamette-nf.json'
   },
-  styles: {
-    featureStyle: {
-      weight: 1,
-      opacity: 1,
-      color: '#d55e00',
-      dashArray: '3',
-      fillOpacity: 0.7,
-      fillColor: '#d55e00'
+  timberHarvestLayer: {
+    url: 'http://10.0.0.70:9090/{z}/{x}/{y}.pbf',
+    options: {
+      vectorTileLayerStyles: {
+        timberharvest: {
+          weight: 1,
+          opacity: 1,
+          color: '#d55e00',
+          dashArray: '3',
+          fillOpacity: 0.7,
+          fillColor: '#d55e00',
+          fill: true
+        }
+      },
+      zIndex: 10,
+      interactive: true,
+      pane: 'mainpane',
+      maxNativeZoom: 14,
+      minNativeZoom: 9,
+      getFeatureId: function(f) {
+        return f.properties.assignedId;
+      }
     },
     highlightedFeatureStyle: {
-      color: 'gray',
-      weight: 3
+      weight: 3,
+      opacity: 1,
+      color: 'black',
+      dashArray: '3',
+      fillOpacity: 0.7,
+      fillColor: '#d55e00',
+      fill: true
     }
   },
   spinnerOpts: {
