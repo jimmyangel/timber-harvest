@@ -275,7 +275,7 @@ function getTimberHarvestLayerStyle(sourceStyle) {
 
 function displaytimberHarvestPbfLayer() {
 
-  $.getJSON('http://10.0.0.70:9090/timber-or-s-selection-data.json', function(data) {
+  $.getJSON(config.dataPaths.willamette, function(data) {
 
     timberHarvestSelectData = data;
 
@@ -335,7 +335,6 @@ function displaytimberHarvestPbfLayer() {
       if ((e.originalEvent.timeStamp - lastLayerEventTimeStamp) > 20) {
         map.closePopup();
         resetHighlight();
-        console.log('hey');
       }
     });
 

@@ -58,7 +58,6 @@ export var config = {
       type: 'esri'
     },
     {
-      //url: 'http://127.0.0.1:9090/{z}/{x}/{y}.pbf',
       url: 'https://tiles.oregonhowl.org/unharvested/willamette/{z}/{x}/{y}.pbf',
       options: {
         vectorTileLayerStyles: {
@@ -89,10 +88,10 @@ export var config = {
     [44.85711, -121.84289]
   ],
   dataPaths: {
-    willamette: 'data/timber-harvest-willamette-nf.json'
+    willamette: 'https://tiles.oregonhowl.org/timber-harvest/willamette/timber-or-s-selection-data.json'
   },
   timberHarvestLayer: {
-    url: 'http://10.0.0.70:9090/{z}/{x}/{y}.pbf',
+    url: 'https://tiles.oregonhowl.org/timber-harvest/willamette/{z}/{x}/{y}.pbf',
     options: {
       vectorTileLayerStyles: {
         timberharvest: {
