@@ -4,7 +4,6 @@ import '../favicon.ico';
 
 import L from 'leaflet';
 import 'leaflet-fullscreen';
-import leafletPip from '@mapbox/leaflet-pip';
 import 'leaflet.vectorgrid';
 import 'multirange';
 import 'leaflet-modal';
@@ -14,7 +13,7 @@ import {config} from './config.js';
 import * as utils from './utils.js';
 
 import infoHeader from '../templates/infoHeader.hbs';
-import infoContent from '../templates/infoContent.hbs';
+import infoContentItem from '../templates/infoContentItem.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
 
@@ -29,11 +28,9 @@ spinner.spin($('#spinner')[0]);
 var map = L.map('map', {fullscreenControl: true, center: [44.04382, -120.58593], zoom: 9, minZoom: 8, maxBounds: [[41, -126], [47, -115]]});
 
 var info = L.control();
-var highlightedFeature;
+var highlightedFeatures = [];
 var timberHarvestSelectData;
-
 var timberHarvestPbfLayer;
-
 var lastLayerEventTimeStamp;
 
 setUpCustomPanes();
@@ -85,26 +82,9 @@ function setUpInfoPanel() {
     return this._div;
   };
 
-  info.update = function (layers) {
-    if (layers) {
-      var infoItems = [];
-      layers.forEach(function(l) {
-        infoItems.push({
-          saleName: (l.feature.properties.SALE_NAME ? l.feature.properties.SALE_NAME : 'N/A'),
-          activity: l.feature.properties.ACTIVITY_N.replace(/ *\([^)]*\) */g, ''),
-          acres: l.feature.properties.GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
-          datePlanned: (new Date(l.feature.properties.DATE_PLANN).toLocaleDateString()),
-          dateAccomplished: (new Date(l.feature.properties.DATE_ACCOM).toLocaleDateString()),
-          dateCompleted: (new Date(l.feature.properties.DATE_COMPL).toLocaleDateString()),
-          sortDate: new Date(l.feature.properties.DATE_COMPL)
-        });
-      });
-      $('#tipToClick').hide();
-      $('#infoContent').html(infoContent({records: infoItems.sort(function(a, b) {return a.sortDate - b.sortDate;})}));
-    } else {
-      $('#infoContent').empty()
-      $('#tipToClick').show();
-    }
+  info.update = function () {
+    $('#infoContent').empty();
+    $('#tipToClick').show();
   };
 
   info.addTo(map);
@@ -143,6 +123,7 @@ function setUpLayerControl() {
         var gLayer = overlayLayers[config.overlayLayers[k].name] = L.vectorGrid.protobuf(config.overlayLayers[k].url, config.overlayLayers[k].options);
         gLayer.on({
           click: function (e) {
+            resetHighlight();
             map.openPopup(standPopUp({standId: e.layer.properties.STAND, year: e.layer.properties.YR_ORIGIN, size: config.treeSizeClass[e.layer.properties.SIZE_CLASS]}), e.latlng, {closeOnClick: false});
             lastLayerEventTimeStamp = e.originalEvent.timeStamp;
           }
@@ -219,22 +200,51 @@ function setUpResetControl() {
   });
 }
 
-function highlightFeature(id) {
-  // Unfortunately id can be 0, so we need to test for undefined
-  if (highlightedFeature !== undefined) {
+function highlightFeature(e) {
+
+  // Not great but the best I can do rigth now to distinguish mutiple features click thrus vs a separate click altogether
+  if ((e.originalEvent.timeStamp - lastLayerEventTimeStamp) > 20) {
     resetHighlight();
   }
-  highlightedFeature = id;
 
-  timberHarvestPbfLayer.setFeatureStyle(id, getTimberHarvestLayerStyle(config.timberHarvestLayer.highlightedFeatureStyle));
+  var sortDate = (new Date(e.layer.properties.DATE_COMPL)).toISOString();
+  var content = infoContentItem({
+    saleName: (e.layer.properties.SALE_NAME ? e.layer.properties.SALE_NAME : 'N/A'),
+    activity: e.layer.properties.ACTIVITY_N.replace(/ *\([^)]*\) */g, ''),
+    acres: e.layer.properties.GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
+    datePlanned: (new Date(e.layer.properties.DATE_PLANN).toLocaleDateString()),
+    dateAccomplished: (new Date(e.layer.properties.DATE_ACCOM).toLocaleDateString()),
+    dateCompleted: (new Date(e.layer.properties.DATE_COMPL).toLocaleDateString()),
+    sortDate: sortDate
+  });
+
+  if ($('.infoContentItem').length === 0) {
+    $('#infoContent').append(content);
+  } else {
+    $('.infoContentItem').each(function(i){
+      if ($(this).attr('data-sortby') >= sortDate) {
+        $(this).before(content);
+        return false;
+      } else {
+        if (i === $('.infoContentItem').length - 1) {
+          $(this).after(content);
+          return false;
+        }
+      }
+    });
+  }
+
+  highlightedFeatures.push(e.layer.properties.assignedId);
+
+  timberHarvestPbfLayer.setFeatureStyle(e.layer.properties.assignedId, getTimberHarvestLayerStyle(config.timberHarvestLayer.highlightedFeatureStyle));
 }
 
 function resetHighlight() {
-  if (highlightedFeature !== undefined) {
+  highlightedFeatures.forEach(function(highlightedFeature) {
     timberHarvestPbfLayer.setFeatureStyle(highlightedFeature, getTimberHarvestLayerStyle(config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest));
-    info.update();
-  }
-  highlightedFeature = undefined;
+  });
+  $('#infoContent').empty();
+  highlightedFeatures = [];
 }
 
 function showFeaturesForRange() {
@@ -276,9 +286,8 @@ function displaytimberHarvestPbfLayer() {
 
     timberHarvestPbfLayer.on({
       click: function (e) {
-        console.log('timberharvest', e.originalEvent.timeStamp);
-        highlightFeature(e.layer.properties.assignedId);
         lastLayerEventTimeStamp = e.originalEvent.timeStamp;
+        highlightFeature(e);
       }
     });
 
@@ -323,13 +332,15 @@ function displaytimberHarvestPbfLayer() {
 
     map.on('click', function(e) {
       // This is a hack but is the only way I found to deal with canvas layer event bubbling issues
-      if ((e.originalEvent.timeStamp - lastLayerEventTimeStamp) > 1) {
+      if ((e.originalEvent.timeStamp - lastLayerEventTimeStamp) > 20) {
         map.closePopup();
         resetHighlight();
+        console.log('hey');
       }
     });
+
     $(document).keyup(function(e) {
-      if ((highlightedFeature !== undefined) && (e.which == 27)) resetHighlight();
+      if ((highlightedFeatures.length) && (e.which == 27)) resetHighlight();
     });
 
   });
