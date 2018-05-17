@@ -34,6 +34,7 @@ var timberHarvestPbfLayer;
 var lastLayerEventTimeStamp;
 
 var dateRangeSlider;
+var opacitySlider;
 
 setUpCustomPanes();
 setUpInfoPanel();
@@ -90,16 +91,11 @@ function setUpInfoPanel() {
   };
 
   info.addTo(map);
-  var options = {
-      isDate: false,
-      min: config.defaultDateRange.fromYear,
-      max: config.defaultDateRange.toYear,
-      start: config.defaultDateRange.fromYear,
-      end: config.defaultDateRange.toYear,
-      overlap: true
-  };
-  dateRangeSlider = new Slider($('#dateRangeSlider')[0], options);
-  $('.handle').attr('tabindex', 0);
+
+  dateRangeSlider = new Slider($('#dateRangeSlider')[0], config.dateRangeSliderOptions);
+  // $('.handle').attr('tabindex', 0); Deal with keyboard later
+
+  opacitySlider = new Slider($('#opacitySlider')[0], config.opacitySliderOptions);
 
   // These tweaks are needed to allow for the info box to scroll and not run on top of other things
   $('.info').css('max-height', $(window).height() - 50);
@@ -280,32 +276,63 @@ function showFeaturesForRange() {
 
 function getTimberHarvestLayerStyle(sourceStyle) {
   var s = Object.assign({}, sourceStyle);
-  s.fillOpacity = $('#transparency').val() / 100;
+  s.fillOpacity = (Math.round(opacitySlider.getInfo().right)) / 100;
   s.opacity = Math.min(s.fillOpacity *
     (config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.opacity /
       config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillOpacity), 1);
   return s;
 }
 
-function setUpDateRangeHandlers() {
+function setUpPlaybackControl() {
+  // Must initialize these in case stop is pressed before play
+  var startValue = Math.round(dateRangeSlider.getInfo().left);
+  var stopValue = Math.round(dateRangeSlider.getInfo().right);
+  var movingValue = startValue;
+  utils.setupPlaybackControlActions(function() {
+    NProgress.start();
+    // Update values
+    startValue = Math.round(dateRangeSlider.getInfo().left);
+    stopValue = Math.round(dateRangeSlider.getInfo().right);
+    movingValue = startValue;
+  },function() {
+    NProgress.set((movingValue - startValue) /(stopValue - startValue));
+    if (movingValue <= stopValue) {
+      dateRangeSlider.move({left: startValue, right: movingValue++}, true);
+    } else {
+      movingValue = startValue;
+    }
+    showFeaturesForRange();
+  }, function() {
+    NProgress.remove();
+    dateRangeSlider.move({left: startValue, right: stopValue});
+    showFeaturesForRange();
+  });
+}
 
-  // Filter data based on slider range value on slider stop
+function setUpSlideHandlers() {
+
   dateRangeSlider.subscribe('stop', function() {
     NProgress.remove();
     utils.resetPlaybackControl();
     showFeaturesForRange();
   });
 
-  // Reset progress and playback control
   dateRangeSlider.subscribe('start', function() {
     NProgress.remove();
     utils.resetPlaybackControl();
   });
 
-  // Update range labels
   dateRangeSlider.subscribe('moving', function(rangeValues) {
     $('#fromLabel').text(Math.round(rangeValues.left));
     $('#toLabel').text(Math.round(rangeValues.right));
+  });
+
+  opacitySlider.subscribe('stop', function() {
+    showFeaturesForRange();
+  });
+
+  opacitySlider.subscribe('moving', function(tValue) {
+    $('#opacityLabel').text(Math.round(tValue.right));
   });
 }
 
@@ -327,35 +354,9 @@ function displaytimberHarvestPbfLayer() {
       }
     });
 
-    // Must initialize these in case stop is pressed before play
-    var startValue = Math.round(dateRangeSlider.getInfo().left);
-    var stopValue = Math.round(dateRangeSlider.getInfo().right);
-    var movingValue = startValue;
-    utils.setupPlaybackControlActions(function() {
-      NProgress.start();
-      // Update values
-      startValue = Math.round(dateRangeSlider.getInfo().left);
-      stopValue = Math.round(dateRangeSlider.getInfo().right);
-      movingValue = startValue;
-    },function() {
-      NProgress.set((movingValue - startValue) /(stopValue - startValue));
-      if (movingValue <= stopValue) {
-        dateRangeSlider.move({left: startValue, right: movingValue++}, true);
-      } else {
-        movingValue = startValue;
-      }
-      showFeaturesForRange();
-    }, function() {
-      NProgress.remove();
-      dateRangeSlider.move({left: startValue, right: stopValue});
-      showFeaturesForRange();
-    });
+    setUpPlaybackControl();
+    setUpSlideHandlers();
 
-    setUpDateRangeHandlers();
-
-    $('#transparency').on('input', function() {
-      showFeaturesForRange();
-    });
     showFeaturesForRange();
 
     spinner.stop();

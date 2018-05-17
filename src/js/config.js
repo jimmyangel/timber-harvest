@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.0.2<sup>Alpha</sup>',
+  versionString: 'v0.0.3<sup>Alpha</sup>',
   baseMapLayers: [
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
@@ -145,8 +145,19 @@ export var config = {
     7.0: 'Giant trees, 48.0 or greater inches DBH',
     9.9: 'Trees 21.0 inches DBH and larger'
   },
-  defaultDateRange: {
-    fromYear: 1900,
-    toYear: 2018
+  dateRangeSliderOptions: {
+      isDate: false,
+      min: 1900,
+      max: 2018,
+      start: 1900,
+      end: 2018,
+      overlap: true
+  },
+  opacitySliderOptions: {
+      isDate: false,
+      isOneWay: true,
+      min: 0,
+      max: 100,
+      start: 70
   }
 }
