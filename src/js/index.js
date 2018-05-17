@@ -287,6 +287,28 @@ function getTimberHarvestLayerStyle(sourceStyle) {
   return s;
 }
 
+function setUpDateRangeHandlers() {
+
+  // Filter data based on slider range value on slider stop
+  dateRangeSlider.subscribe('stop', function() {
+    NProgress.remove();
+    utils.resetPlaybackControl();
+    showFeaturesForRange();
+  });
+
+  // Reset progress and playback control
+  dateRangeSlider.subscribe('start', function() {
+    NProgress.remove();
+    utils.resetPlaybackControl();
+  });
+
+  // Update range labels
+  dateRangeSlider.subscribe('moving', function(rangeValues) {
+    $('#fromLabel').text(Math.round(rangeValues.left));
+    $('#toLabel').text(Math.round(rangeValues.right));
+  });
+}
+
 function displaytimberHarvestPbfLayer() {
 
   $.getJSON(config.dataPaths.willamette, function(data) {
@@ -329,12 +351,7 @@ function displaytimberHarvestPbfLayer() {
       showFeaturesForRange();
     });
 
-    // Filter data based on slider range values
-    dateRangeSlider.subscribe('moving', function(data) {
-      NProgress.remove();
-      utils.resetPlaybackControl()
-      showFeaturesForRange();
-    });
+    setUpDateRangeHandlers();
 
     $('#transparency').on('input', function() {
       showFeaturesForRange();
