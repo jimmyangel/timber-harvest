@@ -1,0 +1,18 @@
+./ms.sh -i USATimberHarvest/S_USA.Activity_TimberHarvest.shp -filter 'ADMIN_FO_1 === "Willamette National Forest"' -filter-fields ADMIN_FO_1,SALE_NAME,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES -verbose -o format=geojson precision=0.0001 timber-or.json
+
+mapshaper timber-or.json -each 'assignedId=this.id' -simplify 30% visvalingam keep-shapes -o format=geojson timber-or-s.json
+
+tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --output-to-directory "vtiles" timber-or-s.json
+
+http-server --cors='*' -g -p 9090
+
+mapshaper VegetationStand/VegetationStand.shp -filter 'LAND_COVER==="FL" && OVRSTRY_YR < 1900 && PARTIAL_YR < 1900 && PRE_COM_YR < 1900 && SHLTRWD_YR < 1900 && COM_THN_YR < 1900' -filter-fields STAND,SIZE_CLASS,YR_ORIGIN -proj wgs84 -simplify 30% visvalingam keep-shapes -o format=geojson precision=0.0001 vegetationstand.json
+
+tippecanoe --layer=vegetation --name=vegetation --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --output-to-directory "vtiles" vegetationstand.json
+
+####### Add SUID (unique id for an activity area)
+
+./ms.sh -i USATimberHarvest/S_USA.Activity_TimberHarvest.shp -filter 'ADMIN_FO_1 === "Willamette National Forest"' -filter-fields SUID,ADMIN_FO_1,SALE_NAME,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES -verbose -o format=geojson precision=0.0001 timber-or.json
+
+######### Selection data
+mapshaper timber-or-s.json -filter-fields assignedId,DATE_COMPL -o format=json timber-or-s-selection-data.json
