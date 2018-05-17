@@ -5,9 +5,9 @@ import '../favicon.ico';
 import L from 'leaflet';
 import 'leaflet-fullscreen';
 import 'leaflet.vectorgrid';
-import 'multirange';
 import 'leaflet-modal';
 import Spinner from 'spin';
+import Slider from 'omni-slider';
 
 import {config} from './config.js';
 import * as utils from './utils.js';
@@ -32,6 +32,8 @@ var highlightedFeatures = [];
 var timberHarvestSelectData;
 var timberHarvestPbfLayer;
 var lastLayerEventTimeStamp;
+
+var dateRangeSlider;
 
 setUpCustomPanes();
 setUpInfoPanel();
@@ -88,7 +90,18 @@ function setUpInfoPanel() {
   };
 
   info.addTo(map);
+  var options = {
+      isDate: false,
+      min: config.defaultDateRange.fromYear,
+      max: config.defaultDateRange.toYear,
+      start: config.defaultDateRange.fromYear,
+      end: config.defaultDateRange.toYear,
+      overlap: true
+  };
+  dateRangeSlider = new Slider($('#dateRangeSlider')[0], options);
+  $('.handle').attr('tabindex', 0);
 
+  // These tweaks are needed to allow for the info box to scroll and not run on top of other things
   $('.info').css('max-height', $(window).height() - 50);
   $(window).on('resize', function() {
     $('.info').css('max-height', $(window).height() - 50);
@@ -248,15 +261,16 @@ function resetHighlight() {
 }
 
 function showFeaturesForRange() {
-  //$('.fromToYear').val('1921,1930');
-  var fromToYear = $('.fromToYear').val().split(',');
-  $('#fromLabel').text(fromToYear[0]);
-  $('#toLabel').text(fromToYear[1]);
+
+  var fromYear = Math.round(dateRangeSlider.getInfo().left);
+  var toYear = Math.round(dateRangeSlider.getInfo().right);
+  $('#fromLabel').text(fromYear);
+  $('#toLabel').text(toYear);
 
   var style = getTimberHarvestLayerStyle(config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest);
   timberHarvestSelectData.forEach(function(s) {
     var y = (new Date(s.DATE_COMPL)).getFullYear();
-    if ((y >= fromToYear[0]) && (y <= fromToYear[1])) {
+    if ((y >= fromYear) && (y <= toYear)) {
       timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
     } else {
       timberHarvestPbfLayer.setFeatureStyle(s.assignedId, {weight:0, fill: false});
@@ -292,36 +306,36 @@ function displaytimberHarvestPbfLayer() {
     });
 
     // Must initialize these in case stop is pressed before play
-    var values = $('.fromToYear').val().split(',');
-    var startValue = parseInt(values[0]);
-    var stopValue = parseInt(values[1]);
+    var startValue = Math.round(dateRangeSlider.getInfo().left);
+    var stopValue = Math.round(dateRangeSlider.getInfo().right);
     var movingValue = startValue;
     utils.setupPlaybackControlActions(function() {
       NProgress.start();
       // Update values
-      values = $('.fromToYear').val().split(',');
-      startValue = parseInt(values[0]);
-      stopValue = parseInt(values[1]);
+      startValue = Math.round(dateRangeSlider.getInfo().left);
+      stopValue = Math.round(dateRangeSlider.getInfo().right);
       movingValue = startValue;
     },function() {
       NProgress.set((movingValue - startValue) /(stopValue - startValue));
       if (movingValue <= stopValue) {
-        $('.fromToYear.multirange.original').val(startValue + ',' + movingValue++);
+        dateRangeSlider.move({left: startValue, right: movingValue++}, true);
       } else {
         movingValue = startValue;
       }
       showFeaturesForRange();
     }, function() {
       NProgress.remove();
-      $('.fromToYear.multirange.original').val(startValue + ',' + stopValue);
+      dateRangeSlider.move({left: startValue, right: stopValue});
       showFeaturesForRange();
     });
 
-    $('.fromToYear').on('input', function() {
+    // Filter data based on slider range values
+    dateRangeSlider.subscribe('moving', function(data) {
       NProgress.remove();
       utils.resetPlaybackControl()
       showFeaturesForRange();
     });
+
     $('#transparency').on('input', function() {
       showFeaturesForRange();
     });

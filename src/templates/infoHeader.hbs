@@ -13,11 +13,11 @@
 <div style="margin: 4px;"><input style="width: 100%;" id="transparency" type="range" min="0" max="100" value="{{layerOpacity}}" /></div>
 <div style="text-align: center;" class="legend-explanation">Move the slider to adjust transparency</div>
 <hr>
-<div style="padding-left: 2px; padding-right: 2px;">
-  <div style="text-align: center" class="legend-title">Date Range</div>
-  <div style="text-align: center"><span id="fromLabel"></span> <input type="range" multiple min="1900" max="2018" value="1900,2018" class="fromToYear" /> <span id="toLabel"></span></div>
-</div>
-<div style="text-align: center;" class="legend-explanation">Move sliders to adjust time range</div>
+
+<div style="text-align: center; margin-bottom: 10px;" class="legend-title">Date Range: <span id="fromLabel"></span> to <span id="toLabel"></span></div>
+<div style="width: 85%; margin: 0 auto;" id="dateRangeSlider" class="fly wrap"></div>
+
+<div style="text-align: center; margin-top: 10px;" class="legend-explanation">Move sliders to adjust time range</div>
 <hr>
 <div style="text-align: center" class="legend-title">Timeline playback</div>
 <div style="text-align: center" class="playback-controls">

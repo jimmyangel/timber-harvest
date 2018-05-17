@@ -144,5 +144,9 @@ export var config = {
     6.5: 'Large trees and giant trees mixed',
     7.0: 'Giant trees, 48.0 or greater inches DBH',
     9.9: 'Trees 21.0 inches DBH and larger'
+  },
+  defaultDateRange: {
+    fromYear: 1900,
+    toYear: 2018
   }
 }

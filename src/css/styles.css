@@ -3,6 +3,7 @@
 @import "~multirange/multirange.css";
 @import "~leaflet-modal/dist/leaflet.modal.css";
 @import "~nprogress/nprogress.css";
+@import "~omni-slider/omni-slider.css";
 
 html, body {
   height: 100%;
@@ -252,3 +253,41 @@ ul.legend-items li span {
 /*.leaflet-mainpane-pane>.leaflet-layer>.leaflet-tile-container>canvas.leaflet-tile {
   cursor: crosshair;
 }*/
+
+/* Omni-slider styling */
+
+.fly .slider-circle {
+  display: none;
+}
+
+.fly .slider {
+  height: 1px;
+  background: #999;
+  border: none;
+}
+
+.fly .slider-fill {
+  height: 5px;
+  top: -2.5px;
+  background: gray;
+}
+
+.fly .handle {
+  width: 22px;
+  height: 22px;
+  top: -12px;
+  border-radius: 22px;
+  border-color: #999;
+}
+
+.fly .handle:active, .fly .handle:focus {
+  border-color: #0a84c1;
+  box-shadow: none;
+  outline: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+}
+
+.slider .slider-transition {
+  -webkit-transition: all 0.0s;
+  transition: all 0.0s; }
