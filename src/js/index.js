@@ -356,6 +356,9 @@ function displaytimberHarvestPbfLayer() {
     setUpPlaybackControl();
     setUpSlideHandlers();
 
+    // Update labels
+    $('#fromLabel').text(Math.round(dateRangeSlider.getInfo().left));
+    $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
     //showFeaturesForRange();
 
     spinner.stop();
