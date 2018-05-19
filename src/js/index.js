@@ -257,7 +257,6 @@ function resetHighlight() {
 }
 
 function showFeaturesForRange() {
-
   var fromYear = Math.round(dateRangeSlider.getInfo().left);
   var toYear = Math.round(dateRangeSlider.getInfo().right);
   $('#fromLabel').text(fromYear);
@@ -357,7 +356,7 @@ function displaytimberHarvestPbfLayer() {
     setUpPlaybackControl();
     setUpSlideHandlers();
 
-    showFeaturesForRange();
+    //showFeaturesForRange();
 
     spinner.stop();
     NProgress.done();
