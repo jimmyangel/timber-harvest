@@ -88,7 +88,7 @@ export var config = {
     [44.85711, -121.84289]
   ],
   dataPaths: {
-    willamette: 'https://tiles.oregonhowl.org/timber-harvest/willamette/timber-or-s-selection-data.json'
+    willamette: 'https://tiles.oregonhowl.org/timber-harvest/willamette/timber-or-s-info.json'
   },
   timberHarvestLayer: {
     url: 'https://tiles.oregonhowl.org/timber-harvest/willamette/{z}/{x}/{y}.pbf',

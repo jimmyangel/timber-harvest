@@ -215,15 +215,16 @@ function highlightFeature(e) {
   if ((e.originalEvent.timeStamp - lastLayerEventTimeStamp) > 20) {
     resetHighlight();
   }
+  var id = e.layer.properties.assignedId;
 
-  var sortDate = (new Date(e.layer.properties.DATE_COMPL)).toISOString();
+  var sortDate = (new Date(timberHarvestSelectData[id].DATE_COMPL)).toISOString();
   var content = infoContentItem({
-    saleName: (e.layer.properties.SALE_NAME ? e.layer.properties.SALE_NAME : 'N/A'),
-    activity: e.layer.properties.ACTIVITY_N.replace(/ *\([^)]*\) */g, ''),
-    acres: e.layer.properties.GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
-    datePlanned: (new Date(e.layer.properties.DATE_PLANN).toLocaleDateString()),
-    dateAccomplished: (new Date(e.layer.properties.DATE_ACCOM).toLocaleDateString()),
-    dateCompleted: (new Date(e.layer.properties.DATE_COMPL).toLocaleDateString()),
+    saleName: (timberHarvestSelectData[id].SALE_NAME ? timberHarvestSelectData[id].SALE_NAME : 'N/A'),
+    activity: timberHarvestSelectData[id].ACTIVITY_N.replace(/ *\([^)]*\) */g, ''),
+    acres: timberHarvestSelectData[id].GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
+    datePlanned: (new Date(timberHarvestSelectData[id].DATE_PLANN).toLocaleDateString()),
+    dateAccomplished: (new Date(timberHarvestSelectData[id].DATE_ACCOM).toLocaleDateString()),
+    dateCompleted: (new Date(timberHarvestSelectData[id].DATE_COMPL).toLocaleDateString()),
     sortDate: sortDate
   });
 
@@ -351,6 +352,12 @@ function displaytimberHarvestPbfLayer() {
       click: function (e) {
         lastLayerEventTimeStamp = e.originalEvent.timeStamp;
         highlightFeature(e);
+      },
+      loading: function() {
+        spinner.spin($('#spinner')[0]);
+      },
+      load: function (e) {
+        spinner.stop();
       }
     });
 
@@ -359,7 +366,7 @@ function displaytimberHarvestPbfLayer() {
 
     showFeaturesForRange();
 
-    spinner.stop();
+    //spinner.stop();
     NProgress.done();
 
     map.on('click', function(e) {

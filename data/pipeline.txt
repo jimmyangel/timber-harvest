@@ -16,3 +16,9 @@ tippecanoe --layer=vegetation --name=vegetation --no-tile-compression --minimum-
 
 ######### Selection data
 mapshaper timber-or-s.json -filter-fields assignedId,DATE_COMPL -o format=json timber-or-s-selection-data.json
+
+### Simplify and reduce tile size
+tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --output-to-directory "vtiles" timber-or-s.json
+
+### Generate info file
+mapshaper timber-or-s.json -filter-fields assignedId,SALE_NAME,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES timber-or-s.json -o format=json timber-or-s-info.json
