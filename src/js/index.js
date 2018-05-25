@@ -50,11 +50,11 @@ $.getJSON('data/areas/nfcartoons.json', function(data) {
   L.geoJson(data, {
     style: function(f) {
         return {
-          fillColor: f.properties.fill,
+          fillColor: '#E5D499',
           fillOpacity:0,
-          color: f.properties.stroke,
-          opacity: f.properties['stroke-opacity'],
-          weight: 5
+          color: '#562700',
+          opacity: 1,
+          weight: 3
         };
     }
   }).addTo(map);
