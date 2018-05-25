@@ -25,7 +25,7 @@ NProgress.configure({showSpinner: false, trickle: false, minimum: 0.001});
 var spinner = new Spinner(config.spinnerOpts);
 spinner.spin($('#spinner')[0]);
 
-var map = L.map('map', {fullscreenControl: true, center: [44.04382, -120.58593], zoom: 9, minZoom: 8, maxBounds: [[41, -126], [47, -115]]});
+var map = L.map('map', {fullscreenControl: true, center: [44.04382, -120.58593], zoom: 8, minZoom: 8, maxBounds: [[41, -126], [47, -115]]});
 
 var info = L.control();
 var highlightedFeatures = [];
@@ -37,12 +37,46 @@ var dateRangeSlider;
 var opacitySlider;
 
 setUpCustomPanes();
-setUpInfoPanel();
+//setUpInfoPanel();
 setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
 
-displaytimberHarvestPbfLayer();
+// *************
+
+//L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.jpg').addTo(map);
+
+$.getJSON('data/areas/nfcartoons.json', function(data) {
+  L.geoJson(data, {
+    style: function(f) {
+        return {
+          fillColor: f.properties.fill,
+          fillOpacity:0,
+          color: f.properties.stroke,
+          opacity: f.properties['stroke-opacity'],
+          weight: 5
+        };
+    }
+  }).addTo(map);
+
+  var myIcon = L.icon({
+    iconAnchor: [120, 81],
+    iconUrl: 'data/areas/willamettenationalforest.png'
+  });
+  L.marker([44, -122], {icon: myIcon}).addTo(map);
+
+  var myIcon2 = L.icon({
+    iconAnchor: [120, 81],
+    iconUrl: 'data/areas/deschutesnationalforest.png'
+  });
+  L.marker([43.6797, -121.16], {icon: myIcon2}).addTo(map);
+
+});
+
+// *************
+
+spinner.stop();
+// displaytimberHarvestPbfLayer();
 
 function setUpCustomPanes() {
   map.createPane('trgrid');
@@ -114,7 +148,7 @@ function setUpLayerControl() {
   // Iterate through list of base layers and add to layer control
   for (var k=0; k<config.baseMapLayers.length; k++) {
     var bl = baseMaps[config.baseMapLayers[k].name] = L.tileLayer(config.baseMapLayers[k].url, config.baseMapLayers[k].options);
-    if (k === 0) {
+    if (config.baseMapLayers[k].default) {
       map.addLayer(bl);
     }
   }
