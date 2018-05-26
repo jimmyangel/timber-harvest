@@ -290,4 +290,11 @@ ul.legend-items li span {
 
 .slider .slider-transition {
   -webkit-transition: all 0.0s;
-  transition: all 0.0s; }
+  transition: all 0.0s;
+}
+
+.forestSign {
+  width: 110px;
+  margin-left: -55px;
+  transition: 0.2s;
+}

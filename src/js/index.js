@@ -23,9 +23,10 @@ var esri = require('esri-leaflet');
 NProgress.configure({showSpinner: false, trickle: false, minimum: 0.001});
 
 var spinner = new Spinner(config.spinnerOpts);
-spinner.spin($('#spinner')[0]);
+//spinner.spin($('#spinner')[0]);
 
-var map = L.map('map', {fullscreenControl: true, center: [44.04382, -120.58593], zoom: 8, minZoom: 8, maxBounds: [[41, -126], [47, -115]]});
+var map = L.map('map', {fullscreenControl: true, zoom: 6, minZoom: 6, maxBounds: [[41, -126], [47, -115]]});
+map.fitBounds(config.oregonBbox);
 
 var info = L.control();
 var highlightedFeatures = [];
@@ -33,49 +34,82 @@ var timberHarvestSelectData;
 var timberHarvestPbfLayer;
 var lastLayerEventTimeStamp;
 
+var baseMaps;
+
 var dateRangeSlider;
 var opacitySlider;
 
 setUpCustomPanes();
-//setUpInfoPanel();
+setUpInfoPanel();
 setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
 
 // *************
 
-//L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.jpg').addTo(map);
-
+var nfLayerGroup = L.layerGroup().addTo(map);
 $.getJSON('data/areas/nfcartoons.json', function(data) {
-  L.geoJson(data, {
-    style: function(f) {
-        return {
-          fillColor: '#E5D499',
-          fillOpacity:0,
-          color: '#562700',
-          opacity: 1,
-          weight: 3
-        };
+  var g = L.geoJson(data, {
+    style: config.forestBoundaryStyle,
+    onEachFeature: function(f, l) {
+      l.on('click', function() {
+        gotoNationalForest(l.feature.properties.name);
+      });
     }
-  }).addTo(map);
+  }).addTo(nfLayerGroup);
 
-  var myIcon = L.icon({
-    iconAnchor: [120, 81],
-    iconUrl: 'data/areas/willamettenationalforest.png'
+  g.eachLayer(function(l) {
+    var m = L.marker(l.getCenter(), {
+      icon: L.icon({iconUrl: 'data/areas/' + l.feature.properties.name + 'nationalforest.png', className: 'forestSign'}
+    )}).addTo(nfLayerGroup);
+    m.on('click', function() {
+      gotoNationalForest(l.feature.properties.name);
+    });
   });
-  L.marker([44, -122], {icon: myIcon}).addTo(map);
 
-  var myIcon2 = L.icon({
-    iconAnchor: [120, 81],
-    iconUrl: 'data/areas/deschutesnationalforest.png'
-  });
-  L.marker([43.6797, -121.16], {icon: myIcon2}).addTo(map);
-
+  var forestSignWidth = parseInt($('.forestSign').css('width'));
+  setSignSize(forestSignWidth);
+  map.on('zoomend', function() {setSignSize(forestSignWidth);});
 });
+
+function setSignSize(forestSignWidth) {
+  var z = map.getZoom();
+  if (z < 8) {
+    var w = forestSignWidth / (2*(8-z));
+    $('.forestSign').css('width', w.toFixed() + 'px');
+    $('.forestSign').css('margin-left', '-' + (w/2).toFixed() + 'px');
+  } else {
+    if ($('.forestSign').css('width') !== (forestSignWidth + 'px')) {
+      $('.forestSign').css('width', forestSignWidth + 'px');
+      $('.forestSign').css('margin-left', '-' + (forestSignWidth/2).toFixed() + 'px');
+    }
+  }
+}
+
+/*function gotoTop() {
+
+}*/
+
+function gotoNationalForest(nf) {
+  spinner.spin($('#spinner')[0]);
+  nfLayerGroup.removeFrom(map);
+  switchBasemap(0);
+  displaytimberHarvestPbfLayer();
+  $('.info').show();
+}
+
+function switchBasemap(index) {
+  for (var k=0; k<config.baseMapLayers.length; k++) {
+    if (map.hasLayer(baseMaps[config.baseMapLayers[k].name])) {
+      map.removeLayer(baseMaps[config.baseMapLayers[k].name])
+    }
+  }
+  map.addLayer(baseMaps[config.baseMapLayers[index].name]);
+}
 
 // *************
 
-spinner.stop();
+//spinner.stop();
 // displaytimberHarvestPbfLayer();
 
 function setUpCustomPanes() {
@@ -125,6 +159,7 @@ function setUpInfoPanel() {
   };
 
   info.addTo(map);
+  $('.info').hide();
 
   dateRangeSlider = new Slider($('#dateRangeSlider')[0], config.dateRangeSliderOptions);
   // $('.handle').attr('tabindex', 0); Deal with keyboard later
@@ -143,7 +178,7 @@ function setUpInfoPanel() {
 }
 
 function setUpLayerControl() {
-  var baseMaps = {};
+  baseMaps = {};
   var overlayLayers = {};
   // Iterate through list of base layers and add to layer control
   for (var k=0; k<config.baseMapLayers.length; k++) {
@@ -172,6 +207,14 @@ function setUpLayerControl() {
           }
         });
         break;
+      case 'geojson':
+        var jLayer = overlayLayers[config.overlayLayers[k].name] = L.geoJson();
+        (function(l, s) {
+          $.getJSON(config.overlayLayers[k].url, function(data) {
+            l.addData(data);
+            l.setStyle(s);
+          });
+        })(jLayer, config.overlayLayers[k].style);
     }
   }
 

@@ -37,11 +37,11 @@ export var config = {
       name: 'Landsat Live'
     },
     {
-      url: 'https://stamen-tiles.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.jpg',
+      url: 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
       options: {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
       },
-      name: 'Terrain Background',
+      name: '<span id="topLevel">Terrain Background</span>',
       default: true
     }
   ],
@@ -64,6 +64,17 @@ export var config = {
       name: 'Township and Range Grid',
       isTownshipAndRange: true,
       type: 'esri'
+    },
+    {
+      url: 'https://stable-data.oregonhowl.org/oregon/oregon.json',
+      name: 'State boundary',
+      type: 'geojson',
+      style: {
+        weight: 4,
+        opacity: 0.5,
+        color: 'black',
+        fill: false
+      }
     },
     {
       url: 'https://tiles.oregonhowl.org/unharvested/willamette/{z}/{x}/{y}.pbf',
@@ -94,6 +105,10 @@ export var config = {
   initialBounds: [
     [43.35683, -122.74594],
     [44.85711, -121.84289]
+  ],
+  oregonBbox: [
+    [41.9918, -124.7035],
+    [46.2991, -116.4635]
   ],
   dataPaths: {
     willamette: 'https://tiles.oregonhowl.org/timber-harvest/willamette/timber-or-s-info.json'
@@ -167,5 +182,12 @@ export var config = {
       min: 0,
       max: 100,
       start: 70
+  },
+  forestBoundaryStyle: {
+    fillColor: '#E5D499',
+    fillOpacity:0,
+    color: '#562700',
+    opacity: 1,
+    weight: 3
   }
 }
