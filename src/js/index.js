@@ -175,6 +175,13 @@ function setUpInfoPanel() {
     e.stopPropagation();
   });
   info.update();
+
+  setUpPlaybackControl();
+  setUpSlideHandlers();
+
+  // Update labels
+  $('#fromLabel').text(Math.round(dateRangeSlider.getInfo().left));
+  $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
 }
 
 function setUpLayerControl() {
@@ -437,15 +444,6 @@ function displaytimberHarvestPbfLayer() {
       }
     });
 
-    setUpPlaybackControl();
-    setUpSlideHandlers();
-
-    // Update labels
-    $('#fromLabel').text(Math.round(dateRangeSlider.getInfo().left));
-    $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
-    //showFeaturesForRange();
-
-    //spinner.stop();
     NProgress.done();
 
     map.on('click', function(e) {
