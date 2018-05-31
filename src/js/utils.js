@@ -119,3 +119,13 @@ function setPlaybackPauseMode() {
   }
   $('#pb-play i').removeClass('blink');
 }
+
+export function getUrlVars() {
+	var urlVars = [];
+	var varArray = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	for (var i = 0; i < varArray.length; i++) {
+		var urlVar = varArray[i].split('=');
+		urlVars[urlVar[0]] = urlVar[1];
+	}
+	return urlVars;
+}

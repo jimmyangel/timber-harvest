@@ -9,7 +9,8 @@ export var config = {
         maxZoom: 19,
         attribution: 'Tiles © Esri — Source: <a href="http://www.arcgis.com/home/item.html?id=30e5fe3149c34df1ba922e6f5bbf808f">ArcGIS World Topographic Map</a>'
       },
-      name: 'World Topographic Map'
+      name: 'World Topographic Map',
+      default: true
     },
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -41,8 +42,7 @@ export var config = {
       options: {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
       },
-      name: '<span id="topLevel">Terrain Background</span>',
-      default: true
+      name: '<span id="topLevel">Terrain Background</span>'
     }
   ],
   overlayLayers: [
@@ -113,6 +113,7 @@ export var config = {
   dataPaths: {
     willamette: 'https://tiles.oregonhowl.org/timber-harvest/willamette/timber-or-s-info.json'
   },
+  forestList: ['willamette', 'deschutes'],
   timberHarvestLayer: {
     url: 'https://tiles.oregonhowl.org/timber-harvest/willamette/{z}/{x}/{y}.pbf',
     options: {
@@ -185,7 +186,7 @@ export var config = {
   },
   forestBoundaryStyle: {
     fillColor: '#E5D499',
-    fillOpacity:0,
+    fillOpacity: 0,
     color: '#562700',
     opacity: 1,
     weight: 3
