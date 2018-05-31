@@ -117,6 +117,7 @@ function gotoTop() {
   if (timberHarvestPbfLayer) {
     timberHarvestPbfLayer.removeFrom(map);
   }
+  $('.info').hide();
   map.flyToBounds(config.oregonBbox);
   nfLayerGroup.addTo(map);
 }
