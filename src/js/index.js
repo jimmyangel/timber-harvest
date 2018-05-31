@@ -209,6 +209,12 @@ function setUpInfoPanel() {
   // Update labels
   $('#fromLabel').text(Math.round(dateRangeSlider.getInfo().left));
   $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
+
+  $('#infoPanelTitle').click(function() {
+    history.pushState('top', '', '.');
+    gotoTop();
+    return false;
+  });
 }
 
 function setUpLayerControl() {
