@@ -185,12 +185,13 @@ function setUpInfoPanel() {
   };
 
   info.addTo(map);
-  $('.info').hide();
 
   dateRangeSlider = new Slider($('#dateRangeSlider')[0], config.dateRangeSliderOptions);
   // $('.handle').attr('tabindex', 0); Deal with keyboard later
 
   opacitySlider = new Slider($('#opacitySlider')[0], config.opacitySliderOptions);
+
+  $('.info').hide();
 
   // These tweaks are needed to allow for the info box to scroll and not run on top of other things
   $('.info').css('max-height', $(window).height() - 50);
