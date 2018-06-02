@@ -102,10 +102,6 @@ export var config = {
       type: 'vectorgrid'
     }
   ],
-  initialBounds: [
-    [43.35683, -122.74594],
-    [44.85711, -121.84289]
-  ],
   oregonBbox: [
     [41.9918, -124.7035],
     [46.2991, -116.4635]

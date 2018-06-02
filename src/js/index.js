@@ -26,7 +26,8 @@ var spinner = new Spinner(config.spinnerOpts);
 //spinner.spin($('#spinner')[0]);
 
 var map = L.map('map', {fullscreenControl: true, zoom: 6, minZoom: 6, maxBounds: [[41, -126], [47, -115]]});
-map.fitBounds(config.oregonBbox);
+var resetViewBounds = config.oregonBbox;
+map.fitBounds(resetViewBounds);
 
 var info = L.control();
 var highlightedFeatures = [];
@@ -71,8 +72,10 @@ function initMap(callback) {
     var g = L.geoJson(data, {
       style: config.forestBoundaryStyle,
       onEachFeature: function(f, l) {
+        if (config.forests[l.feature.properties.name]) {
+          config.forests[l.feature.properties.name].bounds = l.getBounds();
+        }
         l.on('click', function(e) {
-          //history.pushState(l.feature.properties.name, '', '?f=' + l.feature.properties.name);
           gotoNationalForest(l.feature.properties.name, true, e.latlng);
         });
       }
@@ -83,7 +86,6 @@ function initMap(callback) {
         icon: L.icon({iconUrl: 'data/areas/' + l.feature.properties.name + 'nationalforest.png', className: 'forestSign'}
       )}).addTo(nfLayerGroup);
       m.on('click', function(e) {
-        //history.pushState(l.feature.properties.name, '', '?f=' + l.feature.properties.name);
         gotoNationalForest(l.feature.properties.name, true, e.latlng);
       });
     });
@@ -114,6 +116,7 @@ function setSignSize(forestSignWidth) {
 }
 
 function gotoTop() {
+  resetViewBounds = config.oregonBbox;
   if (timberHarvestPbfLayer) {
     utils.resetPlaybackControl();
     resetHighlight();
@@ -123,7 +126,7 @@ function gotoTop() {
     timberHarvestSelectData = undefined;
   }
   $('.info').hide();
-  map.flyToBounds(config.oregonBbox);
+  map.flyToBounds(resetViewBounds);
   nfLayerGroup.addTo(map);
 }
 
@@ -132,6 +135,8 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     if (pushState) {
       history.pushState(nf, '', '?f=' + nf);
     }
+    resetViewBounds = config.forests[nf].bounds;
+    map.fitBounds(resetViewBounds);
     spinner.spin($('#spinner')[0]);
     nfLayerGroup.removeFrom(map);
     displaytimberHarvestPbfLayer(nf);
@@ -327,7 +332,7 @@ function setUpResetControl() {
   $('#resetControl').click(function() {
     map.closePopup();
     resetHighlight();
-    map.flyToBounds(config.initialBounds);
+    map.flyToBounds(resetViewBounds);
     return false;
   });
 }
@@ -464,8 +469,6 @@ function displaytimberHarvestPbfLayer(nf) {
   $.getJSON(config.dataPath.baseUrl + nf + config.dataPath.infoFileName, function(data) {
 
     timberHarvestSelectData = data;
-
-    map.fitBounds(config.initialBounds);
 
     config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
     var url = config.timberHarvestLayer.baseUrl + nf + config.timberHarvestLayer.tileScheme;
