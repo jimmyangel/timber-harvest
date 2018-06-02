@@ -78,13 +78,6 @@ export function setupPlaybackControlActions(startCb, tickCb, resetCb) {
     $(this).blur();
     return false;
   });
-/*
-  $('#pb-end').click(function() {
-    clockViewModel.currentTime = clockViewModel.stopTime;
-    setPlaybackPauseMode();
-    $(this).blur();
-    return false;
-  });*/
 
   // Keyboard events
   $(document).off('keydown');

@@ -110,12 +110,21 @@ export var config = {
     [41.9918, -124.7035],
     [46.2991, -116.4635]
   ],
-  dataPaths: {
-    willamette: 'https://tiles.oregonhowl.org/timber-harvest/willamette/timber-or-s-info.json'
+  dataPath: {
+    baseUrl: 'https://tiles.oregonhowl.org/timber-harvest/',
+    infoFileName: '/timber-or-s-info.json'
   },
-  forestList: ['willamette', 'deschutes'],
+  forests: {
+    willamette: {
+      name: 'Willamette National Forest'
+    }/*,
+    deschutes: {
+      name: 'Deschutes National Forest'
+    }*/
+  },
   timberHarvestLayer: {
-    url: 'https://tiles.oregonhowl.org/timber-harvest/willamette/{z}/{x}/{y}.pbf',
+    baseUrl: 'https://tiles.oregonhowl.org/timber-harvest/',
+    tileScheme: '/{z}/{x}/{y}.pbf',
     options: {
       vectorTileLayerStyles: {
         timberharvest: {
