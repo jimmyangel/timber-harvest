@@ -82,20 +82,22 @@ export function setupPlaybackControlActions(startCb, tickCb, resetCb) {
   // Keyboard events
   $(document).off('keydown');
   $(document).keydown(function (e) {
-    switch (e.which) {
-      case 32: // Spacebar
-        $('#pb-play').click();
-        e.preventDefault();
-        break;
-      case 27: // Escape key
-        $('#pb-stop').click();
-        break;
-      case 38: // Up arror
-        $('#pb-faster').click();
-        break;
-      case 40: // Down arrow
-        $('#pb-slower').click();
-        break;
+    if (history.state !== 'top') { // This if statement is a workaround that needs to be fixed
+      switch (e.which) {
+        case 32: // Spacebar
+          $('#pb-play').click();
+          e.preventDefault();
+          break;
+        case 27: // Escape key
+          $('#pb-stop').click();
+          break;
+        case 38: // Up arror
+          $('#pb-faster').click();
+          break;
+        case 40: // Down arrow
+          $('#pb-slower').click();
+          break;
+      }
     }
   });
 

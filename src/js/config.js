@@ -75,31 +75,6 @@ export var config = {
         color: 'black',
         fill: false
       }
-    },
-    {
-      url: 'https://tiles.oregonhowl.org/unharvested/willamette/{z}/{x}/{y}.pbf',
-      options: {
-        vectorTileLayerStyles: {
-          vegetation: {
-            weight: 1,
-            opacity: 1,
-            color: '#009E73',
-            fillColor: '#009E73',
-            fillOpacity: 0.7,
-            fill: true,
-            className: 'vegetation'
-          }
-        },
-        interactive: true,
-        pane: 'mainpane',
-        maxNativeZoom: 14,
-        minNativeZoom: 9
-      },
-      color: '#009E73',
-      get name () {
-        return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> Unharvested Forest Land'
-      },
-      type: 'vectorgrid'
     }
   ],
   oregonBbox: [
@@ -112,7 +87,8 @@ export var config = {
   },
   forests: {
     willamette: {
-      name: 'Willamette National Forest'
+      name: 'Willamette National Forest',
+      hasUnharvestedLayer: true
     }/*,
     deschutes: {
       name: 'Deschutes National Forest'
@@ -151,6 +127,32 @@ export var config = {
       fillColor: '#d55e00',
       fill: true
     }
+  },
+  unharvestedOverlayLayer: {
+    baseUrl: 'https://tiles.oregonhowl.org/unharvested/',
+    tileScheme: '/{z}/{x}/{y}.pbf',
+    options: {
+      vectorTileLayerStyles: {
+        vegetation: {
+          weight: 1,
+          opacity: 1,
+          color: '#009E73',
+          fillColor: '#009E73',
+          fillOpacity: 0.7,
+          fill: true,
+          className: 'vegetation'
+        }
+      },
+      interactive: true,
+      pane: 'mainpane',
+      maxNativeZoom: 14,
+      minNativeZoom: 9
+    },
+    color: '#009E73',
+    get name () {
+      return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> Unharvested Forest Land'
+    },
+    type: 'vectorgrid'
   },
   spinnerOpts: {
     color: '#939393',

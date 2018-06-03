@@ -33,10 +33,11 @@ var info = L.control();
 var highlightedFeatures = [];
 var timberHarvestSelectData;
 var timberHarvestPbfLayer;
+var unharvestedLayer;
 var lastLayerEventTimeStamp;
 var nfLayerGroup = L.layerGroup().addTo(map); // This is so getCenter works
 
-var baseMaps;
+var layersControl;
 
 var dateRangeSlider;
 var opacitySlider;
@@ -124,6 +125,11 @@ function gotoTop() {
     timberHarvestPbfLayer.removeFrom(map);
     timberHarvestPbfLayer = undefined;
     timberHarvestSelectData = undefined;
+    if (unharvestedLayer) {
+      unharvestedLayer.removeFrom(map);
+      layersControl.removeLayer(unharvestedLayer);
+      unharvestedLayer = undefined;
+    }
   }
   $('.info').hide();
   map.flyToBounds(resetViewBounds);
@@ -140,12 +146,29 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     spinner.spin($('#spinner')[0]);
     nfLayerGroup.removeFrom(map);
     displaytimberHarvestPbfLayer(nf);
+    addUnharvestedOverlay(nf);
     $('#infoPanelSubTitle').text(config.forests[nf].name);
     $('.info').show();
   } else {
     if (popUpLatlng) {
       map.openPopup('Coming soon...', popUpLatlng);
     }
+  }
+}
+
+function addUnharvestedOverlay(nf) {
+  if (config.forests[nf].hasUnharvestedLayer) {
+    config.unharvestedOverlayLayer.options.rendererFactory = L.canvas.tile;
+    unharvestedLayer = L.vectorGrid.protobuf(config.unharvestedOverlayLayer.baseUrl + nf + config.unharvestedOverlayLayer.tileScheme, config.unharvestedOverlayLayer.options);
+    unharvestedLayer.on({
+      click: function (e) {
+        resetHighlight();
+        map.openPopup(standPopUp({standId: e.layer.properties.STAND, year: e.layer.properties.YR_ORIGIN, size: config.treeSizeClass[e.layer.properties.SIZE_CLASS]}), e.latlng, {closeOnClick: false});
+        lastLayerEventTimeStamp = e.originalEvent.timeStamp;
+      }
+    });
+
+    layersControl.addOverlay(unharvestedLayer, config.unharvestedOverlayLayer.name);
   }
 }
 
@@ -229,7 +252,7 @@ function setUpInfoPanel() {
 }
 
 function setUpLayerControl() {
-  baseMaps = {};
+  var baseMaps = {};
   var overlayLayers = {};
   // Iterate through list of base layers and add to layer control
   for (var k=0; k<config.baseMapLayers.length; k++) {
@@ -247,17 +270,6 @@ function setUpLayerControl() {
             setUpTownshipAndRangeLabels(oLayer);
         }
         break;
-      case 'vectorgrid':
-        config.overlayLayers[k].options.rendererFactory = L.canvas.tile;
-        var gLayer = overlayLayers[config.overlayLayers[k].name] = L.vectorGrid.protobuf(config.overlayLayers[k].url, config.overlayLayers[k].options);
-        gLayer.on({
-          click: function (e) {
-            resetHighlight();
-            map.openPopup(standPopUp({standId: e.layer.properties.STAND, year: e.layer.properties.YR_ORIGIN, size: config.treeSizeClass[e.layer.properties.SIZE_CLASS]}), e.latlng, {closeOnClick: false});
-            lastLayerEventTimeStamp = e.originalEvent.timeStamp;
-          }
-        });
-        break;
       case 'geojson':
         var jLayer = overlayLayers[config.overlayLayers[k].name] = L.geoJson();
         (function(l, s) {
@@ -269,7 +281,7 @@ function setUpLayerControl() {
     }
   }
 
-  L.control.layers(baseMaps, overlayLayers, {position: 'topleft', collapsed: true}).addTo(map);
+  layersControl = L.control.layers(baseMaps, overlayLayers, {position: 'topleft', collapsed: true}).addTo(map);
 }
 
 function setUpTownshipAndRangeLabels(overlayLayer) {
