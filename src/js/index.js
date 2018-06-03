@@ -69,7 +69,7 @@ initMap(function() {
 });
 
 function initMap(callback) {
-  $.getJSON('data/areas/nfcartoons.json', function(data) {
+  $.getJSON(config.topLevelDataPath.baseUrl + config.topLevelDataPath.nfCartoonsFileName, function(data) {
     var g = L.geoJson(data, {
       style: config.forestBoundaryStyle,
       onEachFeature: function(f, l) {
@@ -84,7 +84,9 @@ function initMap(callback) {
 
     g.eachLayer(function(l) {
       var m = L.marker(l.getCenter(), {
-        icon: L.icon({iconUrl: 'data/areas/' + l.feature.properties.name + 'nationalforest.png', className: 'forestSign'}
+        icon: L.icon({
+          iconUrl: config.topLevelDataPath.baseUrl + l.feature.properties.name + config.topLevelDataPath.nfIconSuffix,
+          className: 'forestSign'}
       )}).addTo(nfLayerGroup);
       m.on('click', function(e) {
         gotoNationalForest(l.feature.properties.name, true, e.latlng);

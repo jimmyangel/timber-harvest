@@ -94,6 +94,11 @@ export var config = {
       name: 'Deschutes National Forest'
     }*/
   },
+  topLevelDataPath: {
+    baseUrl: 'https://stable-data.oregonhowl.org/oregon/nationalforests/',
+    nfCartoonsFileName: 'nfcartoons.json',
+    nfIconSuffix: 'nationalforest.png'
+  },
   timberHarvestLayer: {
     baseUrl: 'https://tiles.oregonhowl.org/timber-harvest/',
     tileScheme: '/{z}/{x}/{y}.pbf',
