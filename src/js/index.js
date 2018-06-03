@@ -16,6 +16,7 @@ import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
+import topLabel from '../templates/topLabel.hbs';
 
 var NProgress = require('nprogress');
 var esri = require('esri-leaflet');
@@ -28,6 +29,9 @@ var spinner = new Spinner(config.spinnerOpts);
 var map = L.map('map', {fullscreenControl: true, zoom: 6, minZoom: 6, maxBounds: [[41, -126], [47, -115]]});
 var resetViewBounds = config.oregonBbox;
 map.fitBounds(resetViewBounds);
+
+L.DomUtil.create('div', 'topLabel', map.getContainer());
+$('.topLabel').html(topLabel);
 
 var info = L.control();
 var highlightedFeatures = [];
@@ -134,6 +138,7 @@ function gotoTop() {
     }
   }
   $('.info').hide();
+  $('.topLabel').show();
   map.flyToBounds(resetViewBounds);
   nfLayerGroup.addTo(map);
 }
@@ -150,6 +155,7 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     displaytimberHarvestPbfLayer(nf);
     addUnharvestedOverlay(nf);
     $('#infoPanelSubTitle').text(config.forests[nf].name);
+    $('.topLabel').hide();
     $('.info').show();
   } else {
     if (popUpLatlng) {

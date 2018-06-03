@@ -43,6 +43,29 @@ html, body {
   font: 14px/16px Arial, Helvetica, sans-serif;
 }
 
+.topLabel {
+  display: none;
+  text-align: center;
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  padding: 2px;
+  max-width: 30%;
+  z-index: 1000;
+}
+
+.topLabel h4 {
+  margin: 0 0 5px;
+}
+
 @media (max-width: 600px) {
   .info {
     max-width: 230px;
