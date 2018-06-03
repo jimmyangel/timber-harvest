@@ -89,10 +89,10 @@ export var config = {
     willamette: {
       name: 'Willamette National Forest',
       hasUnharvestedLayer: true
-    }/*,
+    },
     deschutes: {
       name: 'Deschutes National Forest'
-    }*/
+    }
   },
   topLevelDataPath: {
     baseUrl: 'https://stable-data.oregonhowl.org/oregon/nationalforests/',
