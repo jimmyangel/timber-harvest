@@ -109,15 +109,17 @@ function initMap(callback) {
 }
 
 function setSignSize(forestSignWidth) {
+  var zoomThreshold = 8;
+  var scalingFactor = 1.4;
   var z = map.getZoom();
-  if (z < 8) {
-    var w = forestSignWidth / (2*(8-z));
+  if (z < zoomThreshold) {
+    var w = forestSignWidth / (scalingFactor*(zoomThreshold-z));
     $('.forestSign').css('width', w.toFixed() + 'px');
-    $('.forestSign').css('margin-left', '-' + (w/2).toFixed() + 'px');
+    $('.forestSign').css('margin-left', '-' + (w/scalingFactor).toFixed() + 'px');
   } else {
     if ($('.forestSign').css('width') !== (forestSignWidth + 'px')) {
       $('.forestSign').css('width', forestSignWidth + 'px');
-      $('.forestSign').css('margin-left', '-' + (forestSignWidth/2).toFixed() + 'px');
+      $('.forestSign').css('margin-left', '-' + (forestSignWidth/scalingFactor).toFixed() + 'px');
     }
   }
 }
