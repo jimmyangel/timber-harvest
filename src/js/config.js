@@ -92,6 +92,9 @@ export var config = {
     },
     deschutes: {
       name: 'Deschutes National Forest'
+    },
+    'fremont-winema': {
+      name: 'Fremont-Winema National Forest'
     }
   },
   topLevelDataPath: {
