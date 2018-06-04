@@ -368,13 +368,16 @@ function highlightFeature(e) {
   var id = e.layer.properties.assignedId;
 
   var sortDate = (new Date(timberHarvestSelectData[id].DATE_COMPL)).toISOString();
+  if (sortDate.substring(0, 4) === '1899') {
+    sortDate = 'N/A';
+  }
   var content = infoContentItem({
     saleName: (timberHarvestSelectData[id].SALE_NAME ? timberHarvestSelectData[id].SALE_NAME : 'N/A'),
     activity: timberHarvestSelectData[id].ACTIVITY_N.replace(/ *\([^)]*\) */g, ''),
     acres: timberHarvestSelectData[id].GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
     datePlanned: (new Date(timberHarvestSelectData[id].DATE_PLANN).toLocaleDateString()),
-    dateAccomplished: (new Date(timberHarvestSelectData[id].DATE_ACCOM).toLocaleDateString()),
-    dateCompleted: (new Date(timberHarvestSelectData[id].DATE_COMPL).toLocaleDateString()),
+    dateAccomplished: (timberHarvestSelectData[id].DATE_ACCOM.substring(0, 4) === '1899') ? 'N/A' : (new Date(timberHarvestSelectData[id].DATE_ACCOM).toLocaleDateString()),
+    dateCompleted: (timberHarvestSelectData[id].DATE_COMPL.substring(0, 4) === '1899') ? 'N/A' : (new Date(timberHarvestSelectData[id].DATE_COMPL).toLocaleDateString()),
     sortDate: sortDate
   });
 
@@ -415,8 +418,20 @@ function showFeaturesForRange() {
 
   var style = getTimberHarvestLayerStyle(config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest);
   timberHarvestSelectData.forEach(function(s) {
-    var y = (new Date(s.DATE_COMPL)).getFullYear();
-    if ((y >= fromYear) && (y <= toYear)) {
+    var refYear;
+
+    if (s.DATE_COMPL.substring(0, 4) === '1899') {
+      if (s.DATE_ACCOM.substring(0, 4) === '1899') {
+        refYear = (new Date(s.DATE_PLANN)).getFullYear();
+      } else {
+        refYear = (new Date(s.DATE_ACCOM)).getFullYear();
+      }
+    } else {
+      refYear = (new Date(s.DATE_COMPL)).getFullYear();
+    }
+
+    //var y = (new Date(s.DATE_COMPL)).getFullYear();
+    if ((refYear >= fromYear) && (refYear <= toYear)) {
       timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
     } else {
       timberHarvestPbfLayer.setFeatureStyle(s.assignedId, {weight:0, fill: false});
