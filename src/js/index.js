@@ -416,6 +416,11 @@ function showFeaturesForRange() {
   $('#fromLabel').text(fromYear);
   $('#toLabel').text(toYear);
 
+  // This is a temporary workaround to deal with future dates
+  if (toYear === config.dateRangeSliderOptions.max) {
+    toYear = 9999
+  }
+
   var style = getTimberHarvestLayerStyle(config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest);
   timberHarvestSelectData.forEach(function(s) {
     var refYear;
