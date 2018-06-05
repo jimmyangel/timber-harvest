@@ -422,7 +422,7 @@ function showFeaturesForRange() {
   }
 
   var style = getTimberHarvestLayerStyle(config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest);
-  timberHarvestSelectData.forEach(function(s) {
+  timberHarvestSelectData.forEach(function(s, idx) {
     var refYear;
 
     if (s.DATE_COMPL.substring(0, 4) === '1899') {
@@ -435,11 +435,16 @@ function showFeaturesForRange() {
       refYear = (new Date(s.DATE_COMPL)).getFullYear();
     }
 
-    //var y = (new Date(s.DATE_COMPL)).getFullYear();
     if ((refYear >= fromYear) && (refYear <= toYear)) {
-      timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
+      if (!s.isOn) {
+        timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
+        timberHarvestSelectData[idx].isOn = true;
+      }
     } else {
-      timberHarvestPbfLayer.setFeatureStyle(s.assignedId, {weight:0, fill: false});
+      if (s.isOn) {
+        timberHarvestPbfLayer.setFeatureStyle(s.assignedId, {weight:0, fill: false});
+        timberHarvestSelectData[idx].isOn = false;
+      }
     }
   });
 }
@@ -511,6 +516,10 @@ function displaytimberHarvestPbfLayer(nf) {
   $.getJSON(config.dataPath.baseUrl + nf + config.dataPath.infoFileName, function(data) {
 
     timberHarvestSelectData = data;
+
+    timberHarvestSelectData.forEach(function(s, idx) {
+      timberHarvestSelectData[idx].isOn = true;
+    });
 
     config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
     var url = config.timberHarvestLayer.baseUrl + nf + config.timberHarvestLayer.tileScheme;
