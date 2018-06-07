@@ -434,6 +434,9 @@ function showFeaturesForRange() {
     } else {
       refYear = (new Date(s.DATE_COMPL)).getFullYear();
     }
+    if (s.isOn && (style.fillOpacity !== config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillOpacity)) {
+      timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
+    }
 
     if ((refYear >= fromYear) && (refYear <= toYear)) {
       if (!s.isOn) {

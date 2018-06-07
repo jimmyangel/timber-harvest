@@ -108,7 +108,7 @@ export var config = {
     options: {
       vectorTileLayerStyles: {
         timberharvest: {
-          weight: 1,
+          weight: 0,
           opacity: 1,
           color: '#d55e00',
           dashArray: '3',

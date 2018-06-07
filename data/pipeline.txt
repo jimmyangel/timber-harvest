@@ -22,3 +22,7 @@ tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --mi
 
 ### Generate info file
 mapshaper timber-or-s.json -filter-fields assignedId,SALE_NAME,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES timber-or-s.json -o format=json timber-or-s-info.json
+
+### Compare with Rosana's file
+
+./ms.sh -i USATimberHarvest/S_USA.Activity_TimberHarvest.shp -filter 'ADMIN_FO_1 === "Willamette National Forest"' -filter-fields ADMIN_FO_1,SALE_NAME,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES,NBR_UNITS1 -verbose -o format=csv timber-willamette-list.csv
