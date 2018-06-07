@@ -130,6 +130,7 @@ function gotoTop() {
     utils.resetPlaybackControl();
     resetHighlight();
     dateRangeSlider.move({left: config.dateRangeSliderOptions.min, right: config.dateRangeSliderOptions.max}, true);
+    opacitySlider.move({right: config.defaultOpacity}, false);
     timberHarvestPbfLayer.removeFrom(map);
     timberHarvestPbfLayer = undefined;
     timberHarvestSelectData = undefined;
@@ -233,8 +234,8 @@ function setUpInfoPanel() {
   dateRangeSlider = new Slider($('#dateRangeSlider')[0], config.dateRangeSliderOptions);
   // $('.handle').attr('tabindex', 0); Deal with keyboard later
 
+  config.opacitySliderOptions.start = config.defaultOpacity;
   opacitySlider = new Slider($('#opacitySlider')[0], config.opacitySliderOptions);
-
   $('.info').hide();
 
   // These tweaks are needed to allow for the info box to scroll and not run on top of other things
@@ -434,14 +435,17 @@ function showFeaturesForRange() {
     } else {
       refYear = (new Date(s.DATE_COMPL)).getFullYear();
     }
-    if (s.isOn && (style.fillOpacity !== config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillOpacity)) {
-      timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
-    }
 
     if ((refYear >= fromYear) && (refYear <= toYear)) {
       if (!s.isOn) {
         timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
+        timberHarvestSelectData[idx].fillOpacity = style.fillOpacity;
         timberHarvestSelectData[idx].isOn = true;
+      } else {
+        if (style.fillOpacity !== s.fillOpacity) {
+          timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
+          timberHarvestSelectData[idx].fillOpacity = style.fillOpacity;
+        }
       }
     } else {
       if (s.isOn) {
@@ -522,6 +526,7 @@ function displaytimberHarvestPbfLayer(nf) {
 
     timberHarvestSelectData.forEach(function(s, idx) {
       timberHarvestSelectData[idx].isOn = true;
+      timberHarvestSelectData[idx].fillOpacity = config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillOpacity
     });
 
     config.timberHarvestLayer.options.rendererFactory = L.svg.tile;

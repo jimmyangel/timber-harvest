@@ -192,12 +192,12 @@ export var config = {
       end: 2018,
       overlap: true
   },
+  defaultOpacity: 70,
   opacitySliderOptions: {
       isDate: false,
       isOneWay: true,
       min: 0,
-      max: 100,
-      start: 70
+      max: 100
   },
   forestBoundaryStyle: {
     fillColor: '#E5D499',
