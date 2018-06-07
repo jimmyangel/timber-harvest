@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.0.4<sup>Alpha</sup>',
+  versionString: 'v0.0.5<sup>Alpha</sup>',
   baseMapLayers: [
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',

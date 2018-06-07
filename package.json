@@ -1,6 +1,6 @@
 {
   "name": "timber-harvest",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Interactive map to visualize National Forest timber harvest data",
   "main": "index.js",
   "repository": {
@@ -30,6 +30,7 @@
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
     "webpack": "^4.6.0",
+    "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^2.1.2",
     "webpack-dev-server": "^3.1.4"
   },
@@ -39,8 +40,9 @@
     "jquery": "^3.3.1",
     "leaflet": "^1.3.1",
     "leaflet-fullscreen": "^1.0.2",
-    "leaflet-modal": "^0.1.5",
+    "leaflet-modal": "git+https://github.com/jimmyangel/Leaflet.Modal.git",
     "leaflet.vectorgrid": "^1.3.0",
+    "micromodal": "^0.3.2",
     "multirange": "^1.0.0",
     "nprogress": "^0.2.0",
     "omni-slider": "^1.2.1",

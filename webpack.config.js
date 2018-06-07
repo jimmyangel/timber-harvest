@@ -3,6 +3,8 @@ const webpack = require('webpack');
 const HtmlPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 module.exports = {
   context: path.resolve(__dirname, './src'),
   entry: ['./js/index.js', './css/styles.css'],
@@ -14,6 +16,7 @@ module.exports = {
     new HtmlPlugin({template: 'index.html',inject : true}),
     new ExtractTextPlugin('styles.css'),
     new webpack.ProvidePlugin({$: 'jquery', jQuery: 'jquery'})
+    //new BundleAnalyzerPlugin()
   ],
   devServer: {
     contentBase: './public',

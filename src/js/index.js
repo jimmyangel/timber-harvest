@@ -336,6 +336,7 @@ function setUpAboutControl() {
     return this._div;
   };
   aboutControl.addTo(map);
+
   $('#aboutControl').click(function() {
     map.fire('modal', {
       content: aboutModal({version: config.versionString})
