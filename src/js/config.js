@@ -107,15 +107,7 @@ export var config = {
     tileScheme: '/{z}/{x}/{y}.pbf',
     options: {
       vectorTileLayerStyles: {
-        timberharvest: {
-          weight: 0,
-          opacity: 1,
-          color: '#d55e00',
-          dashArray: '3',
-          fillOpacity: 0.7,
-          fillColor: '#d55e00',
-          fill: true
-        }
+        timberharvest: {}
       },
       zIndex: 10,
       interactive: true,
@@ -125,16 +117,21 @@ export var config = {
       getFeatureId: function(f) {
         return f.properties.assignedId;
       }
-    },
-    highlightedFeatureStyle: {
-      weight: 3,
-      opacity: 1,
-      color: 'black',
-      dashArray: '3',
-      fillOpacity: 0.7,
-      fillColor: '#d55e00',
-      fill: true
     }
+  },
+  timberHarvestStyle: {
+    weight: 0,
+    opacity: 1,
+    color: '#d55e00',
+    dashArray: '3',
+    fillOpacity: 0.7,
+    fillColor: '#d55e00',
+    fill: true
+  },
+  highlightedTimberHarvestFeatureStyle: {
+    weight: 3,
+    opacity: 1,
+    color: 'black'
   },
   unharvestedOverlayLayer: {
     baseUrl: 'https://tiles.oregonhowl.org/unharvested/',
@@ -142,8 +139,8 @@ export var config = {
     options: {
       vectorTileLayerStyles: {
         vegetation: {
-          weight: 1,
-          opacity: 1,
+          weight: 0,
+          opacity: 0,
           color: '#009E73',
           fillColor: '#009E73',
           fillOpacity: 0.7,
@@ -185,35 +182,50 @@ export var config = {
     9.9: 'Trees 21.0 inches DBH and larger'
   },
   activityCodeTypes: {
-    4101: 'Clearcut',
-    4102: 'Clearcut',
-    4111: 'Clearcut',
-    4113: 'Clearcut',
-    4121: 'Clearcut',
-    4131: 'Clearcut',
-    4141: 'Clearcut',
-    4142: 'Clearcut',
-    4143: 'Clearcut',
-    4145: 'Clearcut',
-    4146: 'Clearcut',
-    4148: 'Thinning',
-    4151: 'Thinning',
-    4152: 'Thinning',
-    4162: 'Clearcut',
-    4175: 'Clearcut',
-    4177: 'Clearcut',
-    4183: 'Clearcut',
-    4192: 'Thinning',
-    4193: 'Clearcut',
-    4194: 'Clearcut',
-    4196: 'Clearcut',
-    4210: 'Thinning',
-    4211: 'Other',
-    4220: 'Thinning',
-    4231: 'Clearcut',
-    4232: 'Other',
-    4242: 'Other'
+    '4101': 0, // Clearcut
+    '4102': 0,
+    '4111': 0,
+    '4113': 0,
+    '4121': 0,
+    '4131': 0,
+    '4132': 0,
+    '4141': 0,
+    '4142': 0,
+    '4143': 0,
+    '4145': 0,
+    '4146': 0,
+    '4148': 1, // Thinning
+    '4151': 1,
+    '4152': 1,
+    '4162': 0,
+    '4175': 0,
+    '4177': 0,
+    '4183': 0,
+    '4192': 1,
+    '4193': 0,
+    '4194': 0,
+    '4196': 0,
+    '4210': 1,
+    '4211': 2, // Other
+    '4220': 1,
+    '4231': 0,
+    '4232': 2,
+    '4242': 2
   },
+  activityLegend: [
+    {
+      color: '#BA4A00',
+      text: 'Clearcut'
+    },
+    {
+      color: '#F1C40F',
+      text: 'Thinning'
+    },
+    {
+      color: '#666600',
+      text: 'Other'
+    }
+  ],
   dateRangeSliderOptions: {
       isDate: false,
       min: 1900,

@@ -1,4 +1,4 @@
-./ms.sh -i USATimberHarvest/S_USA.Activity_TimberHarvest.shp -filter 'ADMIN_FO_1 === "Willamette National Forest"' -filter-fields ADMIN_FO_1,SALE_NAME,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES -verbose -o format=geojson precision=0.0001 timber-or.json
+./ms.sh -i USATimberHarvest/S_USA.Activity_TimberHarvest.shp -filter 'ADMIN_FO_1 === "Willamette National Forest"' -filter-fields ADMIN_FO_1,SALE_NAME,ACTIVITY_C,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES -verbose -o format=geojson precision=0.0001 timber-or.json
 
 mapshaper timber-or.json -each 'assignedId=this.id' -simplify 30% visvalingam keep-shapes -o format=geojson timber-or-s.json
 
@@ -21,7 +21,7 @@ mapshaper timber-or-s.json -filter-fields assignedId,DATE_COMPL -o format=json t
 tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --output-to-directory "vtiles" timber-or-s.json
 
 ### Generate info file
-mapshaper timber-or-s.json -filter-fields assignedId,SALE_NAME,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES timber-or-s.json -o format=json timber-or-s-info.json
+mapshaper timber-or-s.json -filter-fields assignedId,SALE_NAME,ACTIVITY_C,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES timber-or-s.json -o format=json timber-or-s-info.json
 
 ### Compare with Rosana's file
 

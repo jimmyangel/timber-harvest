@@ -4,10 +4,13 @@
   <small><span id="tipToClick">(Click on a shape to view details)</span></small>
 </div>
 <hr>
-<div class="legend-entry" style="text-align: left; margin-left: 10px;">
-  <div class="v-legend-scale">
-    <ul class="v-legend-items">
-      <li><span class="legend-item" style='background:{{layerColor}};'></span> Timber Harvests</li>
+<div class="legend-entry" style="text-align: center;">
+  <div class="legend-title">Harvest Type</div>
+  <div class="legend-scale">
+    <ul class="legend-items">
+      {{#each activityLegend}}
+      <li><span class="legend-item" style='background:{{this.color}};'></span> {{this.text}}</li>
+      {{/each}}
     </ul>
   </div>
 </div>

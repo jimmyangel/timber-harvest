@@ -46,6 +46,9 @@ var layersControl;
 var dateRangeSlider;
 var opacitySlider;
 
+var fromYear;
+var toYear;
+
 setUpCustomPanes();
 setUpInfoPanel();
 setUpResetControl();
@@ -217,8 +220,9 @@ function setUpInfoPanel() {
   info.onAdd = function () {
     this._div = L.DomUtil.create('div', 'info');
     this._div.innerHTML = infoHeader({
-      layerColor: config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillColor,
-      layerOpacity: (config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillOpacity * 100).toFixed()
+      activityLegend: config.activityLegend,
+      layerColor: config.timberHarvestStyle.fillColor,
+      layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed()
     });
     L.DomEvent.disableClickPropagation(this._div);
     return this._div;
@@ -401,59 +405,27 @@ function highlightFeature(e) {
 
   highlightedFeatures.push(e.layer.properties.assignedId);
 
-  timberHarvestPbfLayer.setFeatureStyle(e.layer.properties.assignedId, getTimberHarvestLayerStyle(config.timberHarvestLayer.highlightedFeatureStyle));
+  console.log(timberHarvestSelectData[e.layer.properties.assignedId]);
+
+  var style = Object.assign({}, getTimberHarvestFeatureStyle(e.layer.properties.assignedId), config.highlightedTimberHarvestFeatureStyle);
+  timberHarvestPbfLayer.setFeatureStyle(e.layer.properties.assignedId, getTimberHarvestLayerStyle(style));
 }
 
 function resetHighlight() {
   highlightedFeatures.forEach(function(highlightedFeature) {
-    timberHarvestPbfLayer.setFeatureStyle(highlightedFeature, getTimberHarvestLayerStyle(config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest));
+    timberHarvestPbfLayer.resetFeatureStyle(highlightedFeature);
   });
   $('#infoContent').empty();
   highlightedFeatures = [];
 }
 
 function showFeaturesForRange() {
-  var fromYear = Math.round(dateRangeSlider.getInfo().left);
-  var toYear = Math.round(dateRangeSlider.getInfo().right);
+  fromYear = Math.round(dateRangeSlider.getInfo().left);
+  toYear = Math.round(dateRangeSlider.getInfo().right);
   $('#fromLabel').text(fromYear);
   $('#toLabel').text(toYear);
-
-  // This is a temporary workaround to deal with future dates
-  if (toYear === config.dateRangeSliderOptions.max) {
-    toYear = 9999
-  }
-
-  var style = getTimberHarvestLayerStyle(config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest);
   timberHarvestSelectData.forEach(function(s, idx) {
-    var refYear;
-
-    if (s.DATE_COMPL.substring(0, 4) === '1899') {
-      if (s.DATE_ACCOM.substring(0, 4) === '1899') {
-        refYear = (new Date(s.DATE_PLANN)).getFullYear();
-      } else {
-        refYear = (new Date(s.DATE_ACCOM)).getFullYear();
-      }
-    } else {
-      refYear = (new Date(s.DATE_COMPL)).getFullYear();
-    }
-
-    if ((refYear >= fromYear) && (refYear <= toYear)) {
-      if (!s.isOn) {
-        timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
-        timberHarvestSelectData[idx].fillOpacity = style.fillOpacity;
-        timberHarvestSelectData[idx].isOn = true;
-      } else {
-        if (style.fillOpacity !== s.fillOpacity) {
-          timberHarvestPbfLayer.setFeatureStyle(s.assignedId, style);
-          timberHarvestSelectData[idx].fillOpacity = style.fillOpacity;
-        }
-      }
-    } else {
-      if (s.isOn) {
-        timberHarvestPbfLayer.setFeatureStyle(s.assignedId, {weight:0, fill: false});
-        timberHarvestSelectData[idx].isOn = false;
-      }
-    }
+    timberHarvestPbfLayer.resetFeatureStyle(idx);
   });
 }
 
@@ -461,8 +433,8 @@ function getTimberHarvestLayerStyle(sourceStyle) {
   var s = Object.assign({}, sourceStyle);
   s.fillOpacity = (Math.round(opacitySlider.getInfo().right)) / 100;
   s.opacity = Math.min(s.fillOpacity *
-    (config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.opacity /
-      config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillOpacity), 1);
+    (config.timberHarvestStyle.opacity /
+      config.timberHarvestStyle.fillOpacity), 1);
   return s;
 }
 
@@ -519,6 +491,41 @@ function setUpSlideHandlers() {
   });
 }
 
+function applytimberHarvestLayerStyle(p) {
+
+  if (toYear === config.dateRangeSliderOptions.max) {
+    toYear = 9999
+  }
+
+  var refYear;
+
+  if (timberHarvestSelectData[p.assignedId].DATE_COMPL.substring(0, 4) === '1899') {
+    if (timberHarvestSelectData[p.assignedId].DATE_ACCOM.substring(0, 4) === '1899') {
+      refYear = (new Date(timberHarvestSelectData[p.assignedId].DATE_PLANN)).getFullYear();
+    } else {
+      refYear = (new Date(timberHarvestSelectData[p.assignedId].DATE_ACCOM)).getFullYear();
+    }
+  } else {
+    refYear = (new Date(timberHarvestSelectData[p.assignedId].DATE_COMPL)).getFullYear();
+  }
+
+  if ((refYear >= fromYear) && (refYear <= toYear)) {
+    return getTimberHarvestFeatureStyle(p.assignedId);
+  }
+
+  return {weight:0, fill: false};
+}
+
+function getTimberHarvestFeatureStyle(id) {
+  var style = config.timberHarvestStyle;
+  style.fillOpacity = (Math.round(opacitySlider.getInfo().right)) / 100;
+  if (timberHarvestSelectData[id].ACTIVITY_2) {
+    style.color = config.activityLegend[config.activityCodeTypes[timberHarvestSelectData[id].ACTIVITY_2]].color;
+    style.fillColor = style.color;
+  }
+  return style;
+}
+
 function displaytimberHarvestPbfLayer(nf) {
 
   $.getJSON(config.dataPath.baseUrl + nf + config.dataPath.infoFileName, function(data) {
@@ -527,10 +534,11 @@ function displaytimberHarvestPbfLayer(nf) {
 
     timberHarvestSelectData.forEach(function(s, idx) {
       timberHarvestSelectData[idx].isOn = true;
-      timberHarvestSelectData[idx].fillOpacity = config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest.fillOpacity
+      timberHarvestSelectData[idx].fillOpacity = config.timberHarvestStyle.fillOpacity
     });
 
     config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
+    config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest = applytimberHarvestLayerStyle;
     var url = config.timberHarvestLayer.baseUrl + nf + config.timberHarvestLayer.tileScheme;
     timberHarvestPbfLayer = L.vectorGrid.protobuf(url, config.timberHarvestLayer.options).addTo(map);
 
@@ -546,6 +554,8 @@ function displaytimberHarvestPbfLayer(nf) {
         spinner.stop();
       }
     });
+
+    showFeaturesForRange();
 
     NProgress.done();
 
