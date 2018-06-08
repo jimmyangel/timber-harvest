@@ -221,7 +221,6 @@ function setUpInfoPanel() {
     this._div = L.DomUtil.create('div', 'info');
     this._div.innerHTML = infoHeader({
       activityLegend: config.activityLegend,
-      layerColor: config.timberHarvestStyle.fillColor,
       layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed()
     });
     L.DomEvent.disableClickPropagation(this._div);
@@ -405,10 +404,8 @@ function highlightFeature(e) {
 
   highlightedFeatures.push(e.layer.properties.assignedId);
 
-  console.log(timberHarvestSelectData[e.layer.properties.assignedId]);
-
   var style = Object.assign({}, getTimberHarvestFeatureStyle(e.layer.properties.assignedId), config.highlightedTimberHarvestFeatureStyle);
-  timberHarvestPbfLayer.setFeatureStyle(e.layer.properties.assignedId, getTimberHarvestLayerStyle(style));
+  timberHarvestPbfLayer.setFeatureStyle(e.layer.properties.assignedId, style);
 }
 
 function resetHighlight() {
@@ -427,15 +424,6 @@ function showFeaturesForRange() {
   timberHarvestSelectData.forEach(function(s, idx) {
     timberHarvestPbfLayer.resetFeatureStyle(idx);
   });
-}
-
-function getTimberHarvestLayerStyle(sourceStyle) {
-  var s = Object.assign({}, sourceStyle);
-  s.fillOpacity = (Math.round(opacitySlider.getInfo().right)) / 100;
-  s.opacity = Math.min(s.fillOpacity *
-    (config.timberHarvestStyle.opacity /
-      config.timberHarvestStyle.fillOpacity), 1);
-  return s;
 }
 
 function setUpPlaybackControl() {
@@ -497,17 +485,7 @@ function applytimberHarvestLayerStyle(p) {
     toYear = 9999
   }
 
-  var refYear;
-
-  if (timberHarvestSelectData[p.assignedId].DATE_COMPL.substring(0, 4) === '1899') {
-    if (timberHarvestSelectData[p.assignedId].DATE_ACCOM.substring(0, 4) === '1899') {
-      refYear = (new Date(timberHarvestSelectData[p.assignedId].DATE_PLANN)).getFullYear();
-    } else {
-      refYear = (new Date(timberHarvestSelectData[p.assignedId].DATE_ACCOM)).getFullYear();
-    }
-  } else {
-    refYear = (new Date(timberHarvestSelectData[p.assignedId].DATE_COMPL)).getFullYear();
-  }
+  var refYear = timberHarvestSelectData[p.assignedId].refYear;
 
   if ((refYear >= fromYear) && (refYear <= toYear)) {
     return getTimberHarvestFeatureStyle(p.assignedId);
@@ -533,8 +511,17 @@ function displaytimberHarvestPbfLayer(nf) {
     timberHarvestSelectData = data;
 
     timberHarvestSelectData.forEach(function(s, idx) {
-      timberHarvestSelectData[idx].isOn = true;
       timberHarvestSelectData[idx].fillOpacity = config.timberHarvestStyle.fillOpacity
+
+      if (s.DATE_COMPL.substring(0, 4) === '1899') {
+        if (s.DATE_ACCOM.substring(0, 4) === '1899') {
+          timberHarvestSelectData[idx].refYear = (new Date(s.DATE_PLANN)).getFullYear();
+        } else {
+          timberHarvestSelectData[idx].refYear = (new Date(s.DATE_ACCOM)).getFullYear();
+        }
+      } else {
+        timberHarvestSelectData[idx].refYear = (new Date(s.DATE_COMPL)).getFullYear();
+      }
     });
 
     config.timberHarvestLayer.options.rendererFactory = L.svg.tile;

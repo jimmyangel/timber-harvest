@@ -222,7 +222,7 @@ export var config = {
       text: 'Thinning'
     },
     {
-      color: '#666600',
+      color: 'grey',
       text: 'Other'
     }
   ],
