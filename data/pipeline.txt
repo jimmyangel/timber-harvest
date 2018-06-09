@@ -27,3 +27,12 @@ mapshaper timber-or-s.json -filter-fields assignedId,SALE_NAME,ACTIVITY_2,ACTIVI
 ### Compare with Rosana's file
 
 ./ms.sh -i USATimberHarvest/S_USA.Activity_TimberHarvest.shp -filter 'ADMIN_FO_1 === "Willamette National Forest"' -filter-fields ADMIN_FO_1,SALE_NAME,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES,NBR_UNITS1 -verbose -o format=csv timber-willamette-list.csv
+
+### Sequence for a forest
+./ms.sh -i USATimberHarvest/S_USA.Activity_TimberHarvest.shp -filter 'ADMIN_FO_1 === "Umatilla National Forest"' -filter-fields ADMIN_FO_1,SALE_NAME,ACTIVITY_2,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES -verbose -o format=geojson precision=0.0001 timber-or.json
+
+mapshaper timber-or.json -each 'assignedId=this.id' -simplify 30% visvalingam keep-shapes -o format=geojson timber-or-s.json
+
+tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --output-to-directory "vtiles/umatilla" timber-or-s.json
+
+mapshaper timber-or-s.json -filter-fields assignedId,SALE_NAME,ACTIVITY_2,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES timber-or-s.json -o format=json vtiles/umatilla/timber-or-s-info.json

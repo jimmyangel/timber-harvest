@@ -101,6 +101,24 @@ export var config = {
     },
     mounthood: {
       name: 'Mount Hood National Forest'
+    },
+    'rogueriver-siskiyou': {
+      name: 'Rogue River-Siskiyou National Forest'
+    },
+    siuslaw: {
+      name: 'Siuslaw National Forest'
+    },
+    ochoco: {
+      name: 'Ochoco National Forest'
+    },
+    'wallowa-whitman': {
+      name: 'Wallowa Whitman National Forest'
+    },
+    malheur: {
+      name: 'Malheur National Forest'
+    },
+    umatilla: {
+      name: 'Umatilla National Forest'
     }
   },
   topLevelDataPath: {
