@@ -511,7 +511,6 @@ function displaytimberHarvestPbfLayer(nf) {
     timberHarvestSelectData = data;
 
     timberHarvestSelectData.forEach(function(s, idx) {
-      timberHarvestSelectData[idx].fillOpacity = config.timberHarvestStyle.fillOpacity
 
       if (s.DATE_COMPL.substring(0, 4) === '1899') {
         if (s.DATE_ACCOM.substring(0, 4) === '1899') {
