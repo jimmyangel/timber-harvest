@@ -95,6 +95,12 @@ export var config = {
     },
     'fremont-winema': {
       name: 'Fremont-Winema National Forest'
+    },
+    umpqua: {
+      name: 'Umpqua National Forest'
+    },
+    mounthood: {
+      name: 'Mount Hood National Forest'
     }
   },
   topLevelDataPath: {
