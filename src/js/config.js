@@ -271,5 +271,14 @@ export var config = {
     color: '#562700',
     opacity: 1,
     weight: 3
+  },
+  stripesStyleOptions: {
+    angle: -45,
+    color: '#BA4A00',
+    //spaceColor: '#BA4A00',
+    height: 10,
+    weight: 2,
+    //spaceWeight: 1,
+    //spaceOpacity: 0.7
   }
 }

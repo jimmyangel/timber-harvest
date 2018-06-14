@@ -6,6 +6,7 @@ import L from 'leaflet';
 import 'leaflet-fullscreen';
 import 'leaflet.vectorgrid';
 import 'leaflet-modal';
+import 'leaflet.pattern';
 import Spinner from 'spin';
 import Slider from 'omni-slider';
 
@@ -27,6 +28,7 @@ var spinner = new Spinner(config.spinnerOpts);
 //spinner.spin($('#spinner')[0]);
 
 var map = L.map('map', {fullscreenControl: true, zoom: 6, minZoom: 6, maxBounds: [[41, -126], [47, -115]]});
+var stripes = new L.StripePattern(config.stripesStyleOptions); stripes.addTo(map);
 var resetViewBounds = config.oregonBbox;
 map.fitBounds(resetViewBounds);
 
@@ -39,7 +41,8 @@ var timberHarvestSelectData;
 var timberHarvestPbfLayer;
 var unharvestedLayer;
 var lastLayerEventTimeStamp;
-var nfLayerGroup = L.layerGroup().addTo(map); // This is so getCenter works
+var nfSignsLayerGroup = L.layerGroup().addTo(map); // This is so getCenter works
+var nfShapes;
 
 var layersControl;
 
@@ -77,7 +80,7 @@ initMap(function() {
 
 function initMap(callback) {
   $.getJSON(config.topLevelDataPath.baseUrl + config.topLevelDataPath.nfCartoonsFileName, function(data) {
-    var g = L.geoJson(data, {
+    nfShapes = L.geoJson(data, {
       style: config.forestBoundaryStyle,
       onEachFeature: function(f, l) {
         if (config.forests[l.feature.properties.name]) {
@@ -87,14 +90,14 @@ function initMap(callback) {
           gotoNationalForest(l.feature.properties.name, true, e.latlng);
         });
       }
-    }).addTo(nfLayerGroup);
+    }).addTo(map);
 
-    g.eachLayer(function(l) {
+    nfShapes.eachLayer(function(l) {
       var m = L.marker(l.getCenter(), {
         icon: L.icon({
           iconUrl: config.topLevelDataPath.baseUrl + l.feature.properties.name + config.topLevelDataPath.nfIconSuffix,
           className: 'forestSign'}
-      )}).addTo(nfLayerGroup);
+      )}).addTo(nfSignsLayerGroup);
       m.on('click', function(e) {
         gotoNationalForest(l.feature.properties.name, true, e.latlng);
       });
@@ -105,7 +108,7 @@ function initMap(callback) {
 
     map.on('zoomend', function() {setSignSize(forestSignWidth);});
 
-    nfLayerGroup.removeFrom(map); // Will add it later if top level
+    nfSignsLayerGroup.removeFrom(map); // Will add it later if top level
 
     return callback();
   });
@@ -130,6 +133,8 @@ function setSignSize(forestSignWidth) {
 function gotoTop() {
   resetViewBounds = config.oregonBbox;
   if (timberHarvestPbfLayer) {
+    nfShapes.setStyle(config.forestBoundaryStyle);
+    enableAllNfShapesClick();
     utils.resetPlaybackControl();
     resetHighlight();
     dateRangeSlider.move({left: config.dateRangeSliderOptions.min, right: config.dateRangeSliderOptions.max}, true);
@@ -146,7 +151,7 @@ function gotoTop() {
   $('.info').hide();
   $('.topLabel').show();
   map.flyToBounds(resetViewBounds);
-  nfLayerGroup.addTo(map);
+  nfSignsLayerGroup.addTo(map);
 }
 
 function gotoNationalForest(nf, pushState, popUpLatlng) {
@@ -155,9 +160,18 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
       history.pushState(nf, '', '?f=' + nf);
     }
     resetViewBounds = config.forests[nf].bounds;
-    map.fitBounds(resetViewBounds);
+    //map.fitBounds(resetViewBounds);
     spinner.spin($('#spinner')[0]);
-    nfLayerGroup.removeFrom(map);
+    nfSignsLayerGroup.removeFrom(map);
+    if (timberHarvestPbfLayer) {
+      timberHarvestPbfLayer.removeFrom(map);
+    } else {
+      map.fitBounds(resetViewBounds);
+    }
+    nfShapes.setStyle(config.forestBoundaryStyle);
+    nfShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
+    enableAllNfShapesClick();
+    disableNfShapeClick(nf);
     displaytimberHarvestPbfLayer(nf);
     addUnharvestedOverlay(nf);
     $('#infoPanelSubTitle').text(config.forests[nf].name);
@@ -168,6 +182,25 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
       map.openPopup('Coming soon...', popUpLatlng);
     }
   }
+}
+
+function enableAllNfShapesClick() {
+  nfShapes.eachLayer(function(l) {
+    if (!l.listens('click')) {
+      l.on('click', function(e) {
+        gotoNationalForest(l.feature.properties.name, true, e.latlng);
+      });
+    }
+  });
+}
+
+function disableNfShapeClick(nf) {
+  nfShapes.eachLayer(function(l) {
+    if (nf === l.feature.properties.name) {
+      l.setStyle({opacity: 0, fillOpacity: 0})
+      l.off('click');
+    }
+  });
 }
 
 function addUnharvestedOverlay(nf) {
