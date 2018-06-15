@@ -96,7 +96,8 @@ function initMap(callback) {
       var m = L.marker(l.getCenter(), {
         icon: L.icon({
           iconUrl: config.topLevelDataPath.baseUrl + l.feature.properties.name + config.topLevelDataPath.nfIconSuffix,
-          className: 'forestSign'}
+          className: 'forestSign ' + l.feature.properties.name + '-sign'
+        }
       )}).addTo(nfSignsLayerGroup);
       m.on('click', function(e) {
         gotoNationalForest(l.feature.properties.name, true, e.latlng);
@@ -108,7 +109,7 @@ function initMap(callback) {
 
     map.on('zoomend', function() {setSignSize(forestSignWidth);});
 
-    nfSignsLayerGroup.removeFrom(map); // Will add it later if top level
+    //nfSignsLayerGroup.removeFrom(map); // Will add it later if top level
 
     return callback();
   });
@@ -151,7 +152,8 @@ function gotoTop() {
   $('.info').hide();
   $('.topLabel').show();
   map.flyToBounds(resetViewBounds);
-  nfSignsLayerGroup.addTo(map);
+  $('.forestSign').show();
+  //nfSignsLayerGroup.addTo(map);
 }
 
 function gotoNationalForest(nf, pushState, popUpLatlng) {
@@ -162,7 +164,9 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     resetViewBounds = config.forests[nf].bounds;
     //map.fitBounds(resetViewBounds);
     spinner.spin($('#spinner')[0]);
-    nfSignsLayerGroup.removeFrom(map);
+    //nfSignsLayerGroup.removeFrom(map);
+    $('.forestSign').show();
+    $('.' + nf + '-sign').hide();
     if (timberHarvestPbfLayer) {
       timberHarvestPbfLayer.removeFrom(map);
     } else {
