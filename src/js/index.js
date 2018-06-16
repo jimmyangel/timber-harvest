@@ -144,9 +144,7 @@ function gotoTop() {
     timberHarvestPbfLayer = undefined;
     timberHarvestSelectData = undefined;
     if (unharvestedLayer) {
-      unharvestedLayer.removeFrom(map);
-      layersControl.removeLayer(unharvestedLayer);
-      unharvestedLayer = undefined;
+      removeUnharvestedOverlay();
     }
   }
   $('.info').hide();
@@ -177,6 +175,9 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     enableAllNfShapesClick();
     disableNfShapeClick(nf);
     displaytimberHarvestPbfLayer(nf);
+    if (unharvestedLayer) {
+      removeUnharvestedOverlay();
+    }
     addUnharvestedOverlay(nf);
     $('#infoPanelSubTitle').text(config.forests[nf].name);
     $('.topLabel').hide();
@@ -221,6 +222,12 @@ function addUnharvestedOverlay(nf) {
 
     layersControl.addOverlay(unharvestedLayer, config.unharvestedOverlayLayer.name);
   }
+}
+
+function removeUnharvestedOverlay() {
+  unharvestedLayer.removeFrom(map);
+  layersControl.removeLayer(unharvestedLayer);
+  unharvestedLayer = undefined;
 }
 
 function setUpCustomPanes() {
@@ -329,6 +336,9 @@ function setUpLayerControl() {
             l.setStyle(s);
           });
         })(jLayer, config.overlayLayers[k].style);
+        break;
+      default:
+        overlayLayers[config.overlayLayers[k].name] = L.tileLayer(config.overlayLayers[k].url, config.overlayLayers[k].options);
     }
   }
 

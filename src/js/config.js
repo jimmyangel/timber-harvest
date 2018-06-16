@@ -75,7 +75,16 @@ export var config = {
         color: 'black',
         fill: false
       }
-    }
+    } /*,
+    {
+      url: 'https://tiles.oregonhowl.org/clearcuts/{z}/{x}/{y}.png',
+      options: {
+        maxZoom: 18,
+        attribution: 'Oregon Wild'
+      },
+      name: 'Clearcuts on Federal Lands',
+      type: 'tile'
+    } */
   ],
   oregonBbox: [
     [41.9918, -124.7035],
