@@ -7,6 +7,7 @@ import 'leaflet-fullscreen';
 import 'leaflet.vectorgrid';
 import 'leaflet-modal';
 import 'leaflet.pattern';
+import 'leaflet-tilelayer-pixelfilter';
 import Spinner from 'spin';
 import Slider from 'omni-slider';
 
@@ -338,9 +339,9 @@ function setUpLayerControl() {
         })(jLayer, config.overlayLayers[k].style);
         break;
       default:
-        overlayLayers[config.overlayLayers[k].name] = L.tileLayer(config.overlayLayers[k].url, config.overlayLayers[k].options);
+        overlayLayers[config.overlayLayers[k].name] = L.tileLayerPixelFilter(config.overlayLayers[k].url, config.overlayLayers[k].options);
+      }
     }
-  }
 
   layersControl = L.control.layers(baseMaps, overlayLayers, {position: 'topleft', collapsed: true}).addTo(map);
 }

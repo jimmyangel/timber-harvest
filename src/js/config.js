@@ -75,7 +75,23 @@ export var config = {
         color: 'black',
         fill: false
       }
-    } /*,
+    },
+    {
+      url: 'https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_BLM_Only/MapServer/tile/{z}/{y}/{x}',
+      options: {
+        maxZoom: 18,
+        opacity: 0.5,
+        matchRGBA: [ 150,  128,  150, 255  ],
+        missRGBA:  null,
+        pixelCodes: [ [254, 230, 121], [254, 230, 122] ]
+      },
+      color: 'rgba(150, 128, 150, 0.5)',
+      get name () {
+        return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> BLM Land'
+      },
+      type: 'tile'
+    }
+     /*,
     {
       url: 'https://tiles.oregonhowl.org/clearcuts/{z}/{x}/{y}.png',
       options: {
