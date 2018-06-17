@@ -1,6 +1,6 @@
 {
   "name": "timber-harvest",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Interactive map to visualize National Forest timber harvest data",
   "main": "index.js",
   "repository": {

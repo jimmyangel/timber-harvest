@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.0.7<sup>Alpha</sup>',
+  versionString: 'v0.1.0<sup>Beta</sup>',
   baseMapLayers: [
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
@@ -81,6 +81,7 @@ export var config = {
       options: {
         maxZoom: 18,
         opacity: 0.5,
+        attribution: 'Bureau of Land Management',
         matchRGBA: [ 150,  128,  150, 255  ],
         missRGBA:  null,
         pixelCodes: [ [254, 230, 121], [254, 230, 122] ]
@@ -158,6 +159,7 @@ export var config = {
       vectorTileLayerStyles: {
         timberharvest: {}
       },
+      attribution: 'USDA National Forest Service',
       zIndex: 10,
       interactive: true,
       pane: 'mainpane',
@@ -197,6 +199,7 @@ export var config = {
           className: 'vegetation'
         }
       },
+      attribution: 'USDA National Forest Service',
       interactive: true,
       pane: 'mainpane',
       maxNativeZoom: 14,
