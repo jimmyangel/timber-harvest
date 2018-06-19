@@ -421,7 +421,7 @@ function highlightFeature(e) {
   var id = e.layer.properties.assignedId;
 
   var sortDate = (new Date(timberHarvestSelectData[id].DATE_COMPL)).toISOString();
-  if (sortDate.substring(0, 4) === '1899') {
+  if (sortDate.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
     sortDate = 'N/A';
   }
   var content = infoContentItem({
@@ -429,8 +429,8 @@ function highlightFeature(e) {
     activity: timberHarvestSelectData[id].ACTIVITY_N.replace(/ *\([^)]*\) */g, ''),
     acres: timberHarvestSelectData[id].GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
     datePlanned: (new Date(timberHarvestSelectData[id].DATE_PLANN).toLocaleDateString()),
-    dateAccomplished: (timberHarvestSelectData[id].DATE_ACCOM.substring(0, 4) === '1899') ? 'N/A' : (new Date(timberHarvestSelectData[id].DATE_ACCOM).toLocaleDateString()),
-    dateCompleted: (timberHarvestSelectData[id].DATE_COMPL.substring(0, 4) === '1899') ? 'N/A' : (new Date(timberHarvestSelectData[id].DATE_COMPL).toLocaleDateString()),
+    dateAccomplished: (timberHarvestSelectData[id].DATE_ACCOM.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].DATE_ACCOM).toLocaleDateString()),
+    dateCompleted: (timberHarvestSelectData[id].DATE_COMPL.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].DATE_COMPL).toLocaleDateString()),
     sortDate: sortDate
   });
 
@@ -558,10 +558,11 @@ function displaytimberHarvestPbfLayer(nf) {
 
     timberHarvestSelectData = data;
 
+    var minYear = config.dateRangeSliderOptions.max;
     timberHarvestSelectData.forEach(function(s, idx) {
 
-      if (s.DATE_COMPL.substring(0, 4) === '1899') {
-        if (s.DATE_ACCOM.substring(0, 4) === '1899') {
+      if (s.DATE_COMPL.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
+        if (s.DATE_ACCOM.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
           timberHarvestSelectData[idx].refYear = (new Date(s.DATE_PLANN)).getFullYear();
         } else {
           timberHarvestSelectData[idx].refYear = (new Date(s.DATE_ACCOM)).getFullYear();
@@ -569,7 +570,12 @@ function displaytimberHarvestPbfLayer(nf) {
       } else {
         timberHarvestSelectData[idx].refYear = (new Date(s.DATE_COMPL)).getFullYear();
       }
+
+      minYear = Math.min(timberHarvestSelectData[idx].refYear, minYear);
     });
+
+    dateRangeSlider.move({left: minYear, right: config.dateRangeSliderOptions.max});
+    console.log(minYear);
 
     config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
     config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest = applytimberHarvestLayerStyle;

@@ -286,6 +286,7 @@ export var config = {
       end: 2018,
       overlap: true
   },
+  DATE_NOT_AVAILABLE: '1899',
   defaultOpacity: 70,
   opacitySliderOptions: {
       isDate: false,
