@@ -181,6 +181,12 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     }
     addUnharvestedOverlay(nf);
     $('#infoPanelSubTitle').text(config.forests[nf].name);
+    if (config.forests[nf].underreported) {
+      $('#dataQualityAlert').show();
+    } else {
+      $('#dataQualityAlert').hide();
+    }
+
     $('.topLabel').hide();
     $('.info').show();
   } else {

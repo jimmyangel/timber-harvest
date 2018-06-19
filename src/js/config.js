@@ -132,7 +132,8 @@ export var config = {
       name: 'Rogue River-Siskiyou National Forest'
     },
     siuslaw: {
-      name: 'Siuslaw National Forest'
+      name: 'Siuslaw National Forest',
+      underreported: true
     },
     ochoco: {
       name: 'Ochoco National Forest'
