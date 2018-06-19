@@ -580,8 +580,7 @@ function displaytimberHarvestPbfLayer(nf) {
       minYear = Math.min(timberHarvestSelectData[idx].refYear, minYear);
     });
 
-    dateRangeSlider.move({left: minYear, right: config.dateRangeSliderOptions.max});
-    console.log(minYear);
+    dateRangeSlider.move({left: minYear, right: config.dateRangeSliderOptions.max}, true);
 
     config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
     config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest = applytimberHarvestLayerStyle;
