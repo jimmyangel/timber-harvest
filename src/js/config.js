@@ -126,7 +126,8 @@ export var config = {
       name: 'Umpqua National Forest'
     },
     mounthood: {
-      name: 'Mount Hood National Forest'
+      name: 'Mount Hood National Forest',
+      underreported: true
     },
     'rogueriver-siskiyou': {
       name: 'Rogue River-Siskiyou National Forest'
@@ -310,5 +311,7 @@ export var config = {
     weight: 2,
     //spaceWeight: 1,
     //spaceOpacity: 0.7
-  }
+  },
+  comingSoonMsg: 'Coming soon...',
+  underreportedMsg: '<div style="color: maroon; text-align: center;"><b>Not Available</b><br>Timber harvest data severely<br>underreported in this forest</div>'
 }

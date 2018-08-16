@@ -156,7 +156,7 @@ function gotoTop() {
 }
 
 function gotoNationalForest(nf, pushState, popUpLatlng) {
-  if (config.forests[nf]) {
+  if (config.forests[nf] && !config.forests[nf].underreported) {
     if (pushState) {
       history.pushState(nf, '', '?f=' + nf);
     }
@@ -191,7 +191,7 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     $('.info').show();
   } else {
     if (popUpLatlng) {
-      map.openPopup('Coming soon...', popUpLatlng);
+      map.openPopup((config.forests[nf] && config.forests[nf].underreported) ? config.underreportedMsg : config.comingSoonMsg, popUpLatlng);
     }
   }
 }
