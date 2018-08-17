@@ -306,7 +306,7 @@ export var config = {
   },
   stripesStyleOptions: {
     angle: -45,
-    color: '#BA4A00',
+    color: 'grey',
     //spaceColor: '#BA4A00',
     height: 10,
     weight: 2,

@@ -389,7 +389,7 @@ function setUpAboutControl() {
   var aboutControl = L.control({position: 'bottomright'});
   aboutControl.onAdd = function () {
     this._div = L.DomUtil.create('div', 'leaflet-control leaflet-bar about');
-    this._div.innerHTML = '<a id="aboutControl" style="font-size: large;" href="#" title="About">&#9432;</a>';
+    this._div.innerHTML = '<a id="aboutControl" style="font-size: x-large; font-weight: bold;" href="#" title="About">&#9432;</a>';
     return this._div;
   };
   aboutControl.addTo(map);
