@@ -36,7 +36,7 @@ module.exports = {
         use: 'file-loader?name=[name].[ext]'
       },
       {
-        test: /CNAME$/,
+        test: /(CNAME|_redirects)$/,
         use: 'file-loader?name=[name]'
       },
       {
