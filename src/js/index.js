@@ -396,7 +396,7 @@ function setUpAboutControl() {
 
   $('#aboutControl').click(function() {
     map.fire('modal', {
-      content: aboutModal({version: config.versionString})
+      content: aboutModal({version: config.versionString, lastUpdated: config.dataLastUpdated})
     });
     return false;
   });

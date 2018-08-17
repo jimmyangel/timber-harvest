@@ -2,6 +2,7 @@
 
 export var config = {
   versionString: 'v0.1.1<sup>Beta</sup>',
+  dataLastUpdated: 'April 23, 2018',
   baseMapLayers: [
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
