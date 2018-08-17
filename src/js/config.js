@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.1.0<sup>Beta</sup>',
+  versionString: 'v0.1.1<sup>Beta</sup>',
   baseMapLayers: [
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
@@ -268,7 +268,7 @@ export var config = {
   },
   activityLegend: [
     {
-      color: '#BA4A00',
+      color: '#BA3100',
       text: 'Clearcut'
     },
     {
