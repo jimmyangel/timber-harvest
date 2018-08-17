@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.1.1<sup>Beta</sup>',
+  versionString: 'v0.1.2<sup>Beta</sup>',
   dataLastUpdated: 'April 23, 2018',
   baseMapLayers: [
     {
@@ -314,5 +314,5 @@ export var config = {
     //spaceOpacity: 0.7
   },
   comingSoonMsg: 'Coming soon...',
-  underreportedMsg: '<div style="color: maroon; text-align: center;"><b>Not Available</b><br>Timber harvest data severely<br>underreported in this forest</div>'
+  underreportedMsg: '<div style="color: maroon; text-align: center;"><b>Not Available</b><br>Logging data severely<br>underreported in this forest</div>'
 }
