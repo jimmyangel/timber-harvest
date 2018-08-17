@@ -1,0 +1,5 @@
+# Redirect domain aliases to primary domain
+https://timber-harvest.oregonhowl.org/* https://logging.oregonhowl.org/:splat 301!
+
+# Optional: Redirect default Netlify subdomain to primary domain
+https://timber-harvest.netlify.com/* https://logging.oregonhowl.org/:splat 301!
