@@ -1,5 +1,6 @@
 'use strict';
 import '../CNAME';
+import '../_redirects';
 import '../favicon.ico';
 
 import L from 'leaflet';
