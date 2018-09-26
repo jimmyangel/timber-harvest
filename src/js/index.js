@@ -41,6 +41,7 @@ var info = L.control();
 var highlightedFeatures = [];
 var timberHarvestSelectData;
 var timberHarvestPbfLayer;
+var isFedcuts = false;
 var unharvestedLayer;
 var lastLayerEventTimeStamp;
 var nfSignsLayerGroup = L.layerGroup().addTo(map); // This is so getCenter works
@@ -157,7 +158,7 @@ function gotoTop() {
 }
 
 function gotoNationalForest(nf, pushState, popUpLatlng) {
-  if (config.forests[nf] && !config.forests[nf].underreported) {
+  if (config.forests[nf]) {
     if (pushState) {
       history.pushState(nf, '', '?f=' + nf);
     }
@@ -176,7 +177,21 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     nfShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
     enableAllNfShapesClick();
     disableNfShapeClick(nf);
-    displaytimberHarvestPbfLayer(nf);
+    utils.resetPlaybackControl();
+
+    isFedcuts = config.forests[nf].underreported;
+    if (isFedcuts) {
+      $('#infoContent').empty();
+      $('#rangeWidgets').hide();
+      $('#legendWidget').hide();
+      $('#tipToClick').hide();
+      displayFedcutsPbfLayer(nf);
+    } else {
+      $('#rangeWidgets').show();
+      $('#legendWidget').show();
+      $('#tipToClick').show();
+      displaytimberHarvestPbfLayer(nf);
+    }
     if (unharvestedLayer) {
       removeUnharvestedOverlay();
     }
@@ -191,9 +206,10 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     $('.topLabel').hide();
     $('.info').show();
   } else {
-    if (popUpLatlng) {
+    displayFedcutsPbfLayer(nf);
+    /*if (popUpLatlng) {
       map.openPopup((config.forests[nf] && config.forests[nf].underreported) ? config.underreportedMsg : config.comingSoonMsg, popUpLatlng);
-    }
+    }*/
   }
 }
 
@@ -281,7 +297,6 @@ function setUpInfoPanel() {
 
   info.update = function () {
     $('#infoContent').empty();
-    $('#tipToClick').show();
   };
 
   info.addTo(map);
@@ -476,9 +491,17 @@ function showFeaturesForRange() {
   toYear = Math.round(dateRangeSlider.getInfo().right);
   $('#fromLabel').text(fromYear);
   $('#toLabel').text(toYear);
-  timberHarvestSelectData.forEach(function(s, idx) {
-    timberHarvestPbfLayer.resetFeatureStyle(idx);
-  });
+  updateFeatureStyling();
+}
+
+function updateFeatureStyling() {
+  if (isFedcuts) {
+    timberHarvestPbfLayer.redraw();
+  } else {
+    timberHarvestSelectData.forEach(function(s, idx) {
+      timberHarvestPbfLayer.resetFeatureStyle(idx);
+    });
+  }
 }
 
 function setUpPlaybackControl() {
@@ -526,7 +549,7 @@ function setUpSlideHandlers() {
   });
 
   opacitySlider.subscribe('stop', function() {
-    showFeaturesForRange();
+    updateFeatureStyling();
   });
 
   opacitySlider.subscribe('moving', function(tValue) {
@@ -618,4 +641,25 @@ function displaytimberHarvestPbfLayer(nf) {
     });
 
   });
+}
+
+function applyFedcutsLayerStyle() {
+  config.fedcutsStyle.fillOpacity = (Math.round(opacitySlider.getInfo().right)) / 100;
+  return config.fedcutsStyle;
+}
+
+function displayFedcutsPbfLayer(nf) {
+  var url = config.fedcutsLayer.baseUrl + nf + config.fedcutsLayer.tileScheme;
+  config.fedcutsLayer.options.rendererFactory = L.canvas.tile;
+  config.fedcutsLayer.options.vectorTileLayerStyles.fedcuts = applyFedcutsLayerStyle;
+  timberHarvestPbfLayer = L.vectorGrid.protobuf(url, config.fedcutsLayer.options).addTo(map);
+  timberHarvestPbfLayer.on({
+    loading: function() {
+      spinner.spin($('#spinner')[0]);
+    },
+    load: function (e) {
+      spinner.stop();
+    }
+  });
+
 }

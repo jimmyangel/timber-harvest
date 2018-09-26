@@ -214,6 +214,28 @@ export var config = {
     },
     type: 'vectorgrid'
   },
+  fedcutsLayer: {
+    baseUrl: 'https://tiles.oregonhowl.org/timber-harvest/fedcuts-vtiles/',
+    tileScheme: '/{z}/{x}/{y}.pbf',
+    options: {
+      vectorTileLayerStyles: {
+        fedcuts: {}
+      },
+      attribution: 'Oregon Wild',
+      zIndex: 10,
+      pane: 'mainpane',
+      maxNativeZoom: 14,
+      minNativeZoom: 9
+    }
+  },
+  fedcutsStyle: {
+    weight: 0,
+    opacity: 0,
+    color: '#9300d5',
+    fillColor: '#9300d5',
+    fillOpacity: 0.7,
+    fill: true
+  },
   spinnerOpts: {
     color: '#939393',
     opacity: 0.1,
