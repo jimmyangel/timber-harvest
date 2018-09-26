@@ -653,7 +653,7 @@ function displayFedcutsPbfLayer(nf) {
     loading: function() {
       spinner.spin($('#spinner')[0]);
     },
-    load: function (e) {
+    load: function () {
       spinner.stop();
     }
   });
