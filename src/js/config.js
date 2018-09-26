@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.2.0<sup>Beta</sup>',
+  versionString: 'v0.2.1<sup>Beta</sup>',
   dataLastUpdated: 'April 23, 2018',
   baseMapLayers: [
     {
@@ -306,9 +306,9 @@ export var config = {
   dateRangeSliderOptions: {
       isDate: false,
       min: 1900,
-      max: 2018,
+      get max () {return (new Date()).getFullYear()},
       start: 1900,
-      end: 2018,
+      get end () {return (new Date()).getFullYear()},
       overlap: true
   },
   DATE_NOT_AVAILABLE: '1899',

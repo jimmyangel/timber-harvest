@@ -559,10 +559,6 @@ function setUpSlideHandlers() {
 
 function applytimberHarvestLayerStyle(p) {
 
-  if (toYear === config.dateRangeSliderOptions.max) {
-    toYear = 9999
-  }
-
   var refYear = timberHarvestSelectData[p.assignedId].refYear;
 
   if ((refYear >= fromYear) && (refYear <= toYear)) {
