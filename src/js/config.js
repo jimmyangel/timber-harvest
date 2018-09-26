@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.1.2<sup>Beta</sup>',
+  versionString: 'v0.2.0<sup>Beta</sup>',
   dataLastUpdated: 'April 23, 2018',
   baseMapLayers: [
     {
@@ -213,6 +213,28 @@ export var config = {
       return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> Unharvested Forest Land'
     },
     type: 'vectorgrid'
+  },
+  fedcutsLayer: {
+    baseUrl: 'https://tiles.oregonhowl.org/timber-harvest/fedcuts-vtiles/',
+    tileScheme: '/{z}/{x}/{y}.pbf',
+    options: {
+      vectorTileLayerStyles: {
+        fedcuts: {}
+      },
+      attribution: 'Oregon Wild',
+      zIndex: 10,
+      pane: 'mainpane',
+      maxNativeZoom: 14,
+      minNativeZoom: 9
+    }
+  },
+  fedcutsStyle: {
+    weight: 0,
+    opacity: 0,
+    color: '#9300d5',
+    fillColor: '#9300d5',
+    fillOpacity: 0.7,
+    fill: true
   },
   spinnerOpts: {
     color: '#939393',
