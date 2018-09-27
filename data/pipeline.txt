@@ -36,3 +36,10 @@ mapshaper timber-or.json -each 'assignedId=this.id' -simplify 30% visvalingam ke
 tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --output-to-directory "vtiles/umatilla" timber-or-s.json
 
 mapshaper timber-or-s.json -filter-fields assignedId,SALE_NAME,ACTIVITY_2,ACTIVITY_N,DATE_PLANN,DATE_ACCOM,DATE_COMPL,GIS_ACRES timber-or-s.json -o format=json vtiles/umatilla/timber-or-s-info.json
+
+### fedcuts processing
+mapshaper -i fedcuts/fedcuts.shp -proj wgs84 -verbose -o format=geojson precision=0.0001 fedcuts.json
+
+node filterFedcuts.js > fedcuts_mounthood.json
+
+tippecanoe --layer=fedcuts --name=fedcuts --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --simplification=20 --simplify-only-low-zooms --output-to-directory "fedcuts-vtiles/mounthood" fedcuts_mounthood.json
