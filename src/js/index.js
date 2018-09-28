@@ -288,7 +288,7 @@ function setUpInfoPanel() {
   info.onAdd = function () {
     this._div = L.DomUtil.create('div', 'info');
     this._div.innerHTML = infoHeader({
-      activityLegend: config.activityLegend,
+      loggingTypeLegend: config.loggingTypeLegend,
       layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed()
     });
     L.DomEvent.disableClickPropagation(this._div);
@@ -446,13 +446,15 @@ function highlightFeature(e) {
   if (sortDate.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
     sortDate = 'N/A';
   }
+  console.log(timberHarvestSelectData[id].dateContracted);
+
   var content = infoContentItem({
-    saleName: (timberHarvestSelectData[id].SALE_NAME ? timberHarvestSelectData[id].SALE_NAME : 'N/A'),
-    activity: timberHarvestSelectData[id].ACTIVITY_N.replace(/ *\([^)]*\) */g, ''),
+    projectName: (timberHarvestSelectData[id].projectName ? timberHarvestSelectData[id].projectName : 'N/A'),
+    loggingActivity: timberHarvestSelectData[id].loggingActivity.replace(/ *\([^)]*\) */g, ''),
     acres: timberHarvestSelectData[id].GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
-    datePlanned: (new Date(timberHarvestSelectData[id].DATE_PLANN).toLocaleDateString()),
-    dateAccomplished: (timberHarvestSelectData[id].DATE_ACCOM.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].DATE_ACCOM).toLocaleDateString()),
-    dateCompleted: (timberHarvestSelectData[id].DATE_COMPL.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].DATE_COMPL).toLocaleDateString()),
+    datePlanned: (timberHarvestSelectData[id].datePlanned.substr(0,4) === config.DATE_NA) ? 'N/A' : (new Date(timberHarvestSelectData[id].datePlanned).toLocaleDateString()),
+    dateContracted: (timberHarvestSelectData[id].dateContracted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateContracted).toLocaleDateString()),
+    dateCompleted: (timberHarvestSelectData[id].dateCompleted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateCompleted).toLocaleDateString()),
     sortDate: sortDate
   });
 
@@ -571,11 +573,55 @@ function applytimberHarvestLayerStyle(p) {
 function getTimberHarvestFeatureStyle(id) {
   var style = config.timberHarvestStyle;
   style.fillOpacity = (Math.round(opacitySlider.getInfo().right)) / 100;
-  if (timberHarvestSelectData[id].ACTIVITY_2) {
+  style.color = config.loggingTypeLegend[timberHarvestSelectData[id].loggingType].color;
+  style.fillColor = style.color;
+  /*if (timberHarvestSelectData[id].ACTIVITY_2) {
     style.color = config.activityLegend[config.activityCodeTypes[timberHarvestSelectData[id].ACTIVITY_2]].color;
     style.fillColor = style.color;
-  }
+  }*/
   return style;
+}
+
+// Consider doing the below in the data processing pipeline instead
+function harmonizeTimberHarvestSelectData(areaType) {
+  var minYear = config.dateRangeSliderOptions.max;
+
+  timberHarvestSelectData.forEach(function(s, idx) {
+
+    switch (areaType) {
+      case 'blm':
+        timberHarvestSelectData[idx].projectName = s.TRT_NAME;
+        timberHarvestSelectData[idx].loggingActivity = s.HARV_RX;
+        timberHarvestSelectData[idx].datePlanned = config.DATE_NA;
+        timberHarvestSelectData[idx].dateContracted = (timberHarvestSelectData[idx].dateContracted) ? (s.SALE_DATE.substr(0,4) + '-' + s.SALE_DATE.substr(4,2) + '-' + s.SALE_DATE.substr(6,2)) : config.DATE_NOT_AVAILABLE;
+        timberHarvestSelectData[idx].dateCompleted = s.TRT_DATE.substr(0,4) + '-' + s.TRT_DATE.substr(4,2) + '-' + s.TRT_DATE.substr(6,2);
+        timberHarvestSelectData[idx].refYear = (new Date(s.TRT_DATE.substr(0,4))).getFullYear(); // TODO: Review this
+        timberHarvestSelectData[idx].loggingType = config.treatmentTypeDecode[s.HARV_RX];
+        break;
+      default: // Deafult is National Forest
+        timberHarvestSelectData[idx].projectName = s.SALE_NAME;
+        timberHarvestSelectData[idx].loggingActivity = s.ACTIVITY_N;
+        timberHarvestSelectData[idx].datePlanned = s.DATE_PLANN;
+        timberHarvestSelectData[idx].dateContracted = s.DATE_ACCOM;
+        timberHarvestSelectData[idx].dateCompleted = s.DATE_COMPL;
+
+        if (s.DATE_COMPL.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
+          if (s.DATE_ACCOM.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
+            timberHarvestSelectData[idx].refYear = (new Date(s.DATE_PLANN)).getFullYear();
+          } else {
+            timberHarvestSelectData[idx].refYear = (new Date(s.DATE_ACCOM)).getFullYear();
+          }
+        } else {
+          timberHarvestSelectData[idx].refYear = (new Date(s.DATE_COMPL)).getFullYear();
+        }
+        timberHarvestSelectData[idx].loggingType = config.activityDecode[config.activityCodeTypes[s.ACTIVITY_2]];
+        break;
+    }
+
+    minYear = Math.min(timberHarvestSelectData[idx].refYear, minYear);
+  });
+
+  dateRangeSlider.move({left: minYear, right: config.dateRangeSliderOptions.max}, true);
 }
 
 function displaytimberHarvestPbfLayer(area){
@@ -584,23 +630,7 @@ function displaytimberHarvestPbfLayer(area){
 
     timberHarvestSelectData = data;
 
-    var minYear = config.dateRangeSliderOptions.max;
-    timberHarvestSelectData.forEach(function(s, idx) {
-
-      if (s.DATE_COMPL.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
-        if (s.DATE_ACCOM.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
-          timberHarvestSelectData[idx].refYear = (new Date(s.DATE_PLANN)).getFullYear();
-        } else {
-          timberHarvestSelectData[idx].refYear = (new Date(s.DATE_ACCOM)).getFullYear();
-        }
-      } else {
-        timberHarvestSelectData[idx].refYear = (new Date(s.DATE_COMPL)).getFullYear();
-      }
-
-      minYear = Math.min(timberHarvestSelectData[idx].refYear, minYear);
-    });
-
-    dateRangeSlider.move({left: minYear, right: config.dateRangeSliderOptions.max}, true);
+    harmonizeTimberHarvestSelectData(config.areas[area].type);
 
     config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
     config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest = applytimberHarvestLayerStyle;

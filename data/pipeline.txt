@@ -51,4 +51,4 @@ mapshaper blm-timber-or.json -each 'assignedId=this.id' -simplify 30% visvalinga
 
 tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --output-to-directory "vtiles/blmwest" blm-timber-or-s.json
 
-mapshaper blm-timber-or-s.json -each 'DATE_COMPL=(this.properties.TRT_DATE.substr(0,4))' -filter-fields assignedId,DATE_COMPL,BLM_ORG_CD,TRT_NAME,HARV_RX,TRT_DATE,SALE_DATE,GIS_ACRES -o format=json vtiles/blmwest/timber-or-s-info.json
+mapshaper blm-timber-or-s.json -filter-fields assignedId,BLM_ORG_CD,TRT_NAME,HARV_RX,TRT_DATE,SALE_DATE,GIS_ACRES -o format=json vtiles/blmwest/timber-or-s-info.json

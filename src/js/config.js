@@ -150,10 +150,12 @@ export var config = {
       name: 'Umatilla National Forest'
     },
     blmwest: {
-      name: 'BLM West'
+      name: 'BLM West',
+      type: 'blm'
     },
     blmeast: {
-      name: 'BLM East'
+      name: 'BLM East',
+      type: 'blm'
     }
   },
   topLevelDataPath: {
@@ -296,20 +298,30 @@ export var config = {
     '4232': 0,
     '4242': 2
   },
-  activityLegend: [
-    {
+  activityDecode: ['clearcut', 'thinning', 'other'],
+  treatmentTypeDecode: {
+    'Clearcut': 'clearcut',
+    'Patch Cut': 'clearcut',
+    'Regeneration': 'clearcut',
+    'Selective Cut': 'thinning',
+    'Variable Density Thin': 'thinning',
+    'Thin': 'thinning',
+    'Unknown': 'other'
+  },
+  loggingTypeLegend: {
+    clearcut: {
       color: '#BA3100',
       text: 'Clearcut'
     },
-    {
+    thinning: {
       color: '#F1C40F',
       text: 'Thinning'
     },
-    {
+    other: {
       color: 'grey',
       text: 'Other'
     }
-  ],
+  },
   dateRangeSliderOptions: {
       isDate: false,
       min: 1900,
@@ -319,6 +331,7 @@ export var config = {
       overlap: true
   },
   DATE_NOT_AVAILABLE: '1899',
+  DATE_NA: '1900',
   defaultOpacity: 70,
   opacitySliderOptions: {
       isDate: false,
