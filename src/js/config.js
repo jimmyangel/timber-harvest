@@ -109,10 +109,10 @@ export var config = {
     [46.2991, -116.4635]
   ],
   dataPath: {
-    baseUrl: 'https://tiles.oregonhowl.org/timber-harvest/',
+    baseUrl: 'http://localhost:9090/',
     infoFileName: '/timber-or-s-info.json'
   },
-  forests: {
+  areas: {
     willamette: {
       name: 'Willamette National Forest',
       hasUnharvestedLayer: true
@@ -148,15 +148,22 @@ export var config = {
     },
     umatilla: {
       name: 'Umatilla National Forest'
+    },
+    blmwest: {
+      name: 'BLM West'
+    },
+    blmeast: {
+      name: 'BLM East'
     }
   },
   topLevelDataPath: {
-    baseUrl: 'https://stable-data.oregonhowl.org/oregon/nationalforests/',
+    baseUrl: 'http://localhost:8080/data/areas/',
+    //baseUrl: 'https://stable-data.oregonhowl.org/oregon/nationalforests/',
     nfCartoonsFileName: 'nfcartoons.json',
     nfIconSuffix: 'nationalforest.png'
   },
   timberHarvestLayer: {
-    baseUrl: 'https://tiles.oregonhowl.org/timber-harvest/',
+    baseUrl: 'http://localhost:9090/',
     tileScheme: '/{z}/{x}/{y}.pbf',
     options: {
       vectorTileLayerStyles: {
@@ -319,7 +326,7 @@ export var config = {
       min: 0,
       max: 100
   },
-  forestBoundaryStyle: {
+  areaBoundaryStyle: {
     fillColor: '#E5D499',
     fillOpacity: 0,
     color: '#562700',

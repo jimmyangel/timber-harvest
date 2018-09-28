@@ -44,8 +44,8 @@ var timberHarvestPbfLayer;
 var isFedcuts = false;
 var unharvestedLayer;
 var lastLayerEventTimeStamp;
-var nfSignsLayerGroup = L.layerGroup().addTo(map); // This is so getCenter works
-var nfShapes;
+var areaSignsLayerGroup = L.layerGroup().addTo(map); // This is so getCenter works
+var areaShapes;
 
 var layersControl;
 
@@ -62,19 +62,19 @@ setUpLayerControl();
 setUpAboutControl();
 
 initMap(function() {
-  var f = utils.getUrlVars().f;
+  var f = utils.getUrlVars().a;
 
   window.onpopstate = function(e) {
     if (e.state === 'top') {
       gotoTop();
     } else {
-      gotoNationalForest(e.state);
+      gotoArea(e.state);
     }
   };
 
-  if (f && (config.forests[f])) {
-    history.replaceState(f, '', '?f=' + f);
-    gotoNationalForest(f);
+  if (f && (config.areas[f])) {
+    history.replaceState(f, '', '?a=' + f);
+    gotoArea(f);
   } else {
     history.replaceState('top', '', '.');
     gotoTop();
@@ -83,53 +83,53 @@ initMap(function() {
 
 function initMap(callback) {
   $.getJSON(config.topLevelDataPath.baseUrl + config.topLevelDataPath.nfCartoonsFileName, function(data) {
-    nfShapes = L.geoJson(data, {
-      style: config.forestBoundaryStyle,
+    areaShapes = L.geoJson(data, {
+      style: config.areaBoundaryStyle,
       onEachFeature: function(f, l) {
-        if (config.forests[l.feature.properties.name]) {
-          config.forests[l.feature.properties.name].bounds = l.getBounds();
+        if (config.areas[l.feature.properties.name]) {
+          config.areas[l.feature.properties.name].bounds = l.getBounds();
         }
         l.on('click', function(e) {
-          gotoNationalForest(l.feature.properties.name, true, e.latlng);
+          gotoArea(l.feature.properties.name, true, e.latlng);
         });
       }
     }).addTo(map);
 
-    nfShapes.eachLayer(function(l) {
+    areaShapes.eachLayer(function(l) {
       var m = L.marker(l.getCenter(), {
         icon: L.icon({
           iconUrl: config.topLevelDataPath.baseUrl + l.feature.properties.name + config.topLevelDataPath.nfIconSuffix,
-          className: 'forestSign ' + l.feature.properties.name + '-sign'
+          className: 'areaSign ' + l.feature.properties.name + '-sign'
         }
-      )}).addTo(nfSignsLayerGroup);
+      )}).addTo(areaSignsLayerGroup);
       m.on('click', function(e) {
-        gotoNationalForest(l.feature.properties.name, true, e.latlng);
+        gotoArea(l.feature.properties.name, true, e.latlng);
       });
     });
 
-    var forestSignWidth = parseInt($('.forestSign').css('width'));
-    setSignSize(forestSignWidth);
+    var areaSignWidth = parseInt($('.areaSign').css('width'));
+    setSignSize(areaSignWidth);
 
-    map.on('zoomend', function() {setSignSize(forestSignWidth);});
+    map.on('zoomend', function() {setSignSize(areaSignWidth);});
 
-    //nfSignsLayerGroup.removeFrom(map); // Will add it later if top level
+    //areaSignsLayerGroup.removeFrom(map); // Will add it later if top level
 
     return callback();
   });
 }
 
-function setSignSize(forestSignWidth) {
+function setSignSize(areaSignWidth) {
   var zoomThreshold = 8;
   var scalingFactor = 1.4;
   var z = map.getZoom();
   if (z < zoomThreshold) {
-    var w = forestSignWidth / (scalingFactor*(zoomThreshold-z));
-    $('.forestSign').css('width', w.toFixed() + 'px');
-    $('.forestSign').css('margin-left', '-' + (w/scalingFactor).toFixed() + 'px');
+    var w = areaSignWidth / (scalingFactor*(zoomThreshold-z));
+    $('.areaSign').css('width', w.toFixed() + 'px');
+    $('.areaSign').css('margin-left', '-' + (w/scalingFactor).toFixed() + 'px');
   } else {
-    if ($('.forestSign').css('width') !== (forestSignWidth + 'px')) {
-      $('.forestSign').css('width', forestSignWidth + 'px');
-      $('.forestSign').css('margin-left', '-' + (forestSignWidth/scalingFactor).toFixed() + 'px');
+    if ($('.areaSign').css('width') !== (areaSignWidth + 'px')) {
+      $('.areaSign').css('width', areaSignWidth + 'px');
+      $('.areaSign').css('margin-left', '-' + (areaSignWidth/scalingFactor).toFixed() + 'px');
     }
   }
 }
@@ -137,8 +137,8 @@ function setSignSize(forestSignWidth) {
 function gotoTop() {
   resetViewBounds = config.oregonBbox;
   if (timberHarvestPbfLayer) {
-    nfShapes.setStyle(config.forestBoundaryStyle);
-    enableAllNfShapesClick();
+    areaShapes.setStyle(config.areaBoundaryStyle);
+    enableAllAreaShapesClick();
     utils.resetPlaybackControl();
     resetHighlight();
     dateRangeSlider.move({left: config.dateRangeSliderOptions.min, right: config.dateRangeSliderOptions.max}, true);
@@ -153,51 +153,51 @@ function gotoTop() {
   $('.info').hide();
   $('.topLabel').show();
   map.flyToBounds(resetViewBounds);
-  $('.forestSign').show();
-  //nfSignsLayerGroup.addTo(map);
+  $('.areaSign').show();
+  //areaSignsLayerGroup.addTo(map);
 }
 
-function gotoNationalForest(nf, pushState, popUpLatlng) {
-  if (config.forests[nf]) {
+function gotoArea(area, pushState, popUpLatlng) {
+  if (config.areas[area]) {
     if (pushState) {
-      history.pushState(nf, '', '?f=' + nf);
+      history.pushState(area, '', '?a=' + area);
     }
-    resetViewBounds = config.forests[nf].bounds;
+    resetViewBounds = config.areas[area].bounds;
     //map.fitBounds(resetViewBounds);
     spinner.spin($('#spinner')[0]);
-    //nfSignsLayerGroup.removeFrom(map);
-    $('.forestSign').show();
-    $('.' + nf + '-sign').hide();
+    //areaSignsLayerGroup.removeFrom(map);
+    $('.areaSign').show();
+    $('.' + area + '-sign').hide();
     if (timberHarvestPbfLayer) {
       timberHarvestPbfLayer.removeFrom(map);
     } else {
       map.fitBounds(resetViewBounds);
     }
-    nfShapes.setStyle(config.forestBoundaryStyle);
-    nfShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
-    enableAllNfShapesClick();
-    disableNfShapeClick(nf);
+    areaShapes.setStyle(config.areaBoundaryStyle);
+    areaShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
+    enableAllAreaShapesClick();
+    disableAreaShapeClick(area);
     utils.resetPlaybackControl();
 
-    isFedcuts = config.forests[nf].underreported;
+    isFedcuts = config.areas[area].underreported;
     if (isFedcuts) {
       $('#infoContent').empty();
       $('#rangeWidgets').hide();
       $('#legendWidget').hide();
       $('#tipToClick').hide();
-      displayFedcutsPbfLayer(nf);
+      displayFedcutsPbfLayer(area);
     } else {
       $('#rangeWidgets').show();
       $('#legendWidget').show();
       $('#tipToClick').show();
-      displaytimberHarvestPbfLayer(nf);
+      displaytimberHarvestPbfLayer(area);
     }
     if (unharvestedLayer) {
       removeUnharvestedOverlay();
     }
-    addUnharvestedOverlay(nf);
-    $('#infoPanelSubTitle').text(config.forests[nf].name);
-    if (config.forests[nf].underreported) {
+    addUnharvestedOverlay(area);
+    $('#infoPanelSubTitle').text(config.areas[area].name);
+    if (config.areas[area].underreported) {
       $('#dataQualityAlert').show();
     } else {
       $('#dataQualityAlert').hide();
@@ -206,36 +206,36 @@ function gotoNationalForest(nf, pushState, popUpLatlng) {
     $('.topLabel').hide();
     $('.info').show();
   } else {
-    displayFedcutsPbfLayer(nf);
+    displayFedcutsPbfLayer(area);
     /*if (popUpLatlng) {
-      map.openPopup((config.forests[nf] && config.forests[nf].underreported) ? config.underreportedMsg : config.comingSoonMsg, popUpLatlng);
+      map.openPopup((config.areas[area] && config.areas[area].underreported) ? config.underreportedMsg : config.comingSoonMsg, popUpLatlng);
     }*/
   }
 }
 
-function enableAllNfShapesClick() {
-  nfShapes.eachLayer(function(l) {
+function enableAllAreaShapesClick() {
+  areaShapes.eachLayer(function(l) {
     if (!l.listens('click')) {
       l.on('click', function(e) {
-        gotoNationalForest(l.feature.properties.name, true, e.latlng);
+        gotoArea(l.feature.properties.name, true, e.latlng);
       });
     }
   });
 }
 
-function disableNfShapeClick(nf) {
-  nfShapes.eachLayer(function(l) {
-    if (nf === l.feature.properties.name) {
+function disableAreaShapeClick(area){
+  areaShapes.eachLayer(function(l) {
+    if (area === l.feature.properties.name) {
       l.setStyle({opacity: 0, fillOpacity: 0})
       l.off('click');
     }
   });
 }
 
-function addUnharvestedOverlay(nf) {
-  if (config.forests[nf].hasUnharvestedLayer) {
+function addUnharvestedOverlay(area){
+  if (config.areas[area].hasUnharvestedLayer) {
     config.unharvestedOverlayLayer.options.rendererFactory = L.canvas.tile;
-    unharvestedLayer = L.vectorGrid.protobuf(config.unharvestedOverlayLayer.baseUrl + nf + config.unharvestedOverlayLayer.tileScheme, config.unharvestedOverlayLayer.options);
+    unharvestedLayer = L.vectorGrid.protobuf(config.unharvestedOverlayLayer.baseUrl + area + config.unharvestedOverlayLayer.tileScheme, config.unharvestedOverlayLayer.options);
     unharvestedLayer.on({
       click: function (e) {
         resetHighlight();
@@ -578,9 +578,9 @@ function getTimberHarvestFeatureStyle(id) {
   return style;
 }
 
-function displaytimberHarvestPbfLayer(nf) {
+function displaytimberHarvestPbfLayer(area){
 
-  $.getJSON(config.dataPath.baseUrl + nf + config.dataPath.infoFileName, function(data) {
+  $.getJSON(config.dataPath.baseUrl + area + config.dataPath.infoFileName, function(data) {
 
     timberHarvestSelectData = data;
 
@@ -604,7 +604,7 @@ function displaytimberHarvestPbfLayer(nf) {
 
     config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
     config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest = applytimberHarvestLayerStyle;
-    var url = config.timberHarvestLayer.baseUrl + nf + config.timberHarvestLayer.tileScheme;
+    var url = config.timberHarvestLayer.baseUrl + area + config.timberHarvestLayer.tileScheme;
     timberHarvestPbfLayer = L.vectorGrid.protobuf(url, config.timberHarvestLayer.options).addTo(map);
 
     timberHarvestPbfLayer.on({
@@ -644,8 +644,8 @@ function applyFedcutsLayerStyle() {
   return config.fedcutsStyle;
 }
 
-function displayFedcutsPbfLayer(nf) {
-  var url = config.fedcutsLayer.baseUrl + nf + config.fedcutsLayer.tileScheme;
+function displayFedcutsPbfLayer(area){
+  var url = config.fedcutsLayer.baseUrl + area + config.fedcutsLayer.tileScheme;
   config.fedcutsLayer.options.rendererFactory = L.canvas.tile;
   config.fedcutsLayer.options.vectorTileLayerStyles.fedcuts = applyFedcutsLayerStyle;
   timberHarvestPbfLayer = L.vectorGrid.protobuf(url, config.fedcutsLayer.options).addTo(map);
