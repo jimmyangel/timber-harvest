@@ -446,7 +446,6 @@ function highlightFeature(e) {
   if (sortDate.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
     sortDate = 'N/A';
   }
-  console.log(timberHarvestSelectData[id].dateContracted);
 
   var content = infoContentItem({
     projectName: (timberHarvestSelectData[id].projectName ? timberHarvestSelectData[id].projectName : 'N/A'),
