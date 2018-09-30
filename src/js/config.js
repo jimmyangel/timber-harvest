@@ -149,20 +149,49 @@ export var config = {
     umatilla: {
       name: 'Umatilla National Forest'
     },
-    blmwest: {
-      name: 'BLM West',
+    roseburg: {
+      name: 'BLM Roseburg District Office',
+      type: 'blm',
+      overrideSignPosition: [43.4449, -123.3160]
+    },
+    northwestoregon: {
+      name: 'BLM Northwest Oregon District Office',
+      type: 'blm',
+      overrideSignPosition: [44.9356, -123.0441]
+    },
+    coosbay: {
+      name: 'BLM Coos Bay District Office',
       type: 'blm'
     },
-    blmeast: {
-      name: 'BLM East',
+    medford: {
+      name: 'BLM Medford District Office',
+      type: 'blm',
+      overrideSignPosition: [42.5085, -122.3876]
+    },
+    lakeview: {
+      name: 'BLM Lakeview District Office',
+      type: 'blm',
+      overrideSignPosition: [43.2061, -120.1849]
+    },
+    burns: {
+      name: 'BLM Burns District Office',
       type: 'blm'
+    },
+    vale: {
+      name: 'BLM Vale District Office',
+      type: 'blm'
+    },
+    prineville: {
+      name: 'BLM Prineville District Office',
+      type: 'blm',
+      overrideSignPosition: [44.9482, -120.5708]
     }
   },
   topLevelDataPath: {
     baseUrl: 'http://localhost:8080/data/areas/',
     //baseUrl: 'https://stable-data.oregonhowl.org/oregon/nationalforests/',
     nfCartoonsFileName: 'nfcartoons.json',
-    nfIconSuffix: 'nationalforest.png'
+    nfIconSuffix: '.png'
   },
   timberHarvestLayer: {
     baseUrl: 'http://localhost:9090/',
