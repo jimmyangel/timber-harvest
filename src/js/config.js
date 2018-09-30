@@ -108,10 +108,7 @@ export var config = {
     [41.9918, -124.7035],
     [46.2991, -116.4635]
   ],
-  dataPath: {
-    baseUrl: 'http://localhost:9090/',
-    infoFileName: '/timber-or-s-info.json'
-  },
+  infoFileName: '/timber-or-s-info.json',
   areas: {
     willamette: {
       name: 'Willamette National Forest',
@@ -188,7 +185,7 @@ export var config = {
     }
   },
   topLevelDataPath: {
-    baseUrl: 'http://localhost:8080/data/areas/',
+    baseUrl: 'data/areas/',
     //baseUrl: 'https://stable-data.oregonhowl.org/oregon/nationalforests/',
     areaCartoonsFileName: 'areacartoons.json',
     areaIconSuffix: '.png'

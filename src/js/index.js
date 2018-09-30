@@ -626,7 +626,7 @@ function harmonizeTimberHarvestSelectData(areaType) {
 
 function displaytimberHarvestPbfLayer(area){
 
-  $.getJSON(config.dataPath.baseUrl + area + config.dataPath.infoFileName, function(data) {
+  $.getJSON(config.timberHarvestLayer.baseUrl + area + config.infoFileName, function(data) {
 
     timberHarvestSelectData = data;
 
