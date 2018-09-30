@@ -82,7 +82,7 @@ initMap(function() {
 });
 
 function initMap(callback) {
-  $.getJSON(config.topLevelDataPath.baseUrl + config.topLevelDataPath.nfCartoonsFileName, function(data) {
+  $.getJSON(config.topLevelDataPath.baseUrl + config.topLevelDataPath.areaCartoonsFileName, function(data) {
     areaShapes = L.geoJson(data, {
       style: config.areaBoundaryStyle,
       onEachFeature: function(f, l) {
@@ -100,7 +100,7 @@ function initMap(callback) {
       var op = config.areas[l.feature.properties.name].overrideSignPosition;
       var m = L.marker(op ? op : l.getCenter(), {
         icon: L.icon({
-          iconUrl: config.topLevelDataPath.baseUrl + l.feature.properties.name + config.topLevelDataPath.nfIconSuffix,
+          iconUrl: config.topLevelDataPath.baseUrl + l.feature.properties.name + config.topLevelDataPath.areaIconSuffix,
           className: 'areaSign ' + l.feature.properties.name + '-sign'
         }
       )}).addTo(areaSignsLayerGroup);

@@ -190,8 +190,8 @@ export var config = {
   topLevelDataPath: {
     baseUrl: 'http://localhost:8080/data/areas/',
     //baseUrl: 'https://stable-data.oregonhowl.org/oregon/nationalforests/',
-    nfCartoonsFileName: 'nfcartoons.json',
-    nfIconSuffix: '.png'
+    areaCartoonsFileName: 'areacartoons.json',
+    areaIconSuffix: '.png'
   },
   timberHarvestLayer: {
     baseUrl: 'http://localhost:9090/',
