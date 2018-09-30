@@ -96,7 +96,6 @@ function initMap(callback) {
     }).addTo(map);
 
     areaShapes.eachLayer(function(l) {
-      console.log(config.areas[l.feature.properties.name].overrideSignPosition);
       var op = config.areas[l.feature.properties.name].overrideSignPosition;
       var m = L.marker(op ? op : l.getCenter(), {
         icon: L.icon({
