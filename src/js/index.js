@@ -443,7 +443,7 @@ function highlightFeature(e) {
   }
   var id = e.layer.properties.assignedId;
 
-  var sortDate = (new Date(timberHarvestSelectData[id].DATE_COMPL)).toISOString();
+  var sortDate = (new Date(timberHarvestSelectData[id].dateCompleted)).toISOString();
   if (sortDate.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
     sortDate = 'N/A';
   }
@@ -596,7 +596,7 @@ function harmonizeTimberHarvestSelectData(areaType) {
         timberHarvestSelectData[idx].dateContracted = (timberHarvestSelectData[idx].dateContracted) ? (s.SALE_DATE.substr(0,4) + '-' + s.SALE_DATE.substr(4,2) + '-' + s.SALE_DATE.substr(6,2)) : config.DATE_NOT_AVAILABLE;
         timberHarvestSelectData[idx].dateCompleted = s.TRT_DATE.substr(0,4) + '-' + s.TRT_DATE.substr(4,2) + '-' + s.TRT_DATE.substr(6,2);
         timberHarvestSelectData[idx].refYear = (new Date(s.TRT_DATE.substr(0,4))).getFullYear(); // TODO: Review this
-        timberHarvestSelectData[idx].loggingType = config.treatmentTypeDecode[s.HARV_RX];
+        timberHarvestSelectData[idx].loggingType = s.HARV_RX ? config.treatmentTypeDecode[s.HARV_RX] : 'other';
         break;
       default: // Deafult is National Forest
         timberHarvestSelectData[idx].projectName = s.SALE_NAME;
