@@ -595,6 +595,7 @@ function harmonizeTimberHarvestSelectData(areaType) {
         timberHarvestSelectData[idx].datePlanned = config.DATE_NA;
         timberHarvestSelectData[idx].dateContracted = (timberHarvestSelectData[idx].dateContracted) ? (s.SALE_DATE.substr(0,4) + '-' + s.SALE_DATE.substr(4,2) + '-' + s.SALE_DATE.substr(6,2)) : config.DATE_NOT_AVAILABLE;
         timberHarvestSelectData[idx].dateCompleted = s.TRT_DATE.substr(0,4) + '-' + s.TRT_DATE.substr(4,2) + '-' + s.TRT_DATE.substr(6,2);
+        timberHarvestSelectData[idx].dateCompleted = timberHarvestSelectData[idx].dateCompleted.replace(/(-)+$/, '');
         timberHarvestSelectData[idx].refYear = (new Date(s.TRT_DATE.substr(0,4))).getFullYear(); // TODO: Review this
         timberHarvestSelectData[idx].loggingType = s.HARV_RX ? config.treatmentTypeDecode[s.HARV_RX] : 'other';
         break;
