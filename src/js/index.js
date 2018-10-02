@@ -84,7 +84,7 @@ initMap(function() {
 function initMap(callback) {
   $.getJSON(config.topLevelDataPath.baseUrl + config.topLevelDataPath.areaCartoonsFileName, function(data) {
     areaShapes = L.geoJson(data, {
-      style: config.areaBoundaryStyle,
+      style: setAreaBoundaryStyle,
       onEachFeature: function(f, l) {
         if (config.areas[l.feature.properties.name]) {
           config.areas[l.feature.properties.name].bounds = l.getBounds();
@@ -135,10 +135,14 @@ function setSignSize(areaSignWidth) {
   }
 }
 
+function setAreaBoundaryStyle(f) {
+  return config.areaBoundaryStyles[config.areas[f.properties.name].type];
+}
+
 function gotoTop() {
   resetViewBounds = config.oregonBbox;
   if (timberHarvestPbfLayer) {
-    areaShapes.setStyle(config.areaBoundaryStyle);
+    areaShapes.setStyle(setAreaBoundaryStyle);
     enableAllAreaShapesClick();
     utils.resetPlaybackControl();
     resetHighlight();

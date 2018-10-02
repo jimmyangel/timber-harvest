@@ -1,5 +1,7 @@
 'use strict';
 
+import L from 'leaflet';
+
 export var config = {
   versionString: 'v0.2.1<sup>Beta</sup>',
   dataLastUpdated: 'September 28, 2018',
@@ -78,6 +80,47 @@ export var config = {
       }
     },
     {
+      options: {
+        url: 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_ForestSystemBoundaries_01/MapServer/1',
+        style: function() {
+          return {
+            weight: 0,
+            fillColor: '#C8F10F',
+            fill: true
+          }
+        },
+        simplifyFactor: 0.50,
+        where: "FORESTORGCODE IN ('0601','0602','0604','0606','0607','0610','0611','0612','0614','0615','0616','0618','0620')",
+        //renderer: L.canvas(),
+        attribution: 'USDA National Forest Service',
+        interactive: false
+      },
+      get name () {
+        return '<span class="overlay-legend-item" style="background: ' + '#C8F10F' + ';"></span> National Forests'
+      },
+      type: 'esri'
+    },
+/*    {
+      options: {
+        url: 'https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_BLM_Only/MapServer/2',
+        style: function() {
+          return {
+            weight: 0,
+            fillColor: 'gray',
+            fill: true
+          }
+        },
+        simplifyFactor: 0.25,
+        //where: "FORESTORGCODE IN ('0601','0602','0604','0606','0607','0610','0611','0612','0614','0615','0616','0618','0620')",
+        //renderer: L.canvas(),
+        interactive: false
+      },
+      get name () {
+        return '<span class="overlay-legend-item" style="background: ' + 'gray' + ';"></span> Another BLM'
+      },
+      type: 'esri'
+    }, */
+    {
       url: 'https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_BLM_Only/MapServer/tile/{z}/{y}/{x}',
       options: {
         maxZoom: 18,
@@ -112,39 +155,50 @@ export var config = {
   areas: {
     willamette: {
       name: 'Willamette National Forest',
-      hasUnharvestedLayer: true
+      hasUnharvestedLayer: true,
+      type: 'nf'
     },
     deschutes: {
-      name: 'Deschutes National Forest'
+      name: 'Deschutes National Forest',
+      type: 'nf'
     },
     'fremont-winema': {
-      name: 'Fremont-Winema National Forest'
+      name: 'Fremont-Winema National Forest',
+      type: 'nf'
     },
     umpqua: {
-      name: 'Umpqua National Forest'
+      name: 'Umpqua National Forest',
+      type: 'nf'
     },
     mounthood: {
       name: 'Mount Hood National Forest',
-      underreported: true
+      underreported: true,
+      type: 'nf'
     },
     'rogueriver-siskiyou': {
-      name: 'Rogue River-Siskiyou National Forest'
+      name: 'Rogue River-Siskiyou National Forest',
+      type: 'nf'
     },
     siuslaw: {
       name: 'Siuslaw National Forest',
-      underreported: true
+      underreported: true,
+      type: 'nf'
     },
     ochoco: {
-      name: 'Ochoco National Forest'
+      name: 'Ochoco National Forest',
+      type: 'nf'
     },
     'wallowa-whitman': {
-      name: 'Wallowa Whitman National Forest'
+      name: 'Wallowa Whitman National Forest',
+      type: 'nf'
     },
     malheur: {
-      name: 'Malheur National Forest'
+      name: 'Malheur National Forest',
+      type: 'nf'
     },
     umatilla: {
-      name: 'Umatilla National Forest'
+      name: 'Umatilla National Forest',
+      type: 'nf'
     },
     roseburg: {
       name: 'BLM Roseburg District Office',
@@ -163,7 +217,7 @@ export var config = {
     medford: {
       name: 'BLM Medford District Office',
       type: 'blm',
-      overrideSignPosition: [42.5085, -122.3876]
+      overrideSignPosition: [42.6085, -122.8601]
     },
     lakeview: {
       name: 'BLM Lakeview District Office',
@@ -365,12 +419,21 @@ export var config = {
       min: 0,
       max: 100
   },
-  areaBoundaryStyle: {
-    fillColor: '#E5D499',
-    fillOpacity: 0,
-    color: '#562700',
-    opacity: 1,
-    weight: 3
+  areaBoundaryStyles: {
+    nf: {
+      fillColor: '#E5D499',
+      fillOpacity: 0,
+      color: '#562700',
+      opacity: 1,
+      weight: 3
+    },
+    blm: {
+      fillOpacity: 0,
+      opacity: 0.6,
+      color: 'grey',
+      weight: 2,
+      dashArray: '4'
+    }
   },
   stripesStyleOptions: {
     angle: -45,
