@@ -164,6 +164,7 @@ export var config = {
     },
     'fremont-winema': {
       name: 'Fremont-Winema National Forest',
+      underreported: true,
       type: 'nf'
     },
     umpqua: {
@@ -304,7 +305,7 @@ export var config = {
     type: 'vectorgrid'
   },
   fedcutsLayer: {
-    baseUrl: 'https://tiles.oregonhowl.org/timber-harvest/fedcuts-vtiles/',
+    baseUrl: 'http://localhost:9090/fedcuts-vtiles/',
     tileScheme: '/{z}/{x}/{y}.pbf',
     options: {
       vectorTileLayerStyles: {
