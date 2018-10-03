@@ -304,7 +304,7 @@ export var config = {
     type: 'vectorgrid'
   },
   fedcutsLayer: {
-    baseUrl: 'http://localhost:9090/fedcuts-vtiles/',
+    baseUrl: 'https://vtiles.oregonhowl.org/timber-harvest/fedcuts-vtiles/',
     tileScheme: '/{z}/{x}/{y}.pbf',
     options: {
       vectorTileLayerStyles: {
