@@ -27,7 +27,6 @@ var esri = require('esri-leaflet');
 NProgress.configure({showSpinner: false, trickle: false, minimum: 0.001});
 
 var spinner = new Spinner(config.spinnerOpts);
-//spinner.spin($('#spinner')[0]);
 
 var map = L.map('map', {fullscreenControl: true, zoom: 6, minZoom: 6, maxBounds: [[41, -126], [47, -115]]});
 var stripes = new L.StripePattern(config.stripesStyleOptions); stripes.addTo(map);
@@ -113,8 +112,6 @@ function initMap(callback) {
 
     map.on('zoomend', function() {setSignSize(areaSignWidth);});
 
-    //areaSignsLayerGroup.removeFrom(map); // Will add it later if top level
-
     return callback();
   });
 }
@@ -159,18 +156,15 @@ function gotoTop() {
   $('.topLabel').show();
   map.flyToBounds(resetViewBounds);
   $('.areaSign').show();
-  //areaSignsLayerGroup.addTo(map);
 }
 
-function gotoArea(area, pushState, popUpLatlng) {
+function gotoArea(area, pushState) {
   if (config.areas[area]) {
     if (pushState) {
       history.pushState(area, '', '?a=' + area);
     }
     resetViewBounds = config.areas[area].bounds;
-    //map.fitBounds(resetViewBounds);
     spinner.spin($('#spinner')[0]);
-    //areaSignsLayerGroup.removeFrom(map);
     $('.areaSign').show();
     $('.' + area + '-sign').hide();
     if (timberHarvestPbfLayer) {
@@ -212,9 +206,6 @@ function gotoArea(area, pushState, popUpLatlng) {
     $('.info').show();
   } else {
     displayFedcutsPbfLayer(area);
-    /*if (popUpLatlng) {
-      map.openPopup((config.areas[area] && config.areas[area].underreported) ? config.underreportedMsg : config.comingSoonMsg, popUpLatlng);
-    }*/
   }
 }
 
@@ -579,10 +570,7 @@ function getTimberHarvestFeatureStyle(id) {
   style.fillOpacity = (Math.round(opacitySlider.getInfo().right)) / 100;
   style.color = config.loggingTypeLegend[timberHarvestSelectData[id].loggingType].color;
   style.fillColor = style.color;
-  /*if (timberHarvestSelectData[id].ACTIVITY_2) {
-    style.color = config.activityLegend[config.activityCodeTypes[timberHarvestSelectData[id].ACTIVITY_2]].color;
-    style.fillColor = style.color;
-  }*/
+
   return style;
 }
 

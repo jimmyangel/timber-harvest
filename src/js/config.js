@@ -3,7 +3,7 @@
 import L from 'leaflet';
 
 export var config = {
-  versionString: 'v0.2.1<sup>Beta</sup>',
+  versionString: 'v0.3.0<sup>Beta</sup>',
   dataLastUpdated: 'September 28, 2018',
   baseMapLayers: [
     {
@@ -241,12 +241,11 @@ export var config = {
   },
   topLevelDataPath: {
     baseUrl: 'data/areas/',
-    //baseUrl: 'https://stable-data.oregonhowl.org/oregon/nationalforests/',
     areaCartoonsFileName: 'areacartoons.json',
     areaIconSuffix: '.png'
   },
   timberHarvestLayer: {
-    baseUrl: 'http://localhost:9090/',
+    baseUrl: 'https://vtiles.oregonhowl.org/timber-harvest/',
     tileScheme: '/{z}/{x}/{y}.pbf',
     options: {
       vectorTileLayerStyles: {
@@ -278,7 +277,7 @@ export var config = {
     color: 'black'
   },
   unharvestedOverlayLayer: {
-    baseUrl: 'https://tiles.oregonhowl.org/unharvested/',
+    baseUrl: 'https://vtiles.oregonhowl.org/unharvested/',
     tileScheme: '/{z}/{x}/{y}.pbf',
     options: {
       vectorTileLayerStyles: {
