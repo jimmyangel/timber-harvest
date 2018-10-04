@@ -92,25 +92,19 @@ export var config = {
             fill: true
           }
         },
-        where: "ADMIN_UNIT_NAME IN (" +
-          "'Mount Hood National Forest'," +
-          "'Willamette National Forest'," +
-          "'Deschutes National Forest'," +
-          "'Fremont-Winema National Forests'," +
-          "'Umpqua National Forest'," +
-          "'Rogue River-Siskiyou National Forests'," +
-          "'Siskiyou National Forest'," +
-          "'Siuslaw National Forest'," +
-          "'Ochoco National Forest'," +
-          "'Wallowa-Whitman National Forest'," +
-          "'Malheur National Forest'," +
-          "'Umatilla National Forest'" +
-        ")",
+        get where () {
+          var result = 'ADMIN_UNIT_NAME IN (';
+          Object.keys(config.areas).forEach((k) => {
+            if (config.areas[k].type === 'nf') {
+              result += "'" + config.areas[k].name + "',"
+            }
+          });
+          return result.substring(result, result.length - 1) + ')';
+        },
         simplifyFactor: 0.25,
-        //where: "FORESTORGCODE IN ('0601','0602','0604','0606','0607','0610','0611','0612','0614','0615','0616','0618','0620')",
-        //renderer: L.canvas(),
         attribution: 'USDA National Forest Service',
         pane: 'tilePane',
+        //renderer: L.canvas(),
         interactive: false
       },
       get name () {
@@ -119,26 +113,6 @@ export var config = {
       checked: true,
       type: 'esri'
     },
-/*    {
-      options: {
-        url: 'https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_BLM_Only/MapServer/2',
-        style: function() {
-          return {
-            weight: 0,
-            fillColor: 'gray',
-            fill: true
-          }
-        },
-        simplifyFactor: 0.25,
-        //where: "FORESTORGCODE IN ('0601','0602','0604','0606','0607','0610','0611','0612','0614','0615','0616','0618','0620')",
-        //renderer: L.canvas(),
-        interactive: false
-      },
-      get name () {
-        return '<span class="overlay-legend-item" style="background: ' + 'gray' + ';"></span> Another BLM'
-      },
-      type: 'esri'
-    }, */
     {
       url: 'https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_BLM_Only/MapServer/tile/{z}/{y}/{x}',
       options: {
@@ -155,16 +129,6 @@ export var config = {
       },
       type: 'tile'
     }
-     /*,
-    {
-      url: 'https://tiles.oregonhowl.org/clearcuts/{z}/{x}/{y}.png',
-      options: {
-        maxZoom: 18,
-        attribution: 'Oregon Wild'
-      },
-      name: 'Clearcuts on Federal Lands',
-      type: 'tile'
-    } */
   ],
   oregonBbox: [
     [41.9918, -124.7035],
@@ -209,7 +173,7 @@ export var config = {
       type: 'nf'
     },
     'wallowa-whitman': {
-      name: 'Wallowa Whitman National Forest',
+      name: 'Wallowa-Whitman National Forest',
       type: 'nf'
     },
     malheur: {
