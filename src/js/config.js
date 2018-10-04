@@ -7,13 +7,21 @@ export var config = {
   dataLastUpdated: 'September 28, 2018',
   baseMapLayers: [
     {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       options: {
         maxZoom: 19,
-        attribution: 'Tiles © Esri — Source: <a href="http://www.arcgis.com/home/item.html?id=30e5fe3149c34df1ba922e6f5bbf808f">ArcGIS World Topographic Map</a>'
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       },
-      name: 'World Topographic Map',
+      name: 'OpenStreetMap',
       default: true
+    },
+    {
+      url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
+      options: {
+        maxZoom: 19,
+        attribution: 'USGS The National Map: National Boundaries Dataset, National Elevation Dataset, Geographic Names Information System, National Hydrography Dataset, National Land Cover Database, National Structures Dataset, and National Transportation Dataset; U.S. Census Bureau - TIGER/Line; HERE Road Data.'
+      },
+      name: 'USGS National Map'
     },
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -24,14 +32,6 @@ export var config = {
       name: 'World Imagery'
     },
     {
-      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      options: {
-        maxZoom: 19,
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      },
-      name: 'OpenStreetMap'
-    },
-    {
       url: 'https://a.tiles.mapbox.com/v4/mapbox.landsat-live/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiamltbXlhbmdlbCIsImEiOiJjaW5sMGR0cDkweXN2dHZseXl6OWM4YnloIn0.v2Sv_ODztWuLuk78rUoiqg',
       options: {
         tileSize: 256,
@@ -39,13 +39,6 @@ export var config = {
         attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox Landsat Live</a>'
       },
       name: 'Landsat Live'
-    },
-    {
-      url: 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg',
-      options: {
-        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
-      },
-      name: '<span id="topLevel">Terrain Background</span>'
     }
   ],
   overlayLayers: [
@@ -110,7 +103,7 @@ export var config = {
       get name () {
         return '<span class="overlay-legend-item" style="background: ' + '#C8F10F' + ';"></span> National Forests'
       },
-      checked: true,
+      //checked: true,
       type: 'esri'
     },
     {
