@@ -243,20 +243,20 @@ export var config = {
       name: 'BLM Lakeview District Office',
       type: 'blm',
       overrideSignPosition: [43.2061, -120.1849]
-    },
+    },/*
     burns: {
       name: 'BLM Burns District Office',
       type: 'blm'
-    },
+    },*/
     vale: {
       name: 'BLM Vale District Office',
       type: 'blm'
-    },
+    }/*,
     prineville: {
       name: 'BLM Prineville District Office',
       type: 'blm',
       overrideSignPosition: [44.9482, -120.5708]
-    }
+    }*/
   },
   topLevelDataPath: {
     baseUrl: 'data/areas/',
