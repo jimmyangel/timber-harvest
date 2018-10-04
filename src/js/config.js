@@ -81,7 +81,7 @@ export var config = {
     },
     {
       options: {
-        url: 'https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_with_PriUnk/MapServer/24',
+        url: 'https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_without_PriUnk/MapServer/23',
         style: function() {
           return {
             weight: 0,
