@@ -340,24 +340,28 @@ function setUpLayerControl() {
   }
   // Iterate through list of overlay layers and add to layer control
   for (k=0; k<config.overlayLayers.length; k++) {
+    var oLayer;
     switch (config.overlayLayers[k].type) {
       case 'esri':
-        var oLayer = overlayLayers[config.overlayLayers[k].name] = esri.featureLayer(config.overlayLayers[k].options);
+        oLayer = overlayLayers[config.overlayLayers[k].name] = esri.featureLayer(config.overlayLayers[k].options);
         if (config.overlayLayers[k].isTownshipAndRange) {
             setUpTownshipAndRangeLabels(oLayer);
         }
         break;
       case 'geojson':
-        var jLayer = overlayLayers[config.overlayLayers[k].name] = L.geoJson();
+        oLayer = overlayLayers[config.overlayLayers[k].name] = L.geoJson();
         (function(l, s) {
           $.getJSON(config.overlayLayers[k].url, function(data) {
             l.addData(data);
             l.setStyle(s);
           });
-        })(jLayer, config.overlayLayers[k].style);
+        })(oLayer, config.overlayLayers[k].style);
         break;
       default:
-        overlayLayers[config.overlayLayers[k].name] = L.tileLayerPixelFilter(config.overlayLayers[k].url, config.overlayLayers[k].options);
+        oLayer = overlayLayers[config.overlayLayers[k].name] = L.tileLayerPixelFilter(config.overlayLayers[k].url, config.overlayLayers[k].options);
+      }
+      if (config.overlayLayers[k].checked) {
+        map.addLayer(oLayer);
       }
     }
 

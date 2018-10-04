@@ -81,23 +81,42 @@ export var config = {
     },
     {
       options: {
-        url: 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_ForestSystemBoundaries_01/MapServer/1',
+        url: 'https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_with_PriUnk/MapServer/24',
         style: function() {
           return {
             weight: 0,
+            color: '#C8F10F',
+            opacity: 1,
             fillColor: '#C8F10F',
+            fillOpacity: 0.25,
             fill: true
           }
         },
-        simplifyFactor: 0.50,
-        where: "FORESTORGCODE IN ('0601','0602','0604','0606','0607','0610','0611','0612','0614','0615','0616','0618','0620')",
+        where: "ADMIN_UNIT_NAME IN (" +
+          "'Mount Hood National Forest'," +
+          "'Willamette National Forest'," +
+          "'Deschutes National Forest'," +
+          "'Fremont-Winema National Forests'," +
+          "'Umpqua National Forest'," +
+          "'Rogue River-Siskiyou National Forests'," +
+          "'Siskiyou National Forest'," +
+          "'Siuslaw National Forest'," +
+          "'Ochoco National Forest'," +
+          "'Wallowa-Whitman National Forest'," +
+          "'Malheur National Forest'," +
+          "'Umatilla National Forest'" +
+        ")",
+        simplifyFactor: 0.25,
+        //where: "FORESTORGCODE IN ('0601','0602','0604','0606','0607','0610','0611','0612','0614','0615','0616','0618','0620')",
         //renderer: L.canvas(),
         attribution: 'USDA National Forest Service',
+        pane: 'tilePane',
         interactive: false
       },
       get name () {
         return '<span class="overlay-legend-item" style="background: ' + '#C8F10F' + ';"></span> National Forests'
       },
+      checked: true,
       type: 'esri'
     },
 /*    {
@@ -163,7 +182,7 @@ export var config = {
       type: 'nf'
     },
     'fremont-winema': {
-      name: 'Fremont-Winema National Forest',
+      name: 'Fremont-Winema National Forests',
       underreported: true,
       type: 'nf'
     },
@@ -177,7 +196,7 @@ export var config = {
       type: 'nf'
     },
     'rogueriver-siskiyou': {
-      name: 'Rogue River-Siskiyou National Forest',
+      name: 'Rogue River-Siskiyou National Forests',
       type: 'nf'
     },
     siuslaw: {
