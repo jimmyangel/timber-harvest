@@ -43,3 +43,12 @@ mapshaper -i fedcuts/fedcuts.shp -proj wgs84 -verbose -o format=geojson precisio
 node filterFedcuts.js > fedcuts_mounthood.json
 
 tippecanoe --layer=fedcuts --name=fedcuts --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --simplification=20 --simplify-only-low-zooms --output-to-directory "fedcuts-vtiles/mounthood" fedcuts_mounthood.json
+
+### Sequence for a BLM area
+mapshaper -i BLM_logging/BLM_logging.shp -filter '(TRT_DATE != "") && ("ORR".indexOf(BLM_ORG_CD.substr(0,3)) > -1)' -filter-fields BLM_ORG_CD,TRT_NAME,HARV_RX,TRT_DATE,SALE_DATE,GIS_ACRES -verbose -o format=geojson precision=0.0001 blm-timber-or.json
+
+mapshaper blm-timber-or.json -each 'assignedId=this.id' -simplify 30% visvalingam keep-shapes -o format=geojson blm-timber-or-s.json
+
+tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --output-to-directory "vtiles/blmwest" blm-timber-or-s.json
+
+mapshaper blm-timber-or-s.json -filter-fields assignedId,BLM_ORG_CD,TRT_NAME,HARV_RX,TRT_DATE,SALE_DATE,GIS_ACRES -o format=json vtiles/blmwest/timber-or-s-info.json

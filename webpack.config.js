@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 //const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
@@ -15,7 +16,8 @@ module.exports = {
   plugins: [
     new HtmlPlugin({template: 'index.html',inject : true}),
     new ExtractTextPlugin('styles.css'),
-    new webpack.ProvidePlugin({$: 'jquery', jQuery: 'jquery'})
+    new webpack.ProvidePlugin({$: 'jquery', jQuery: 'jquery'}),
+    new CopyWebpackPlugin([{from: 'data', to: 'data'}])
     //new BundleAnalyzerPlugin()
   ],
   devServer: {
