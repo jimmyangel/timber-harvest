@@ -1,7 +1,5 @@
 'use strict';
 
-import L from 'leaflet';
-
 export var config = {
   versionString: 'v0.3.0<sup>Beta</sup>',
   dataLastUpdated: 'September 28, 2018',
@@ -300,6 +298,24 @@ export var config = {
     fillColor: '#9300d5',
     fillOpacity: 0.7,
     fill: true
+  },
+  allFedcutsLayer:  {
+    url: 'https://tiles.oregonhowl.org/clearcuts/{z}/{x}/{y}.png',
+    options: {
+      maxZoom: 19,
+      maxNativeZoom: 12,
+      opacity: 0.7,
+      attribution: 'Oregon Wild',
+      matchRGBA: [ 186,  49,  0, 255 ],
+      missRGBA:  [ 186,  49,  0, 255 ]//,
+      //pixelCodes: [ [102, 102, 102] ]
+    },
+    color: 'rgba(186, 49, 0, 0.7)',
+    get name () {
+      return '<span id="clearCutsLabel" class="overlay-legend-item" style="background: ' + this.color + ';"></span> Clearcuts on Federal Lands'
+    },
+    checked: true,
+    type: 'tile'
   },
   spinnerOpts: {
     color: '#939393',

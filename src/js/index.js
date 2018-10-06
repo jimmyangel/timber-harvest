@@ -42,6 +42,7 @@ var timberHarvestSelectData;
 var timberHarvestPbfLayer;
 var isFedcuts = false;
 var unharvestedLayer;
+var overviewLayer;
 var lastLayerEventTimeStamp;
 var areaSignsLayerGroup = L.layerGroup().addTo(map); // This is so getCenter works
 var areaShapes;
@@ -149,9 +150,10 @@ function gotoTop() {
     timberHarvestPbfLayer = undefined;
     timberHarvestSelectData = undefined;
     if (unharvestedLayer) {
-      removeUnharvestedOverlay();
+      removeOverlay(unharvestedLayer);
     }
   }
+  addOverviewLayer();
   $('.info').hide();
   $('.topLabel').show();
   map.flyToBounds(resetViewBounds);
@@ -159,6 +161,8 @@ function gotoTop() {
 }
 
 function gotoArea(area, pushState) {
+  removeOverlay(overviewLayer);
+
   if (config.areas[area]) {
     if (pushState) {
       history.pushState(area, '', '?a=' + area);
@@ -192,7 +196,7 @@ function gotoArea(area, pushState) {
       displaytimberHarvestPbfLayer(area);
     }
     if (unharvestedLayer) {
-      removeUnharvestedOverlay();
+      removeOverlay(unharvestedLayer);
     }
     addUnharvestedOverlay(area);
     $('#infoPanelSubTitle').text(config.areas[area].name);
@@ -244,10 +248,15 @@ function addUnharvestedOverlay(area){
   }
 }
 
-function removeUnharvestedOverlay() {
-  unharvestedLayer.removeFrom(map);
-  layersControl.removeLayer(unharvestedLayer);
-  unharvestedLayer = undefined;
+function addOverviewLayer() {
+  overviewLayer = L.tileLayerPixelFilter(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
+  layersControl.addOverlay(overviewLayer, config.allFedcutsLayer.name);
+  map.addLayer(overviewLayer);
+}
+
+function removeOverlay(ol) {
+  ol.removeFrom(map);
+  layersControl.removeLayer(ol);
 }
 
 function setUpCustomPanes() {
