@@ -300,6 +300,31 @@ export var config = {
     fill: true
   },
   allFedcutsLayer:  {
+    url: 'https://vtiles.oregonhowl.org/timber-harvest/fedcuts-vtiles/all/{z}/{x}/{y}.pbf',
+    options: {
+      vectorTileLayerStyles: {
+        fedcuts: {
+          weight: 0.5,
+          opacity: 0.9,
+          color: '#d55e00',
+          fillColor: '#d55e00',
+          fillOpacity: 0.9,
+          fill: true
+        }
+      },
+      attribution: 'Oregon Wild',
+      zIndex: 10,
+      pane: 'mainpane',
+      maxNativeZoom: 14,
+      minNativeZoom: 9
+    },
+    color: '#d55e00',
+    get name () {
+      return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> Clearcuts on Federal lands'
+    },
+    type: 'vectorgrid'
+  },
+  /*allFedcutsLayer:  {
     url: 'https://tiles.oregonhowl.org/clearcuts/{z}/{x}/{y}.png',
     options: {
       pane: 'overlayPane',
@@ -317,7 +342,7 @@ export var config = {
     },
     checked: true,
     type: 'tile'
-  },
+  },*/
   spinnerOpts: {
     color: '#939393',
     opacity: 0.1,

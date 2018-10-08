@@ -249,7 +249,9 @@ function addUnharvestedOverlay(area){
 }
 
 function addOverviewLayer() {
-  overviewLayer = L.tileLayerPixelFilter(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
+  //overviewLayer = L.tileLayerPixelFilter(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
+  config.allFedcutsLayer.options.rendererFactory = L.canvas.tile;
+  overviewLayer = L.vectorGrid.protobuf(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
   layersControl.addOverlay(overviewLayer, config.allFedcutsLayer.name);
   map.addLayer(overviewLayer);
 }
