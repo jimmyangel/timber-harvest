@@ -5,21 +5,21 @@ export var config = {
   dataLastUpdated: 'September 28, 2018',
   baseMapLayers: [
     {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+      options: {
+        maxZoom: 19,
+        attribution: 'Tiles © Esri — Source: <a href="http://www.arcgis.com/home/item.html?id=30e5fe3149c34df1ba922e6f5bbf808f">ArcGIS World Topographic Map</a>'
+      },
+      name: 'World Topographic Map',
+      default: true
+    },
+    {
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       options: {
         maxZoom: 19,
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       },
-      name: 'OpenStreetMap',
-      default: true
-    },
-    {
-      url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
-      options: {
-        maxZoom: 19,
-        attribution: 'USGS The National Map: National Boundaries Dataset, National Elevation Dataset, Geographic Names Information System, National Hydrography Dataset, National Land Cover Database, National Structures Dataset, and National Transportation Dataset; U.S. Census Bureau - TIGER/Line; HERE Road Data.'
-      },
-      name: 'USGS National Map'
+      name: 'OpenStreetMap'
     },
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -101,7 +101,7 @@ export var config = {
       get name () {
         return '<span class="overlay-legend-item" style="background: ' + '#C8F10F' + ';"></span> National Forests'
       },
-      //checked: true,
+      checked: true,
       type: 'esri'
     },
     {
@@ -302,6 +302,7 @@ export var config = {
   allFedcutsLayer:  {
     url: 'https://tiles.oregonhowl.org/clearcuts/{z}/{x}/{y}.png',
     options: {
+      pane: 'overlayPane',
       maxZoom: 19,
       maxNativeZoom: 12,
       opacity: 0.7,
