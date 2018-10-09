@@ -1,27 +1,25 @@
 'use strict';
 
-import L from 'leaflet';
-
 export var config = {
-  versionString: 'v0.3.0<sup>Beta</sup>',
+  versionString: 'v0.4.0<sup>Beta</sup>',
   dataLastUpdated: 'September 28, 2018',
   baseMapLayers: [
+    {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+      options: {
+        maxZoom: 19,
+        attribution: 'Tiles © Esri — Source: <a href="http://www.arcgis.com/home/item.html?id=30e5fe3149c34df1ba922e6f5bbf808f">ArcGIS World Topographic Map</a>'
+      },
+      name: 'World Topographic Map',
+      default: true
+    },
     {
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       options: {
         maxZoom: 19,
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       },
-      name: 'OpenStreetMap',
-      default: true
-    },
-    {
-      url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',
-      options: {
-        maxZoom: 19,
-        attribution: 'USGS The National Map: National Boundaries Dataset, National Elevation Dataset, Geographic Names Information System, National Hydrography Dataset, National Land Cover Database, National Structures Dataset, and National Transportation Dataset; U.S. Census Bureau - TIGER/Line; HERE Road Data.'
-      },
-      name: 'USGS National Map'
+      name: 'OpenStreetMap'
     },
     {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -103,7 +101,7 @@ export var config = {
       get name () {
         return '<span class="overlay-legend-item" style="background: ' + '#C8F10F' + ';"></span> National Forests'
       },
-      //checked: true,
+      checked: true,
       type: 'esri'
     },
     {
@@ -301,6 +299,50 @@ export var config = {
     fillOpacity: 0.7,
     fill: true
   },
+  allFedcutsLayer:  {
+    url: 'https://vtiles.oregonhowl.org/timber-harvest/fedcuts-vtiles/all/{z}/{x}/{y}.pbf',
+    options: {
+      vectorTileLayerStyles: {
+        fedcuts: {
+          weight: 0.5,
+          opacity: 0.9,
+          color: '#d55e00',
+          fillColor: '#d55e00',
+          fillOpacity: 0.9,
+          fill: true
+        }
+      },
+      attribution: 'Oregon Wild',
+      zIndex: 10,
+      pane: 'mainpane',
+      maxNativeZoom: 14,
+      minNativeZoom: 9
+    },
+    color: '#d55e00',
+    get name () {
+      return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> Clearcuts on Federal lands'
+    },
+    type: 'vectorgrid'
+  },
+  /*allFedcutsLayer:  {
+    url: 'https://tiles.oregonhowl.org/clearcuts/{z}/{x}/{y}.png',
+    options: {
+      pane: 'overlayPane',
+      maxZoom: 19,
+      maxNativeZoom: 12,
+      opacity: 0.7,
+      attribution: 'Oregon Wild',
+      matchRGBA: [ 186,  49,  0, 255 ],
+      missRGBA:  [ 186,  49,  0, 255 ]//,
+      //pixelCodes: [ [102, 102, 102] ]
+    },
+    color: 'rgba(186, 49, 0, 0.7)',
+    get name () {
+      return '<span id="clearCutsLabel" class="overlay-legend-item" style="background: ' + this.color + ';"></span> Clearcuts on Federal Lands'
+    },
+    checked: true,
+    type: 'tile'
+  },*/
   spinnerOpts: {
     color: '#939393',
     opacity: 0.1,
