@@ -21,11 +21,6 @@ import aboutModal from '../templates/aboutModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
 import topLabel from '../templates/topLabel.hbs';
 
-import parse_georaster from 'georaster';
-import GeoRasterLayer from 'georaster-layer-for-leaflet';
-import 'leaflet-geotiff';
-import 'leaflet-geotiff/leaflet-geotiff-plotty';
-
 var NProgress = require('nprogress');
 var esri = require('esri-leaflet');
 
