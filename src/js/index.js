@@ -21,6 +21,11 @@ import aboutModal from '../templates/aboutModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
 import topLabel from '../templates/topLabel.hbs';
 
+import parse_georaster from 'georaster';
+import GeoRasterLayer from 'georaster-layer-for-leaflet';
+import 'leaflet-geotiff';
+import 'leaflet-geotiff/leaflet-geotiff-plotty';
+
 var NProgress = require('nprogress');
 var esri = require('esri-leaflet');
 
@@ -82,7 +87,7 @@ initMap(function() {
 });
 
 function initMap(callback) {
-  $.getJSON(config.topLevelDataPath.baseUrl + config.topLevelDataPath.areaCartoonsFileName, function(data) {
+  /*$.getJSON(config.topLevelDataPath.baseUrl + config.topLevelDataPath.areaCartoonsFileName, function(data) {
     areaShapes = L.geoJson(data, {
       style: setAreaBoundaryStyle,
       onEachFeature: function(f, l) {
@@ -114,7 +119,65 @@ function initMap(callback) {
     map.on('zoomend', function() {setSignSize(areaSignWidth);});
 
     return callback();
-  });
+  });*/
+
+  //$.get('http://10.0.0.70:9090/hansenclippedcompressed.tif', function(data) {console.log(data); return callback;}, 'binary').fail(function (err) {console.log('failed', err);});
+
+  /*$.ajax({
+    url: 'http://10.0.0.70:9090/hansenclippedcompressed.tif',
+    dataType: 'string',
+  }).always(function(data) {
+    console.log(data);
+  });*/
+
+  /*fetch('http://10.0.0.70:9090/hansenclippedcompressed.tif')
+    .then(response => response.arrayBuffer())
+      .then(arrayBuffer => {
+        parse_georaster(arrayBuffer).then(georaster => {
+          console.log("georaster:", georaster);
+          var layer = new GeoRasterLayer({
+            georaster: georaster,
+            opacity: 0.7,
+            pixelValueToColorFn: value => {
+              if (value) {
+                return '#000000';
+              }
+            }
+          });
+          layer.addTo(map);
+        });
+      });*/
+
+  /*var r = L.LeafletGeotiff.plotty({colorScale: 'greys', displayMin: 1, displayMax: 17,})
+  L.leafletGeotiff(
+    'http://10.0.0.70:9090/hansenclippedcompressed.tif',
+    {
+      band: 0,
+      renderer: r
+    }).addTo(map);*/
+  var opts = {
+    vectorTileLayerStyles: {
+      hansen: {
+        weight: 0,
+        opacity: 0,
+        color: '#009E73',
+        fillColor: '#009E73',
+        fillOpacity: 0.7,
+        fill: true,
+        className: 'hansen'
+      }
+    },
+    rendererFactory: L.canvas.tile,
+    attribution: 'ATTRIB',
+    interactive: false,
+    pane: 'mainpane',
+    maxNativeZoom: 14,
+    minNativeZoom: 9
+  }
+
+  L.vectorGrid.protobuf('http://10.0.0.70:9090/{z}/{x}/{y}.pbf', opts).addTo(map);
+
+  return callback();
 }
 
 function setSignSize(areaSignWidth) {
