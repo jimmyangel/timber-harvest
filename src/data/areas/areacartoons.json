@@ -3,6 +3,39 @@
   "features": [
     {
       "type": "Feature",
+      "properties": {
+        "name": "private"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -123.3838,
+              46.165275
+            ],
+            [
+              -123.38375,
+              46.16527
+            ],
+            [
+              -123.38375,
+              46.16529
+            ],
+            [
+              -123.3838,
+              46.1653
+            ],
+            [
+              -123.3838,
+              46.165275
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
       "geometry": {
         "type": "Polygon",
         "coordinates": [

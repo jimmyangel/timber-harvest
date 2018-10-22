@@ -206,12 +206,16 @@ export var config = {
     vale: {
       name: 'BLM Vale District Office',
       type: 'blm'
-    }/*,
+    },/*,
     prineville: {
       name: 'BLM Prineville District Office',
       type: 'blm',
       overrideSignPosition: [44.9482, -120.5708]
     }*/
+    private: {
+      name: 'Private',
+      type: 'private'
+    },
   },
   topLevelDataPath: {
     baseUrl: 'data/areas/',
