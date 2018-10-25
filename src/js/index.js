@@ -161,7 +161,9 @@ function gotoTop() {
 }
 
 function gotoArea(area, pushState) {
-  removeOverlay(overviewLayer);
+  if (overviewLayer) {
+    removeOverlay(overviewLayer);
+  }
 
   if (config.areas[area]) {
     if (pushState) {
