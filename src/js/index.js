@@ -116,6 +116,29 @@ function initMap(callback) {
     return callback();
   });
 
+  var opts = {
+    vectorTileLayerStyles: {
+      hansen: {
+        weight: 0,
+        opacity: 0,
+        color: '#009E73',
+        fillColor: '#009E73',
+        fillOpacity: 0.7,
+        fill: true,
+        className: 'hansen'
+      }
+    },
+    rendererFactory: L.canvas.tile,
+    attribution: 'ATTRIB',
+    interactive: false,
+    pane: 'mainpane',
+    maxNativeZoom: 14,
+    minNativeZoom: 9
+  }
+
+  L.vectorGrid.protobuf('http://10.0.0.70:9090/{z}/{x}/{y}.pbf', opts).addTo(map);
+
+
   /*var r = L.LeafletGeotiff.plotty({colorScale: 'greys', displayMin: 1, displayMax: 17,})
   L.leafletGeotiff(
     'http://10.0.0.70:9090/hansenclippedcompressed.tif',
@@ -192,7 +215,9 @@ function gotoTop() {
 }
 
 function gotoArea(area, pushState) {
-  removeOverlay(overviewLayer);
+  if (overviewLayer) {
+    removeOverlay(overviewLayer);
+  }
 
   if (config.areas[area]) {
     if (pushState) {
