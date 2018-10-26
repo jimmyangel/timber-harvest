@@ -323,7 +323,8 @@ function setUpInfoPanel() {
     this._div = L.DomUtil.create('div', 'info');
     this._div.innerHTML = infoHeader({
       loggingTypeLegend: config.loggingTypeLegend,
-      layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed()
+      layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed(),
+      alternateLoggingColor: config.alternateLoggingColor
     });
     L.DomEvent.disableClickPropagation(this._div);
     return this._div;
