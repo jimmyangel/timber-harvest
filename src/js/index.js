@@ -32,7 +32,14 @@ var spinner = new Spinner(config.spinnerOpts);
 var map = L.map('map', {fullscreenControl: true, zoom: 6, minZoom: 6, maxBounds: [[41, -126], [47, -115]]});
 var stripes = new L.StripePattern(config.stripesStyleOptions); stripes.addTo(map);
 var resetViewBounds = config.oregonBbox;
+
 map.fitBounds(resetViewBounds);
+
+// Update map zoom info
+var zoomLevel = map.getZoom();
+map.on('zoomend', function(e) {
+  zoomLevel = map.getZoom();
+});
 
 L.DomUtil.create('div', 'topLabel', map.getContainer());
 $('.topLabel').html(topLabel);
@@ -116,37 +123,6 @@ function initMap(callback) {
 
     return callback();
   });
-
-  /*var r = L.LeafletGeotiff.plotty({colorScale: 'greys', displayMin: 1, displayMax: 17,})
-  L.leafletGeotiff(
-    'http://10.0.0.70:9090/hansenclippedcompressed.tif',
-    {
-      band: 0,
-      renderer: r
-    }).addTo(map);*/
-  /*var opts = {
-    vectorTileLayerStyles: {
-      hansen: {
-        weight: 0,
-        opacity: 0,
-        color: '#009E73',
-        fillColor: '#009E73',
-        fillOpacity: 0.7,
-        fill: true,
-        className: 'hansen'
-      }
-    },
-    rendererFactory: L.canvas.tile,
-    attribution: 'ATTRIB',
-    interactive: false,
-    pane: 'mainpane',
-    maxNativeZoom: 14,
-    minNativeZoom: 9
-  }
-
-  L.vectorGrid.protobuf('http://10.0.0.70:9090/{z}/{x}/{y}.pbf', opts).addTo(map);
-
-  return callback();*/
 }
 
 function setSignSize(areaSignWidth) {
@@ -228,10 +204,19 @@ function gotoArea(area, pushState) {
       $('#rangeWidgets').hide();
       $('#legendWidget').hide();
       $('#tipToClick').hide();
+      $('#forestLossAlert').hide();
+      $('#dataQualityAlert').show();
       displayFedcutsPbfLayer(area);
     } else {
+      $('#dataQualityAlert').hide();
+      if (area === 'private') {
+        $('#forestLossAlert').show();
+        $('#legendWidget').hide();
+      } else {
+        $('#forestLossAlert').hide();
+        $('#legendWidget').show();
+      }
       $('#rangeWidgets').show();
-      $('#legendWidget').show();
       $('#tipToClick').show();
       displaytimberHarvestPbfLayer(area);
     }
@@ -240,11 +225,6 @@ function gotoArea(area, pushState) {
     }
     addUnharvestedOverlay(area);
     $('#infoPanelSubTitle').text(config.areas[area].name);
-    if (config.areas[area].underreported) {
-      $('#dataQualityAlert').show();
-    } else {
-      $('#dataQualityAlert').hide();
-    }
 
     $('.topLabel').hide();
     $('.info').show();
