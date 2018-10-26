@@ -87,7 +87,7 @@ function initMap(callback) {
       style: setAreaBoundaryStyle,
       onEachFeature: function(f, l) {
         if (config.areas[l.feature.properties.name]) {
-          config.areas[l.feature.properties.name].bounds = l.getBounds();
+          config.areas[l.feature.properties.name].bounds = (config.areas[l.feature.properties.name].type === 'private') ? config.oregonBbox : l.getBounds();
         }
         l.on('click', function(e) {
           gotoArea(l.feature.properties.name, true, e.latlng);
@@ -641,10 +641,10 @@ function harmonizeTimberHarvestSelectData(areaType) {
       case 'private':
         timberHarvestSelectData[idx].projectName = 'Unknown';
         timberHarvestSelectData[idx].loggingActivity = 'Clearcut Likely';
-        timberHarvestSelectData[idx].datePlanned = 'N/A';
-        timberHarvestSelectData[idx].dateContracted = 'N/A';
+        timberHarvestSelectData[idx].datePlanned = config.DATE_NA;
+        timberHarvestSelectData[idx].dateContracted = config.DATE_NOT_AVAILABLE;
         timberHarvestSelectData[idx].refYear = 2000 + parseInt(s.YEAR);
-        timberHarvestSelectData[idx].dateCompleted = timberHarvestSelectData[idx].refYear + '1231';
+        timberHarvestSelectData[idx].dateCompleted = timberHarvestSelectData[idx].refYear + '-12-31';
         timberHarvestSelectData[idx].loggingType = 'clearcut';
         break;
       default: // Deafult is National Forest
