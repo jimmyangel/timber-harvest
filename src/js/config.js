@@ -213,7 +213,7 @@ export var config = {
       overrideSignPosition: [44.9482, -120.5708]
     }*/
     private: {
-      name: 'Private',
+      name: 'Private and State Lands',
       type: 'private'
     },
   },
@@ -239,6 +239,12 @@ export var config = {
         return f.properties.assignedId;
       }
     }
+  },
+  attributionLabels: {
+    nf: 'USDA National Forest Service',
+    blm: 'Bureau of Land Management',
+    private: 'Hansen/UMD/Google/USGS/NASA'
+
   },
   timberHarvestStyle: {
     weight: 0,

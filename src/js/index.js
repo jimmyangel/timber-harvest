@@ -676,6 +676,7 @@ function displaytimberHarvestPbfLayer(area){
 
     config.timberHarvestLayer.options.rendererFactory = (area === 'private') ? L.canvas.tile : L.svg.tile;
     config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest = applytimberHarvestLayerStyle;
+    config.timberHarvestLayer.options.attribution = config.attributionLabels[config.areas[area].type];
     var url = baseUrl + config.timberHarvestLayer.tileScheme;
     timberHarvestPbfLayer = L.vectorGrid.protobuf(url, config.timberHarvestLayer.options).addTo(map);
 

@@ -1,7 +1,7 @@
 <div class="about">
-  <h2>Logging in Oregon's Public Lands <span style="font-size: small;"><b>{{{version}}}</b></span></h2>
+  <h2>Logging in Oregon <span style="font-size: small;"><b>{{{version}}}</b></span></h2>
   <h3>About this site</h3>
-  <p>This site is an interactive map used to visualize logging activities in National Forests and land managed by the Bureau of Land Management (BLM) within the state of Oregon.</p>
+  <p>This site is an interactive map used to visualize logging activities in National Forests and land managed by the Bureau of Land Management (BLM) within the state of Oregon. It also shows clearcut logging in private and State lands.</p>
   <p>Logging activities for a given National Forest and BLM District Office can be seen across all reported years, or within a given range of years, using a date range control. In addition, a timelapse animation can be visualized across all years reported, as well as within an arbitrary date range. Logged areas can be clicked to retrieve project details.</p>
   <p>A set of basemaps and overlays are available to customize the visualization.</p>
   <h4>Data Sources</h4>
@@ -9,7 +9,8 @@
     <li><a href="https://www.blm.gov/or/gis/data-details.php?id=421">BLM OR Harvest Treatments Polygon</a> - United States Department of the Interior, Bureau of Land Management</li><br>
     <li><a href="https://data.fs.usda.gov/geodata/edw/datasets.php?xmlKeyword=Timber+Harvests">Timber Harvests Dataset</a> - United States Department of Agriculture, Forest Service</li><br>
     <li>Unharvested Forest Lands - Derived from Vegetation Stand datasets from individual National Forest offices (not available for every National Forest)</li><br>
-    <li>Clearcuts in Federal lands - Obtained from <a href="https://oregonwild.org/">Oregon Wild</a></li>
+    <li>Clearcuts in Federal lands - Obtained from <a href="https://oregonwild.org/">Oregon Wild</a></li><br>
+    <li>Forest Loss - Obtained from <a href="https://oregonwild.org/">Global Forest Change 2000–2017</a>, Hansen/UMD/Google/USGS/NASA</li>
   </ul>
   <small><b>A note about data quality:</b> Logging spatial data are separately and independently reported by each National Forest and BLM office. Availability over date ranges varies considerably across offices and there can be significant omissions of logging activity, especially regarding older records. In addition, the most recent logging activities may not be shown. Last Update: {{lastUpdated}}</small>
   <p>This project is <a href="https://github.com/jimmyangel/timber-harvest">open source</a> and uses open data.</p>
