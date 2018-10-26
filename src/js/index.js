@@ -19,6 +19,7 @@ import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
+import privatePopUp from '../templates/privatePopUp.hbs';
 import topLabel from '../templates/topLabel.hbs';
 
 var NProgress = require('nprogress');
@@ -218,7 +219,7 @@ function gotoArea(area, pushState) {
       enableAllAreaShapesClick();
       disableAreaShapeClick(area);
     }
-    
+
     utils.resetPlaybackControl();
 
     isFedcuts = config.areas[area].underreported;
@@ -496,37 +497,38 @@ function highlightFeature(e) {
   var id = e.layer.properties.assignedId;
   if (timberHarvestSelectData[id].isPrivate) {
     resetHighlight();
-  }
-
-  var sortDate = (new Date(timberHarvestSelectData[id].dateCompleted)).toISOString();
-  if (sortDate.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
-    sortDate = 'N/A';
-  }
-
-  var content = infoContentItem({
-    projectName: (timberHarvestSelectData[id].projectName ? timberHarvestSelectData[id].projectName : 'N/A'),
-    loggingActivity: timberHarvestSelectData[id].loggingActivity.replace(/ *\([^)]*\) */g, ''),
-    acres: timberHarvestSelectData[id].GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
-    datePlanned: (timberHarvestSelectData[id].datePlanned.substr(0,4) === config.DATE_NA) ? 'N/A' : (new Date(timberHarvestSelectData[id].datePlanned).toLocaleDateString()),
-    dateContracted: (timberHarvestSelectData[id].dateContracted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateContracted).toLocaleDateString()),
-    dateCompleted: (timberHarvestSelectData[id].dateCompleted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateCompleted).toLocaleDateString()),
-    sortDate: sortDate
-  });
-
-  if ($('.infoContentItem').length === 0) {
-    $('#infoContent').append(content);
   } else {
-    $('.infoContentItem').each(function(i){
-      if ($(this).attr('data-sortby') >= sortDate) {
-        $(this).before(content);
-        return false;
-      } else {
-        if (i === $('.infoContentItem').length - 1) {
-          $(this).after(content);
-          return false;
-        }
-      }
+
+    var sortDate = (new Date(timberHarvestSelectData[id].dateCompleted)).toISOString();
+    if (sortDate.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
+      sortDate = 'N/A';
+    }
+
+    var content = infoContentItem({
+      projectName: (timberHarvestSelectData[id].projectName ? timberHarvestSelectData[id].projectName : 'N/A'),
+      loggingActivity: timberHarvestSelectData[id].loggingActivity.replace(/ *\([^)]*\) */g, ''),
+      acres: timberHarvestSelectData[id].GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
+      datePlanned: (timberHarvestSelectData[id].datePlanned.substr(0,4) === config.DATE_NA) ? 'N/A' : (new Date(timberHarvestSelectData[id].datePlanned).toLocaleDateString()),
+      dateContracted: (timberHarvestSelectData[id].dateContracted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateContracted).toLocaleDateString()),
+      dateCompleted: (timberHarvestSelectData[id].dateCompleted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateCompleted).toLocaleDateString()),
+      sortDate: sortDate
     });
+
+    if ($('.infoContentItem').length === 0) {
+      $('#infoContent').append(content);
+    } else {
+      $('.infoContentItem').each(function(i){
+        if ($(this).attr('data-sortby') >= sortDate) {
+          $(this).before(content);
+          return false;
+        } else {
+          if (i === $('.infoContentItem').length - 1) {
+            $(this).after(content);
+            return false;
+          }
+        }
+      });
+    }
   }
 
   highlightedFeatures.push(e.layer.properties.assignedId);
@@ -652,12 +654,7 @@ function harmonizeTimberHarvestSelectData(areaType) {
         break;
       case 'private':
         timberHarvestSelectData[idx].isPrivate = true;
-        timberHarvestSelectData[idx].projectName = 'Unknown';
-        timberHarvestSelectData[idx].loggingActivity = 'Clearcut Likely';
-        timberHarvestSelectData[idx].datePlanned = config.DATE_NA;
-        timberHarvestSelectData[idx].dateContracted = config.DATE_NOT_AVAILABLE;
         timberHarvestSelectData[idx].refYear = 2000 + parseInt(s.YEAR);
-        timberHarvestSelectData[idx].dateCompleted = timberHarvestSelectData[idx].refYear + '-12-31';
         timberHarvestSelectData[idx].loggingType = 'clearcut';
         break;
       default: // Deafult is National Forest
@@ -704,7 +701,12 @@ function displaytimberHarvestPbfLayer(area){
     timberHarvestPbfLayer.on({
       click: function (e) {
         lastLayerEventTimeStamp = e.originalEvent.timeStamp;
-        console.log(e);
+        if (timberHarvestSelectData[e.layer.properties.assignedId].isPrivate) {
+          map.openPopup(privatePopUp({
+            year: timberHarvestSelectData[e.layer.properties.assignedId].refYear,
+            acres: timberHarvestSelectData[e.layer.properties.assignedId].GIS_ACRES
+          }), e.latlng, {closeOnClick: false});
+        }
         highlightFeature(e);
       },
       loading: function() {
