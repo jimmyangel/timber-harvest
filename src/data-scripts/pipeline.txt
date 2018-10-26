@@ -52,3 +52,20 @@ mapshaper blm-timber-or.json -each 'assignedId=this.id' -simplify 30% visvalinga
 tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --output-to-directory "vtiles/blmwest" blm-timber-or-s.json
 
 mapshaper blm-timber-or-s.json -filter-fields assignedId,BLM_ORG_CD,TRT_NAME,HARV_RX,TRT_DATE,SALE_DATE,GIS_ACRES -o format=json vtiles/blmwest/timber-or-s-info.json
+
+### hansen processing
+# Get Hansen
+# Clip to Oregon
+# Clip to Private
+# Polygonize
+# Simplify 30%
+# clean
+# filter remove-empty
+# filter 'this.area>2000'
+# export precision 0.0001
+
+mapshaper hansen-private-polygons.json -each 'assignedId=this.id' -o format=geojson hansen-private-polygons-i.json
+
+tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=9 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --output-to-directory "hansen" hansen-private-polygons-i.json
+
+mapshaper hansen-private-polygons-i.json -each 'GIS_ACRES=Math.round(this.area*0.000247105)' -filter-fields assignedId,YEAR,GIS_ACRES -o format=json hansen/timber-or-s-info.json

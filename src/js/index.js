@@ -116,29 +116,6 @@ function initMap(callback) {
     return callback();
   });
 
-  var opts = {
-    vectorTileLayerStyles: {
-      hansen: {
-        weight: 0,
-        opacity: 0,
-        color: '#009E73',
-        fillColor: '#009E73',
-        fillOpacity: 0.7,
-        fill: true,
-        className: 'hansen'
-      }
-    },
-    rendererFactory: L.canvas.tile,
-    attribution: 'ATTRIB',
-    interactive: false,
-    pane: 'mainpane',
-    maxNativeZoom: 14,
-    minNativeZoom: 9
-  }
-
-  L.vectorGrid.protobuf('http://10.0.0.70:9090/{z}/{x}/{y}.pbf', opts).addTo(map);
-
-
   /*var r = L.LeafletGeotiff.plotty({colorScale: 'greys', displayMin: 1, displayMax: 17,})
   L.leafletGeotiff(
     'http://10.0.0.70:9090/hansenclippedcompressed.tif',
@@ -566,8 +543,8 @@ function updateFeatureStyling() {
   if (isFedcuts) {
     timberHarvestPbfLayer.redraw();
   } else {
-    timberHarvestSelectData.forEach(function(s, idx) {
-      timberHarvestPbfLayer.resetFeatureStyle(idx);
+    timberHarvestSelectData.forEach(function(s) {
+      timberHarvestPbfLayer.resetFeatureStyle(s.assignedId);
     });
   }
 }
@@ -626,7 +603,6 @@ function setUpSlideHandlers() {
 }
 
 function applytimberHarvestLayerStyle(p) {
-
   var refYear = timberHarvestSelectData[p.assignedId].refYear;
 
   if ((refYear >= fromYear) && (refYear <= toYear)) {
@@ -662,6 +638,15 @@ function harmonizeTimberHarvestSelectData(areaType) {
         timberHarvestSelectData[idx].refYear = (new Date(s.TRT_DATE.substr(0,4))).getFullYear(); // TODO: Review this
         timberHarvestSelectData[idx].loggingType = s.HARV_RX ? config.treatmentTypeDecode[s.HARV_RX] : 'other';
         break;
+      case 'private':
+        timberHarvestSelectData[idx].projectName = 'Unknown';
+        timberHarvestSelectData[idx].loggingActivity = 'Clearcut Likely';
+        timberHarvestSelectData[idx].datePlanned = 'N/A';
+        timberHarvestSelectData[idx].dateContracted = 'N/A';
+        timberHarvestSelectData[idx].refYear = 2000 + parseInt(s.YEAR);
+        timberHarvestSelectData[idx].dateCompleted = timberHarvestSelectData[idx].refYear + '1231';
+        timberHarvestSelectData[idx].loggingType = 'clearcut';
+        break;
       default: // Deafult is National Forest
         timberHarvestSelectData[idx].projectName = s.SALE_NAME;
         timberHarvestSelectData[idx].loggingActivity = s.ACTIVITY_N;
@@ -690,15 +675,17 @@ function harmonizeTimberHarvestSelectData(areaType) {
 
 function displaytimberHarvestPbfLayer(area){
 
-  $.getJSON(config.timberHarvestLayer.baseUrl + area + config.infoFileName, function(data) {
+  var baseUrl = (area === 'private') ? 'http://10.0.0.70:9090' : config.timberHarvestLayer.baseUrl + area;
+
+  $.getJSON(baseUrl + config.infoFileName, function(data) {
 
     timberHarvestSelectData = data;
 
     harmonizeTimberHarvestSelectData(config.areas[area].type);
 
-    config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
+    config.timberHarvestLayer.options.rendererFactory = (area === 'private') ? L.canvas.tile : L.svg.tile;
     config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest = applytimberHarvestLayerStyle;
-    var url = config.timberHarvestLayer.baseUrl + area + config.timberHarvestLayer.tileScheme;
+    var url = baseUrl + config.timberHarvestLayer.tileScheme;
     timberHarvestPbfLayer = L.vectorGrid.protobuf(url, config.timberHarvestLayer.options).addTo(map);
 
     timberHarvestPbfLayer.on({
