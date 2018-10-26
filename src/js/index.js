@@ -609,7 +609,7 @@ function applytimberHarvestLayerStyle(p) {
 function getTimberHarvestFeatureStyle(id) {
   var style = config.timberHarvestStyle;
   style.fillOpacity = (Math.round(opacitySlider.getInfo().right)) / 100;
-  style.color = config.loggingTypeLegend[timberHarvestSelectData[id].loggingType].color;
+  style.color = timberHarvestSelectData[id].isPrivate ? config.alternateLoggingColor : config.loggingTypeLegend[timberHarvestSelectData[id].loggingType].color;
   style.fillColor = style.color;
 
   return style;
