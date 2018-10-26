@@ -211,8 +211,14 @@ function gotoArea(area, pushState) {
     }
     areaShapes.setStyle(config.areaBoundaryStyle);
     areaShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
-    enableAllAreaShapesClick();
-    disableAreaShapeClick(area);
+
+    if (area === 'private') {
+      disableAllAreaShapesClick();
+    } else {
+      enableAllAreaShapesClick();
+      disableAreaShapeClick(area);
+    }
+    
     utils.resetPlaybackControl();
 
     isFedcuts = config.areas[area].underreported;
@@ -253,6 +259,13 @@ function enableAllAreaShapesClick() {
         gotoArea(l.feature.properties.name, true, e.latlng);
       });
     }
+  });
+}
+
+function disableAllAreaShapesClick() {
+  areaShapes.eachLayer(function(l) {
+    l.setStyle({opacity: 0, fillOpacity: 0})
+    l.off('click');
   });
 }
 
@@ -480,11 +493,10 @@ function setUpResetControl() {
 
 function highlightFeature(e) {
 
-  // Not great but the best I can do rigth now to distinguish mutiple features click thrus vs a separate click altogether
-  if ((e.originalEvent.timeStamp - lastLayerEventTimeStamp) > 20) {
+  var id = e.layer.properties.assignedId;
+  if (timberHarvestSelectData[id].isPrivate) {
     resetHighlight();
   }
-  var id = e.layer.properties.assignedId;
 
   var sortDate = (new Date(timberHarvestSelectData[id].dateCompleted)).toISOString();
   if (sortDate.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
@@ -639,6 +651,7 @@ function harmonizeTimberHarvestSelectData(areaType) {
         timberHarvestSelectData[idx].loggingType = s.HARV_RX ? config.treatmentTypeDecode[s.HARV_RX] : 'other';
         break;
       case 'private':
+        timberHarvestSelectData[idx].isPrivate = true;
         timberHarvestSelectData[idx].projectName = 'Unknown';
         timberHarvestSelectData[idx].loggingActivity = 'Clearcut Likely';
         timberHarvestSelectData[idx].datePlanned = config.DATE_NA;
@@ -691,6 +704,7 @@ function displaytimberHarvestPbfLayer(area){
     timberHarvestPbfLayer.on({
       click: function (e) {
         lastLayerEventTimeStamp = e.originalEvent.timeStamp;
+        console.log(e);
         highlightFeature(e);
       },
       loading: function() {
