@@ -240,6 +240,7 @@ export var config = {
       }
     }
   },
+  privateLayerUrl: 'https://forestloss.oregonhowl.org/hansen-private',
   attributionLabels: {
     nf: 'USDA National Forest Service',
     blm: 'Bureau of Land Management',

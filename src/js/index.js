@@ -199,9 +199,11 @@ function gotoArea(area, pushState) {
     utils.resetPlaybackControl();
 
     isFedcuts = config.areas[area].underreported;
+    $('#rangeWidgets').hide();
+    map.off('zoomend', zoomHandler);
+
     if (isFedcuts) {
       $('#infoContent').empty();
-      $('#rangeWidgets').hide();
       $('#legendWidget').hide();
       $('#tipToClick').hide();
       $('#forestLossAlert').hide();
@@ -212,11 +214,12 @@ function gotoArea(area, pushState) {
       if (area === 'private') {
         $('#forestLossAlert').show();
         $('#legendWidget').hide();
+        map.on('zoomend', zoomHandler);
       } else {
         $('#forestLossAlert').hide();
         $('#legendWidget').show();
+        $('#rangeWidgets').show();
       }
-      $('#rangeWidgets').show();
       $('#tipToClick').show();
       displaytimberHarvestPbfLayer(area);
     }
@@ -230,6 +233,15 @@ function gotoArea(area, pushState) {
     $('.info').show();
   } else {
     displayFedcutsPbfLayer(area);
+  }
+}
+
+function zoomHandler() {
+  if (map.getZoom() > 9) {
+    $('#rangeWidgets').show();
+  } else {
+    utils.resetPlaybackControl();
+    $('#rangeWidgets').hide();
   }
 }
 
@@ -666,7 +678,7 @@ function harmonizeTimberHarvestSelectData(areaType) {
 
 function displaytimberHarvestPbfLayer(area){
 
-  var baseUrl = (area === 'private') ? 'http://10.0.0.70:9090' : config.timberHarvestLayer.baseUrl + area;
+  var baseUrl = (area === 'private') ? config.privateLayerUrl : config.timberHarvestLayer.baseUrl + area;
 
   $.getJSON(baseUrl + config.infoFileName, function(data) {
 
