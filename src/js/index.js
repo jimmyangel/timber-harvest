@@ -35,12 +35,6 @@ var resetViewBounds = config.oregonBbox;
 
 map.fitBounds(resetViewBounds);
 
-// Update map zoom info
-var zoomLevel = map.getZoom();
-map.on('zoomend', function(e) {
-  zoomLevel = map.getZoom();
-});
-
 L.DomUtil.create('div', 'topLabel', map.getContainer());
 $('.topLabel').html(topLabel);
 
