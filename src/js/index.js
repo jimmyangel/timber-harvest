@@ -625,6 +625,7 @@ function getTimberHarvestFeatureStyle(id) {
 // Consider doing the below in the data processing pipeline instead
 function harmonizeTimberHarvestSelectData(areaType) {
   var minYear = config.dateRangeSliderOptions.max;
+  var maxYear = config.dateRangeSliderOptions.min;
 
   timberHarvestSelectData.forEach(function(s, idx) {
 
@@ -665,9 +666,10 @@ function harmonizeTimberHarvestSelectData(areaType) {
     }
 
     minYear = Math.min(timberHarvestSelectData[idx].refYear, minYear);
+    maxYear = Math.max(timberHarvestSelectData[idx].refYear, maxYear);
   });
 
-  dateRangeSlider.move({left: minYear, right: config.dateRangeSliderOptions.max}, true);
+  dateRangeSlider.move({left: minYear, right: maxYear}, true);
 }
 
 function displaytimberHarvestPbfLayer(area){
