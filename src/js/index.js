@@ -211,6 +211,7 @@ function gotoArea(area, pushState) {
         $('#legendWidget').hide();
         $('#rangeWidgets').hide();
         $('#zoomInForRangeWidgets').show();
+        zoomHandler();
         map.on('zoomend', zoomHandler);
       } else {
         $('#forestLossAlert').hide();
