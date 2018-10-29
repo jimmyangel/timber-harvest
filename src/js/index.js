@@ -193,7 +193,6 @@ function gotoArea(area, pushState) {
     utils.resetPlaybackControl();
 
     isFedcuts = config.areas[area].underreported;
-    $('#rangeWidgets').hide();
     map.off('zoomend', zoomHandler);
 
     if (isFedcuts) {
@@ -201,6 +200,8 @@ function gotoArea(area, pushState) {
       $('#legendWidget').hide();
       $('#tipToClick').hide();
       $('#forestLossAlert').hide();
+      $('#rangeWidgets').hide();
+      $('#zoomInForRangeWidgets').hide();
       $('#dataQualityAlert').show();
       displayFedcutsPbfLayer(area);
     } else {
@@ -208,11 +209,14 @@ function gotoArea(area, pushState) {
       if (area === 'private') {
         $('#forestLossAlert').show();
         $('#legendWidget').hide();
+        $('#rangeWidgets').hide();
+        $('#zoomInForRangeWidgets').show();
         map.on('zoomend', zoomHandler);
       } else {
         $('#forestLossAlert').hide();
         $('#legendWidget').show();
         $('#rangeWidgets').show();
+        $('#zoomInForRangeWidgets').hide();
       }
       $('#tipToClick').show();
       displaytimberHarvestPbfLayer(area);
@@ -233,9 +237,11 @@ function gotoArea(area, pushState) {
 function zoomHandler() {
   if (map.getZoom() > 9) {
     $('#rangeWidgets').show();
+    $('#zoomInForRangeWidgets').hide();
   } else {
     utils.resetPlaybackControl();
     $('#rangeWidgets').hide();
+    $('#zoomInForRangeWidgets').show();
   }
 }
 
