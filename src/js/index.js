@@ -19,6 +19,7 @@ import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
+import privatePopUp from '../templates/privatePopUp.hbs';
 import topLabel from '../templates/topLabel.hbs';
 
 var NProgress = require('nprogress');
@@ -31,6 +32,7 @@ var spinner = new Spinner(config.spinnerOpts);
 var map = L.map('map', {fullscreenControl: true, zoom: 6, minZoom: 6, maxBounds: [[41, -126], [47, -115]]});
 var stripes = new L.StripePattern(config.stripesStyleOptions); stripes.addTo(map);
 var resetViewBounds = config.oregonBbox;
+
 map.fitBounds(resetViewBounds);
 
 L.DomUtil.create('div', 'topLabel', map.getContainer());
@@ -87,7 +89,7 @@ function initMap(callback) {
       style: setAreaBoundaryStyle,
       onEachFeature: function(f, l) {
         if (config.areas[l.feature.properties.name]) {
-          config.areas[l.feature.properties.name].bounds = l.getBounds();
+          config.areas[l.feature.properties.name].bounds = (config.areas[l.feature.properties.name].type === 'private') ? config.oregonBbox : l.getBounds();
         }
         l.on('click', function(e) {
           gotoArea(l.feature.properties.name, true, e.latlng);
@@ -180,20 +182,43 @@ function gotoArea(area, pushState) {
     }
     areaShapes.setStyle(config.areaBoundaryStyle);
     areaShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
-    enableAllAreaShapesClick();
-    disableAreaShapeClick(area);
+
+    if (area === 'private') {
+      disableAllAreaShapesClick();
+    } else {
+      enableAllAreaShapesClick();
+      disableAreaShapeClick(area);
+    }
+
     utils.resetPlaybackControl();
 
     isFedcuts = config.areas[area].underreported;
+    map.off('zoomend', zoomHandler);
+
     if (isFedcuts) {
       $('#infoContent').empty();
-      $('#rangeWidgets').hide();
       $('#legendWidget').hide();
       $('#tipToClick').hide();
+      $('#forestLossAlert').hide();
+      $('#rangeWidgets').hide();
+      $('#zoomInForRangeWidgets').hide();
+      $('#dataQualityAlert').show();
       displayFedcutsPbfLayer(area);
     } else {
-      $('#rangeWidgets').show();
-      $('#legendWidget').show();
+      $('#dataQualityAlert').hide();
+      if (area === 'private') {
+        $('#forestLossAlert').show();
+        $('#legendWidget').hide();
+        $('#rangeWidgets').hide();
+        $('#zoomInForRangeWidgets').show();
+        zoomHandler();
+        map.on('zoomend', zoomHandler);
+      } else {
+        $('#forestLossAlert').hide();
+        $('#legendWidget').show();
+        $('#rangeWidgets').show();
+        $('#zoomInForRangeWidgets').hide();
+      }
       $('#tipToClick').show();
       displaytimberHarvestPbfLayer(area);
     }
@@ -202,16 +227,22 @@ function gotoArea(area, pushState) {
     }
     addUnharvestedOverlay(area);
     $('#infoPanelSubTitle').text(config.areas[area].name);
-    if (config.areas[area].underreported) {
-      $('#dataQualityAlert').show();
-    } else {
-      $('#dataQualityAlert').hide();
-    }
 
     $('.topLabel').hide();
     $('.info').show();
   } else {
     displayFedcutsPbfLayer(area);
+  }
+}
+
+function zoomHandler() {
+  if (map.getZoom() > 9) {
+    $('#rangeWidgets').show();
+    $('#zoomInForRangeWidgets').hide();
+  } else {
+    utils.resetPlaybackControl();
+    $('#rangeWidgets').hide();
+    $('#zoomInForRangeWidgets').show();
   }
 }
 
@@ -222,6 +253,13 @@ function enableAllAreaShapesClick() {
         gotoArea(l.feature.properties.name, true, e.latlng);
       });
     }
+  });
+}
+
+function disableAllAreaShapesClick() {
+  areaShapes.eachLayer(function(l) {
+    l.setStyle({opacity: 0, fillOpacity: 0})
+    l.off('click');
   });
 }
 
@@ -298,7 +336,8 @@ function setUpInfoPanel() {
     this._div = L.DomUtil.create('div', 'info');
     this._div.innerHTML = infoHeader({
       loggingTypeLegend: config.loggingTypeLegend,
-      layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed()
+      layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed(),
+      alternateLoggingColor: config.alternateLoggingColor
     });
     L.DomEvent.disableClickPropagation(this._div);
     return this._div;
@@ -449,41 +488,41 @@ function setUpResetControl() {
 
 function highlightFeature(e) {
 
-  // Not great but the best I can do rigth now to distinguish mutiple features click thrus vs a separate click altogether
-  if ((e.originalEvent.timeStamp - lastLayerEventTimeStamp) > 20) {
-    resetHighlight();
-  }
   var id = e.layer.properties.assignedId;
-
-  var sortDate = (new Date(timberHarvestSelectData[id].dateCompleted)).toISOString();
-  if (sortDate.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
-    sortDate = 'N/A';
-  }
-
-  var content = infoContentItem({
-    projectName: (timberHarvestSelectData[id].projectName ? timberHarvestSelectData[id].projectName : 'N/A'),
-    loggingActivity: timberHarvestSelectData[id].loggingActivity.replace(/ *\([^)]*\) */g, ''),
-    acres: timberHarvestSelectData[id].GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
-    datePlanned: (timberHarvestSelectData[id].datePlanned.substr(0,4) === config.DATE_NA) ? 'N/A' : (new Date(timberHarvestSelectData[id].datePlanned).toLocaleDateString()),
-    dateContracted: (timberHarvestSelectData[id].dateContracted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateContracted).toLocaleDateString()),
-    dateCompleted: (timberHarvestSelectData[id].dateCompleted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateCompleted).toLocaleDateString()),
-    sortDate: sortDate
-  });
-
-  if ($('.infoContentItem').length === 0) {
-    $('#infoContent').append(content);
+  if (timberHarvestSelectData[id].isPrivate) {
+    resetHighlight();
   } else {
-    $('.infoContentItem').each(function(i){
-      if ($(this).attr('data-sortby') >= sortDate) {
-        $(this).before(content);
-        return false;
-      } else {
-        if (i === $('.infoContentItem').length - 1) {
-          $(this).after(content);
-          return false;
-        }
-      }
+
+    var sortDate = (new Date(timberHarvestSelectData[id].dateCompleted)).toISOString();
+    if (sortDate.substring(0, 4) === config.DATE_NOT_AVAILABLE) {
+      sortDate = 'N/A';
+    }
+
+    var content = infoContentItem({
+      projectName: (timberHarvestSelectData[id].projectName ? timberHarvestSelectData[id].projectName : 'N/A'),
+      loggingActivity: timberHarvestSelectData[id].loggingActivity.replace(/ *\([^)]*\) */g, ''),
+      acres: timberHarvestSelectData[id].GIS_ACRES.toLocaleString(window.navigator.language, {maximumFractionDigits: 0}),
+      datePlanned: (timberHarvestSelectData[id].datePlanned.substr(0,4) === config.DATE_NA) ? 'N/A' : (new Date(timberHarvestSelectData[id].datePlanned).toLocaleDateString()),
+      dateContracted: (timberHarvestSelectData[id].dateContracted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateContracted).toLocaleDateString()),
+      dateCompleted: (timberHarvestSelectData[id].dateCompleted.substring(0, 4) === config.DATE_NOT_AVAILABLE) ? 'N/A' : (new Date(timberHarvestSelectData[id].dateCompleted).toLocaleDateString()),
+      sortDate: sortDate
     });
+
+    if ($('.infoContentItem').length === 0) {
+      $('#infoContent').append(content);
+    } else {
+      $('.infoContentItem').each(function(i){
+        if ($(this).attr('data-sortby') >= sortDate) {
+          $(this).before(content);
+          return false;
+        } else {
+          if (i === $('.infoContentItem').length - 1) {
+            $(this).after(content);
+            return false;
+          }
+        }
+      });
+    }
   }
 
   highlightedFeatures.push(e.layer.properties.assignedId);
@@ -512,8 +551,8 @@ function updateFeatureStyling() {
   if (isFedcuts) {
     timberHarvestPbfLayer.redraw();
   } else {
-    timberHarvestSelectData.forEach(function(s, idx) {
-      timberHarvestPbfLayer.resetFeatureStyle(idx);
+    timberHarvestSelectData.forEach(function(s) {
+      timberHarvestPbfLayer.resetFeatureStyle(s.assignedId);
     });
   }
 }
@@ -572,7 +611,6 @@ function setUpSlideHandlers() {
 }
 
 function applytimberHarvestLayerStyle(p) {
-
   var refYear = timberHarvestSelectData[p.assignedId].refYear;
 
   if ((refYear >= fromYear) && (refYear <= toYear)) {
@@ -585,7 +623,7 @@ function applytimberHarvestLayerStyle(p) {
 function getTimberHarvestFeatureStyle(id) {
   var style = config.timberHarvestStyle;
   style.fillOpacity = (Math.round(opacitySlider.getInfo().right)) / 100;
-  style.color = config.loggingTypeLegend[timberHarvestSelectData[id].loggingType].color;
+  style.color = timberHarvestSelectData[id].isPrivate ? config.alternateLoggingColor : config.loggingTypeLegend[timberHarvestSelectData[id].loggingType].color;
   style.fillColor = style.color;
 
   return style;
@@ -594,6 +632,7 @@ function getTimberHarvestFeatureStyle(id) {
 // Consider doing the below in the data processing pipeline instead
 function harmonizeTimberHarvestSelectData(areaType) {
   var minYear = config.dateRangeSliderOptions.max;
+  var maxYear = config.dateRangeSliderOptions.min;
 
   timberHarvestSelectData.forEach(function(s, idx) {
 
@@ -607,6 +646,11 @@ function harmonizeTimberHarvestSelectData(areaType) {
         timberHarvestSelectData[idx].dateCompleted = timberHarvestSelectData[idx].dateCompleted.replace(/(-)+$/, '');
         timberHarvestSelectData[idx].refYear = (new Date(s.TRT_DATE.substr(0,4))).getFullYear(); // TODO: Review this
         timberHarvestSelectData[idx].loggingType = s.HARV_RX ? config.treatmentTypeDecode[s.HARV_RX] : 'other';
+        break;
+      case 'private':
+        timberHarvestSelectData[idx].isPrivate = true;
+        timberHarvestSelectData[idx].refYear = 2000 + parseInt(s.YEAR);
+        timberHarvestSelectData[idx].loggingType = 'clearcut';
         break;
       default: // Deafult is National Forest
         timberHarvestSelectData[idx].projectName = s.SALE_NAME;
@@ -629,27 +673,37 @@ function harmonizeTimberHarvestSelectData(areaType) {
     }
 
     minYear = Math.min(timberHarvestSelectData[idx].refYear, minYear);
+    maxYear = Math.max(timberHarvestSelectData[idx].refYear, maxYear);
   });
 
-  dateRangeSlider.move({left: minYear, right: config.dateRangeSliderOptions.max}, true);
+  dateRangeSlider.move({left: minYear, right: maxYear}, true);
 }
 
 function displaytimberHarvestPbfLayer(area){
 
-  $.getJSON(config.timberHarvestLayer.baseUrl + area + config.infoFileName, function(data) {
+  var baseUrl = (area === 'private') ? config.privateLayerUrl : config.timberHarvestLayer.baseUrl + area;
+
+  $.getJSON(baseUrl + config.infoFileName, function(data) {
 
     timberHarvestSelectData = data;
 
     harmonizeTimberHarvestSelectData(config.areas[area].type);
 
-    config.timberHarvestLayer.options.rendererFactory = L.svg.tile;
+    config.timberHarvestLayer.options.rendererFactory = (area === 'private') ? L.canvas.tile : L.svg.tile;
     config.timberHarvestLayer.options.vectorTileLayerStyles.timberharvest = applytimberHarvestLayerStyle;
-    var url = config.timberHarvestLayer.baseUrl + area + config.timberHarvestLayer.tileScheme;
+    config.timberHarvestLayer.options.attribution = config.attributionLabels[config.areas[area].type];
+    var url = baseUrl + config.timberHarvestLayer.tileScheme;
     timberHarvestPbfLayer = L.vectorGrid.protobuf(url, config.timberHarvestLayer.options).addTo(map);
 
     timberHarvestPbfLayer.on({
       click: function (e) {
         lastLayerEventTimeStamp = e.originalEvent.timeStamp;
+        if (timberHarvestSelectData[e.layer.properties.assignedId].isPrivate) {
+          map.openPopup(privatePopUp({
+            year: timberHarvestSelectData[e.layer.properties.assignedId].refYear,
+            acres: timberHarvestSelectData[e.layer.properties.assignedId].GIS_ACRES
+          }), e.latlng, {closeOnClick: false});
+        }
         highlightFeature(e);
       },
       loading: function() {

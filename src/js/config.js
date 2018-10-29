@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.4.0<sup>Beta</sup>',
+  versionString: 'v0.5.0<sup>Beta</sup>',
   dataLastUpdated: 'September 28, 2018',
   baseMapLayers: [
     {
@@ -206,12 +206,16 @@ export var config = {
     vale: {
       name: 'BLM Vale District Office',
       type: 'blm'
-    }/*,
+    },/*,
     prineville: {
       name: 'BLM Prineville District Office',
       type: 'blm',
       overrideSignPosition: [44.9482, -120.5708]
     }*/
+    private: {
+      name: 'Private and State Lands',
+      type: 'private'
+    },
   },
   topLevelDataPath: {
     baseUrl: 'data/areas/',
@@ -235,6 +239,14 @@ export var config = {
         return f.properties.assignedId;
       }
     }
+  },
+  privateLayerUrl: 'https://forestloss.oregonhowl.org/hansen-private',
+  // privateLayerUrl: 'http://localhost:9090/hansen',
+  attributionLabels: {
+    nf: 'USDA National Forest Service',
+    blm: 'Bureau of Land Management',
+    private: 'Hansen/UMD/Google/USGS/NASA'
+
   },
   timberHarvestStyle: {
     weight: 0,
@@ -420,6 +432,7 @@ export var config = {
       text: 'Other'
     }
   },
+  alternateLoggingColor: '#9300d5',
   dateRangeSliderOptions: {
       isDate: false,
       min: 1900,

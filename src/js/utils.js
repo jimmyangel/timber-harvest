@@ -124,3 +124,15 @@ export function getUrlVars() {
 	}
 	return urlVars;
 }
+
+// Handle binary content (only needed to deal with GeoTIFF, which we are not right now
+/*$.ajaxSetup({
+  beforeSend:function(jqXHR,settings){
+    if (settings.dataType === 'binary'){
+      console.log('binary type');
+      settings.xhr().responseType='arraybuffer';
+      //settings.processData=false;
+    }
+  }
+});
+*/
