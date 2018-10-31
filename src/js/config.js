@@ -118,6 +118,17 @@ export var config = {
       get name () {
         return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> BLM Land'
       },
+      type: 'pixelfiltertile'
+    },
+    {
+      url: 'http://localhost:9090/logging/{z}/{x}/{y}.png',
+      options: {
+        maxNativeZoom: 13,
+        opacity: 1,
+        attribution: 'Oregon Wild, Hansen/UMD/Google/USGS/NASA'
+      },
+      name: 'Test',
+      checked: true,
       type: 'tile'
     }
   ],
@@ -240,8 +251,9 @@ export var config = {
       }
     }
   },
-  privateLayerUrl: 'https://forestloss.oregonhowl.org/hansen-private',
-  // privateLayerUrl: 'http://localhost:9090/hansen',
+  //privateLayerUrl: 'https://forestloss.oregonhowl.org/hansen-private',
+  privateLayerUrl: 'http://localhost:9191/hansen',
+  minZoomForPlayback: 8,
   attributionLabels: {
     nf: 'USDA National Forest Service',
     blm: 'Bureau of Land Management',

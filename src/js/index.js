@@ -236,7 +236,7 @@ function gotoArea(area, pushState) {
 }
 
 function zoomHandler() {
-  if (map.getZoom() > 9) {
+  if (map.getZoom() > config.minZoomForPlayback) {
     $('#rangeWidgets').show();
     $('#zoomInForRangeWidgets').hide();
   } else {
@@ -409,8 +409,11 @@ function setUpLayerControl() {
           });
         })(oLayer, config.overlayLayers[k].style);
         break;
-      default:
+      case 'pixelfiltertile':
         oLayer = overlayLayers[config.overlayLayers[k].name] = L.tileLayerPixelFilter(config.overlayLayers[k].url, config.overlayLayers[k].options);
+        break;
+      default:
+        oLayer = overlayLayers[config.overlayLayers[k].name] = L.tileLayer(config.overlayLayers[k].url, config.overlayLayers[k].options);
       }
       if (config.overlayLayers[k].checked) {
         map.addLayer(oLayer);
