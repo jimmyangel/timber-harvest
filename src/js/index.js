@@ -17,6 +17,7 @@ import * as utils from './utils.js';
 
 import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
+import topInfoContent from '../templates/topInfoContent.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
 import privatePopUp from '../templates/privatePopUp.hbs';
@@ -38,7 +39,6 @@ map.fitBounds(resetViewBounds);
 L.DomUtil.create('div', 'topLabel', map.getContainer());
 $('.topLabel').html(topLabel);
 
-var info = L.control();
 var highlightedFeatures = [];
 var timberHarvestSelectData;
 var timberHarvestPbfLayer;
@@ -46,7 +46,7 @@ var isFedcuts = false;
 var unharvestedLayer;
 var overviewLayer;
 var lastLayerEventTimeStamp;
-var areaSignsLayerGroup = L.layerGroup().addTo(map); // This is so getCenter works
+var areaSignsLayerGroup = L.layerGroup(); //.addTo(map); // This is so getCenter works
 var areaShapes;
 
 var layersControl;
@@ -58,7 +58,7 @@ var fromYear;
 var toYear;
 
 setUpCustomPanes();
-setUpInfoPanel();
+setUpInfoPanels();
 setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
@@ -67,10 +67,15 @@ initMap(function() {
   var f = utils.getUrlVars().a;
 
   window.onpopstate = function(e) {
-    if (e.state === 'top') {
-      gotoTop();
-    } else {
-      gotoArea(e.state);
+
+    switch (e.state) {
+      case 'fed':
+        gotoFed();
+        break;
+      case 'top':
+        break;
+      default:
+        gotoArea(e.state);
     }
   };
 
@@ -78,8 +83,8 @@ initMap(function() {
     history.replaceState(f, '', '?a=' + f);
     gotoArea(f);
   } else {
-    history.replaceState('top', '', '.');
-    gotoTop();
+    history.replaceState('fed', '', '.');
+    gotoFed();
   }
 });
 
@@ -95,11 +100,11 @@ function initMap(callback) {
           gotoArea(l.feature.properties.name, true, e.latlng);
         });
       }
-    }).addTo(map);
+    });
 
     areaShapes.eachLayer(function(l) {
       var op = config.areas[l.feature.properties.name].overrideSignPosition;
-      var m = L.marker(op ? op : l.getCenter(), {
+      var m = L.marker(op ? op : getCenter(l.getBounds()), {
         icon: L.icon({
           iconUrl: config.topLevelDataPath.baseUrl + l.feature.properties.name + config.topLevelDataPath.areaIconSuffix,
           className: 'areaSign ' + l.feature.properties.name + '-sign'
@@ -110,16 +115,18 @@ function initMap(callback) {
       });
     });
 
-    var areaSignWidth = parseInt($('.areaSign').css('width'));
-    setSignSize(areaSignWidth);
-
-    map.on('zoomend', function() {setSignSize(areaSignWidth);});
+    map.on('zoomend', function() {setSignSize();});
 
     return callback();
   });
 }
 
-function setSignSize(areaSignWidth) {
+function getCenter(b) {
+  return L.latLng((b.getNorth() - b.getSouth())/2 + b.getSouth(), (b.getEast() - b.getWest())/2 + b.getWest());
+}
+
+function setSignSize() {
+  var areaSignWidth = 110;
   var zoomThreshold = 8;
   var scalingFactor = 1.4;
   var z = map.getZoom();
@@ -139,7 +146,12 @@ function setAreaBoundaryStyle(f) {
   return config.areaBoundaryStyles[config.areas[f.properties.name].type];
 }
 
-function gotoTop() {
+function gotoFed() {
+
+  areaShapes.addTo(map);
+  areaSignsLayerGroup.addTo(map);
+  setSignSize();
+
   resetViewBounds = config.oregonBbox;
   if (timberHarvestPbfLayer) {
     areaShapes.setStyle(setAreaBoundaryStyle);
@@ -194,9 +206,9 @@ function gotoArea(area, pushState) {
 
     isFedcuts = config.areas[area].underreported;
     map.off('zoomend', zoomHandler);
+    $('#infoContent').empty();
 
     if (isFedcuts) {
-      $('#infoContent').empty();
       $('#legendWidget').hide();
       $('#tipToClick').hide();
       $('#forestLossAlert').hide();
@@ -331,9 +343,25 @@ function setUpCustomPanes() {
   });
 }
 
-function setUpInfoPanel() {
+function setUpInfoPanels() {
+
+  var topInfo = L.control();
+
+  topInfo.onAdd = function () {
+    this._div = L.DomUtil.create('div', 'topInfo infoStyle');
+    this._div.innerHTML = topInfoContent({
+
+    });
+    return this._div;
+  };
+
+  topInfo.addTo(map);
+  $('.topInfo').hide();
+
+  var info = L.control();
+
   info.onAdd = function () {
-    this._div = L.DomUtil.create('div', 'info');
+    this._div = L.DomUtil.create('div', 'info infoStyle');
     this._div.innerHTML = infoHeader({
       loggingTypeLegend: config.loggingTypeLegend,
       layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed(),
@@ -341,10 +369,6 @@ function setUpInfoPanel() {
     });
     L.DomEvent.disableClickPropagation(this._div);
     return this._div;
-  };
-
-  info.update = function () {
-    $('#infoContent').empty();
   };
 
   info.addTo(map);
@@ -357,14 +381,13 @@ function setUpInfoPanel() {
   $('.info').hide();
 
   // These tweaks are needed to allow for the info box to scroll and not run on top of other things
-  $('.info').css('max-height', $(window).height() - 50);
+  $('.infoStyle').css('max-height', $(window).height() - 50);
   $(window).on('resize', function() {
-    $('.info').css('max-height', $(window).height() - 50);
+    $('.infoStyle').css('max-height', $(window).height() - 50);
   });
-  $('.info').on('mousedown wheel scrollstart touchstart mousewheel DOMMouseScroll MozMousePixelScroll', function(e) {
+  $('.infoStyle').on('mousedown wheel scrollstart touchstart mousewheel DOMMouseScroll MozMousePixelScroll', function(e) {
     e.stopPropagation();
   });
-  info.update();
 
   setUpPlaybackControl();
   setUpSlideHandlers();
@@ -374,8 +397,8 @@ function setUpInfoPanel() {
   $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
 
   $('#infoPanelTitle').click(function() {
-    history.pushState('top', '', '.');
-    gotoTop();
+    history.pushState('fed', '', '.');
+    gotoFed();
     return false;
   });
 }

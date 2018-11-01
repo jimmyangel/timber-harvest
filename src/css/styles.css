@@ -15,7 +15,7 @@ html, body {
   height: 100%;
 }
 
-.info {
+.infoStyle {
   padding: 6px 8px;
   max-width: 400px;
   min-width: 230px;
@@ -27,15 +27,15 @@ html, body {
   overflow: auto;
 }
 
-.info h4 {
+.infoStyle h4 {
   margin: 0 0 5px;
 }
 
-.info a {
+.infoStyle a {
   text-decoration: none;
 }
 
-.info a:hover, .info a:focus {
+.infoStyle a:hover, .info a:focus {
   text-decoration: underline;
 }
 

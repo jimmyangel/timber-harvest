@@ -251,8 +251,8 @@ export var config = {
       }
     }
   },
-  //privateLayerUrl: 'https://forestloss.oregonhowl.org/hansen-private',
-  privateLayerUrl: 'http://localhost:9191/hansen',
+  privateLayerUrl: 'https://forestloss.oregonhowl.org/hansen-private',
+  //privateLayerUrl: 'http://localhost:9191/hansen',
   minZoomForPlayback: 8,
   attributionLabels: {
     nf: 'USDA National Forest Service',
