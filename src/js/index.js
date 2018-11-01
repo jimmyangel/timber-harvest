@@ -350,13 +350,18 @@ function setUpInfoPanels() {
   topInfo.onAdd = function () {
     this._div = L.DomUtil.create('div', 'topInfo infoStyle');
     this._div.innerHTML = topInfoContent({
-
+      alternateLoggingColor: config.alternateLoggingColor
     });
+    L.DomEvent.disableClickPropagation(this._div);
     return this._div;
   };
 
   topInfo.addTo(map);
-  $('.topInfo').hide();
+
+  config.opacitySliderOptions.start = config.defaultOpacity;
+  var topOpacitySlider = new Slider($('#topOpacitySlider')[0], config.opacitySliderOptions);
+
+  //$('.topInfo').hide();
 
   var info = L.control();
 
@@ -380,7 +385,7 @@ function setUpInfoPanels() {
   opacitySlider = new Slider($('#opacitySlider')[0], config.opacitySliderOptions);
   $('.info').hide();
 
-  // These tweaks are needed to allow for the info box to scroll and not run on top of other things
+  // These tweaks are needed to allow for info boxes to scroll and not run on top of other things
   $('.infoStyle').css('max-height', $(window).height() - 50);
   $(window).on('resize', function() {
     $('.infoStyle').css('max-height', $(window).height() - 50);

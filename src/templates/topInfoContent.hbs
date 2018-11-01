@@ -1,4 +1,25 @@
 <div style="text-align: center">
-  <h4>Hellow there!</h4>
-
+  <h4>Logging in Oregon</h4>
+  <div class="legend-title">
+    <hr>
+    <small style="color: maroon;">
+      Detailed logging records are not <br>
+      available for this National Forest,<br>
+      therefore only all known clearcut areas<br>
+      are shown in the color below.
+      <br><br>
+    </small>
+    <div class="legend-scale">
+      <ul class="legend-items">
+        <li><span class="legend-item" style='background: {{alternateLoggingColor}};'></span></li>
+      </ul>
+    </div>
+  </div>
+  <hr>
+  <div style="text-align: center; margin-bottom: 10px;" class="legend-title">Shape Opacity (<span id="topOpacityLabel">70</span>%)</div>
+  <div style="width: 85%; margin: 0 auto;" id="topOpacitySlider" class="fly wrap"></div>
+  <div style="text-align: center;  margin-top: 10px;" class="legend-explanation">Move the slider to adjust opacity</div>
+  <hr>
+  <div class="legend-title">Details</div>
+  <hr>
 </div>
