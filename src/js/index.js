@@ -44,7 +44,7 @@ var timberHarvestSelectData;
 var timberHarvestPbfLayer;
 var isFedcuts = false;
 var unharvestedLayer;
-var allClearcutsLayer;
+var allClearcutsLayer = L.tileLayer(config.allClearcutsLayer.url, config.allClearcutsLayer.options);
 var lastLayerEventTimeStamp;
 var areaSignsLayerGroup = L.layerGroup(); //.addTo(map); // This is so getCenter works
 var areaShapes;
@@ -84,8 +84,13 @@ initMap(function() {
     history.replaceState(f, '', '?a=' + f);
     gotoArea(f);
   } else {
-    history.replaceState('top', '', '.');
-    gotoTop();
+    if (f === 'fed') {
+      history.replaceState('fed', '', '?a=fed');
+      gotoFed();
+    } else {
+      history.replaceState('top', '', '.');
+      gotoTop();
+    }
   }
 });
 
@@ -147,15 +152,29 @@ function setAreaBoundaryStyle(f) {
   return config.areaBoundaryStyles[config.areas[f.properties.name].type];
 }
 
-function gotoTop() {
-  addAllClearcutsLayer();
+function gotoTop(pushState) {
+  $('.info').hide();
+  $('.topInfo').show();
+  if (pushState) {
+    history.pushState('top', '', '.');
+  }
+  if (!map.hasLayer(allClearcutsLayer)) {
+    map.addLayer(allClearcutsLayer);
+  }
 }
 
-function gotoFed() {
+function gotoFed(pushState) {
+
+  $('.topInfo').hide();
+  removeOverlay(allClearcutsLayer);
 
   areaShapes.addTo(map);
   areaSignsLayerGroup.addTo(map);
   setSignSize();
+
+  if (pushState) {
+    history.pushState('fed', '', '?a=fed');
+  }
 
   resetViewBounds = config.oregonBbox;
   if (timberHarvestPbfLayer) {
@@ -174,15 +193,14 @@ function gotoFed() {
   }
   $('.info').hide();
   $('.topLabel').show();
-  map.flyToBounds(resetViewBounds);
+  // map.flyToBounds(resetViewBounds);
   $('.areaSign').show();
 }
 
 function gotoArea(area, pushState) {
+  $('.topInfo').hide();
 
-  if (allClearcutsLayer) {
-    removeOverlay(allClearcutsLayer);
-  }
+  removeOverlay(allClearcutsLayer);
 
   if (config.areas[area]) {
     if (pushState) {
@@ -305,11 +323,6 @@ function addUnharvestedOverlay(area){
   }
 }
 
-function addAllClearcutsLayer() {
-  allClearcutsLayer = L.tileLayer(config.allClearcutsLayer.url, config.allClearcutsLayer.options);
-  map.addLayer(allClearcutsLayer);
-}
-
 function removeOverlay(ol) {
   ol.removeFrom(map);
   layersControl.removeLayer(ol);
@@ -369,6 +382,8 @@ function setUpInfoPanels() {
       case 'private':
         gotoArea('private', true);
         break;
+      default:
+        gotoFed(true);
     }
   });
 
@@ -413,8 +428,7 @@ function setUpInfoPanels() {
   $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
 
   $('#infoPanelTitle').click(function() {
-    history.pushState('fed', '', '.');
-    gotoFed();
+    gotoTop(true);
     return false;
   });
 }
