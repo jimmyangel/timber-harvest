@@ -158,9 +158,14 @@ function gotoTop(pushState) {
   if (pushState) {
     history.pushState('top', '', '.');
   }
+
+  resetViewBounds = config.oregonBbox;
+
   if (!map.hasLayer(allClearcutsLayer)) {
     map.addLayer(allClearcutsLayer);
   }
+  wipeAreaLayer();
+  wipeFedLayer();
 }
 
 function gotoFed(pushState) {
@@ -177,6 +182,83 @@ function gotoFed(pushState) {
   }
 
   resetViewBounds = config.oregonBbox;
+  wipeAreaLayer();
+
+  $('.info').hide();
+  $('.topLabel').show();
+  // map.flyToBounds(resetViewBounds);
+  $('.areaSign').show();
+}
+
+function gotoArea(area, pushState) {
+  $('.topInfo').hide();
+  removeOverlay(allClearcutsLayer);
+
+  if (pushState) {
+    history.pushState(area, '', '?a=' + area);
+  }
+  resetViewBounds = config.areas[area].bounds;
+  spinner.spin($('#spinner')[0]);
+  $('.areaSign').show();
+  $('.' + area + '-sign').hide();
+  if (timberHarvestPbfLayer) {
+    timberHarvestPbfLayer.removeFrom(map);
+  } else {
+    map.fitBounds(resetViewBounds);
+  }
+  areaShapes.setStyle(config.areaBoundaryStyle);
+  areaShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
+
+  if (area === 'private') {
+    disableAllAreaShapesClick();
+  } else {
+    enableAllAreaShapesClick();
+    disableAreaShapeClick(area);
+  }
+
+  utils.resetPlaybackControl();
+
+  isFedcuts = config.areas[area].underreported;
+  map.off('zoomend', zoomHandler);
+  $('#infoContent').empty();
+
+  if (isFedcuts) {
+    $('#legendWidget').hide();
+    $('#tipToClick').hide();
+    $('#forestLossAlert').hide();
+    $('#rangeWidgets').hide();
+    $('#zoomInForRangeWidgets').hide();
+    $('#dataQualityAlert').show();
+    displayFedcutsPbfLayer(area);
+  } else {
+    $('#dataQualityAlert').hide();
+    if (area === 'private') {
+      $('#forestLossAlert').show();
+      $('#legendWidget').hide();
+      $('#rangeWidgets').hide();
+      $('#zoomInForRangeWidgets').show();
+      zoomHandler();
+      map.on('zoomend', zoomHandler);
+    } else {
+      $('#forestLossAlert').hide();
+      $('#legendWidget').show();
+      $('#rangeWidgets').show();
+      $('#zoomInForRangeWidgets').hide();
+    }
+    $('#tipToClick').show();
+    displaytimberHarvestPbfLayer(area);
+  }
+  if (unharvestedLayer) {
+    removeOverlay(unharvestedLayer);
+  }
+  addUnharvestedOverlay(area);
+  $('#infoPanelSubTitle').text(config.areas[area].name);
+
+  $('.topLabel').hide();
+  $('.info').show();
+}
+
+function wipeAreaLayer() {
   if (timberHarvestPbfLayer) {
     areaShapes.setStyle(setAreaBoundaryStyle);
     enableAllAreaShapesClick();
@@ -191,82 +273,12 @@ function gotoFed(pushState) {
       removeOverlay(unharvestedLayer);
     }
   }
-  $('.info').hide();
-  $('.topLabel').show();
-  // map.flyToBounds(resetViewBounds);
-  $('.areaSign').show();
 }
 
-function gotoArea(area, pushState) {
-  $('.topInfo').hide();
-
-  removeOverlay(allClearcutsLayer);
-
-  if (config.areas[area]) {
-    if (pushState) {
-      history.pushState(area, '', '?a=' + area);
-    }
-    resetViewBounds = config.areas[area].bounds;
-    spinner.spin($('#spinner')[0]);
-    $('.areaSign').show();
-    $('.' + area + '-sign').hide();
-    if (timberHarvestPbfLayer) {
-      timberHarvestPbfLayer.removeFrom(map);
-    } else {
-      map.fitBounds(resetViewBounds);
-    }
-    areaShapes.setStyle(config.areaBoundaryStyle);
-    areaShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
-
-    if (area === 'private') {
-      disableAllAreaShapesClick();
-    } else {
-      enableAllAreaShapesClick();
-      disableAreaShapeClick(area);
-    }
-
-    utils.resetPlaybackControl();
-
-    isFedcuts = config.areas[area].underreported;
-    map.off('zoomend', zoomHandler);
-    $('#infoContent').empty();
-
-    if (isFedcuts) {
-      $('#legendWidget').hide();
-      $('#tipToClick').hide();
-      $('#forestLossAlert').hide();
-      $('#rangeWidgets').hide();
-      $('#zoomInForRangeWidgets').hide();
-      $('#dataQualityAlert').show();
-      displayFedcutsPbfLayer(area);
-    } else {
-      $('#dataQualityAlert').hide();
-      if (area === 'private') {
-        $('#forestLossAlert').show();
-        $('#legendWidget').hide();
-        $('#rangeWidgets').hide();
-        $('#zoomInForRangeWidgets').show();
-        zoomHandler();
-        map.on('zoomend', zoomHandler);
-      } else {
-        $('#forestLossAlert').hide();
-        $('#legendWidget').show();
-        $('#rangeWidgets').show();
-        $('#zoomInForRangeWidgets').hide();
-      }
-      $('#tipToClick').show();
-      displaytimberHarvestPbfLayer(area);
-    }
-    if (unharvestedLayer) {
-      removeOverlay(unharvestedLayer);
-    }
-    addUnharvestedOverlay(area);
-    $('#infoPanelSubTitle').text(config.areas[area].name);
-
-    $('.topLabel').hide();
-    $('.info').show();
-  } else {
-    displayFedcutsPbfLayer(area);
+function wipeFedLayer() {
+  if (map.hasLayer(areaShapes)) {
+    areaShapes.removeFrom(map);
+    areaSignsLayerGroup.removeFrom(map);
   }
 }
 
