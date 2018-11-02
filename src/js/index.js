@@ -44,7 +44,7 @@ var timberHarvestSelectData;
 var timberHarvestPbfLayer;
 var isFedcuts = false;
 var unharvestedLayer;
-var overviewLayer;
+var allClearcutsLayer;
 var lastLayerEventTimeStamp;
 var areaSignsLayerGroup = L.layerGroup(); //.addTo(map); // This is so getCenter works
 var areaShapes;
@@ -73,6 +73,7 @@ initMap(function() {
         gotoFed();
         break;
       case 'top':
+        gotoTop()
         break;
       default:
         gotoArea(e.state);
@@ -83,8 +84,8 @@ initMap(function() {
     history.replaceState(f, '', '?a=' + f);
     gotoArea(f);
   } else {
-    history.replaceState('fed', '', '.');
-    gotoFed();
+    history.replaceState('top', '', '.');
+    gotoTop();
   }
 });
 
@@ -96,8 +97,8 @@ function initMap(callback) {
         if (config.areas[l.feature.properties.name]) {
           config.areas[l.feature.properties.name].bounds = (config.areas[l.feature.properties.name].type === 'private') ? config.oregonBbox : l.getBounds();
         }
-        l.on('click', function(e) {
-          gotoArea(l.feature.properties.name, true, e.latlng);
+        l.on('click', function() {
+          gotoArea(l.feature.properties.name, true);
         });
       }
     });
@@ -110,8 +111,8 @@ function initMap(callback) {
           className: 'areaSign ' + l.feature.properties.name + '-sign'
         }
       )}).addTo(areaSignsLayerGroup);
-      m.on('click', function(e) {
-        gotoArea(l.feature.properties.name, true, e.latlng);
+      m.on('click', function() {
+        gotoArea(l.feature.properties.name, true);
       });
     });
 
@@ -146,6 +147,10 @@ function setAreaBoundaryStyle(f) {
   return config.areaBoundaryStyles[config.areas[f.properties.name].type];
 }
 
+function gotoTop() {
+  addAllClearcutsLayer();
+}
+
 function gotoFed() {
 
   areaShapes.addTo(map);
@@ -167,7 +172,6 @@ function gotoFed() {
       removeOverlay(unharvestedLayer);
     }
   }
-  addOverviewLayer();
   $('.info').hide();
   $('.topLabel').show();
   map.flyToBounds(resetViewBounds);
@@ -175,8 +179,9 @@ function gotoFed() {
 }
 
 function gotoArea(area, pushState) {
-  if (overviewLayer) {
-    removeOverlay(overviewLayer);
+
+  if (allClearcutsLayer) {
+    removeOverlay(allClearcutsLayer);
   }
 
   if (config.areas[area]) {
@@ -261,8 +266,8 @@ function zoomHandler() {
 function enableAllAreaShapesClick() {
   areaShapes.eachLayer(function(l) {
     if (!l.listens('click')) {
-      l.on('click', function(e) {
-        gotoArea(l.feature.properties.name, true, e.latlng);
+      l.on('click', function() {
+        gotoArea(l.feature.properties.name, true);
       });
     }
   });
@@ -300,12 +305,9 @@ function addUnharvestedOverlay(area){
   }
 }
 
-function addOverviewLayer() {
-  //overviewLayer = L.tileLayerPixelFilter(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
-  config.allFedcutsLayer.options.rendererFactory = L.canvas.tile;
-  overviewLayer = L.vectorGrid.protobuf(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
-  layersControl.addOverlay(overviewLayer, config.allFedcutsLayer.name);
-  map.addLayer(overviewLayer);
+function addAllClearcutsLayer() {
+  allClearcutsLayer = L.tileLayer(config.allClearcutsLayer.url, config.allClearcutsLayer.options);
+  map.addLayer(allClearcutsLayer);
 }
 
 function removeOverlay(ol) {
@@ -360,6 +362,15 @@ function setUpInfoPanels() {
 
   config.opacitySliderOptions.start = config.defaultOpacity;
   var topOpacitySlider = new Slider($('#topOpacitySlider')[0], config.opacitySliderOptions);
+
+  $('.top-list-item').click(function() {
+    console.log($(this).attr('data-item-id'));
+    switch ($(this).attr('data-item-id')) {
+      case 'private':
+        gotoArea('private', true);
+        break;
+    }
+  });
 
   //$('.topInfo').hide();
 

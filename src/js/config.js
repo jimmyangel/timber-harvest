@@ -119,17 +119,6 @@ export var config = {
         return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> BLM Land'
       },
       type: 'pixelfiltertile'
-    },
-    {
-      url: 'http://localhost:9090/logging/{z}/{x}/{y}.png',
-      options: {
-        maxNativeZoom: 13,
-        opacity: 1,
-        attribution: 'Oregon Wild, Hansen/UMD/Google/USGS/NASA'
-      },
-      name: 'Test',
-      checked: true,
-      type: 'tile'
     }
   ],
   oregonBbox: [
@@ -323,50 +312,19 @@ export var config = {
     fillOpacity: 0.7,
     fill: true
   },
-  allFedcutsLayer:  {
-    url: 'https://vtiles.oregonhowl.org/timber-harvest/fedcuts-vtiles/all/{z}/{x}/{y}.pbf',
+  allClearcutsLayer: {
+    url: 'http://localhost:9090/logging/{z}/{x}/{y}.png',
     options: {
-      vectorTileLayerStyles: {
-        fedcuts: {
-          weight: 0.5,
-          opacity: 0.9,
-          color: '#d55e00',
-          fillColor: '#d55e00',
-          fillOpacity: 0.9,
-          fill: true
-        }
-      },
-      attribution: 'Oregon Wild',
+      maxNativeZoom: 13,
+      opacity: 1,
+      attribution: 'Oregon Wild, Hansen/UMD/Google/USGS/NASA',
       zIndex: 10,
-      pane: 'mainpane',
-      maxNativeZoom: 14,
-      minNativeZoom: 9
+      pane: 'mainpane'
     },
-    color: '#d55e00',
-    get name () {
-      return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> Clearcuts on Federal lands'
-    },
-    type: 'vectorgrid'
-  },
-  /*allFedcutsLayer:  {
-    url: 'https://tiles.oregonhowl.org/clearcuts/{z}/{x}/{y}.png',
-    options: {
-      pane: 'overlayPane',
-      maxZoom: 19,
-      maxNativeZoom: 12,
-      opacity: 0.7,
-      attribution: 'Oregon Wild',
-      matchRGBA: [ 186,  49,  0, 255 ],
-      missRGBA:  [ 186,  49,  0, 255 ]//,
-      //pixelCodes: [ [102, 102, 102] ]
-    },
-    color: 'rgba(186, 49, 0, 0.7)',
-    get name () {
-      return '<span id="clearCutsLabel" class="overlay-legend-item" style="background: ' + this.color + ';"></span> Clearcuts on Federal Lands'
-    },
+    name: 'State-wide Clearcuts',
     checked: true,
     type: 'tile'
-  },*/
+  },
   spinnerOpts: {
     color: '#939393',
     opacity: 0.1,
