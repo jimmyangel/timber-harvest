@@ -53,6 +53,7 @@ var layersControl;
 
 var dateRangeSlider;
 var opacitySlider;
+var topOpacitySlider;
 
 var fromYear;
 var toYear;
@@ -100,13 +101,14 @@ function initMap(callback) {
       style: setAreaBoundaryStyle,
       onEachFeature: function(f, l) {
         if (config.areas[l.feature.properties.name]) {
-          config.areas[l.feature.properties.name].bounds = (config.areas[l.feature.properties.name].type === 'private') ? config.oregonBbox : l.getBounds();
+          config.areas[l.feature.properties.name].bounds = l.getBounds();
         }
         l.on('click', function() {
           gotoArea(l.feature.properties.name, true);
         });
       }
     });
+    config.areas['private'].bounds = config.oregonBbox;
 
     areaShapes.eachLayer(function(l) {
       var op = config.areas[l.feature.properties.name].overrideSignPosition;
@@ -162,6 +164,7 @@ function gotoTop(pushState) {
   resetViewBounds = config.oregonBbox;
 
   if (!map.hasLayer(allClearcutsLayer)) {
+    allClearcutsLayer.setOpacity($('#topOpacityLabel').text()/100);
     map.addLayer(allClearcutsLayer);
   }
   wipeAreaLayer();
@@ -385,11 +388,10 @@ function setUpInfoPanels() {
 
   topInfo.addTo(map);
 
-  config.opacitySliderOptions.start = config.defaultOpacity;
-  var topOpacitySlider = new Slider($('#topOpacitySlider')[0], config.opacitySliderOptions);
+  config.topOpacitySliderOptions.start = config.defaultOpacity;
+  topOpacitySlider = new Slider($('#topOpacitySlider')[0], config.topOpacitySliderOptions);
 
   $('.top-list-item').click(function() {
-    console.log($(this).attr('data-item-id'));
     switch ($(this).attr('data-item-id')) {
       case 'private':
         gotoArea('private', true);
@@ -675,6 +677,14 @@ function setUpSlideHandlers() {
 
   opacitySlider.subscribe('moving', function(tValue) {
     $('#opacityLabel').text(Math.round(tValue.right));
+  });
+
+  topOpacitySlider.subscribe('stop', function(tValue) {
+    allClearcutsLayer.setOpacity(tValue.right/100);
+  });
+
+  topOpacitySlider.subscribe('moving', function(tValue) {
+    $('#topOpacityLabel').text(Math.round(tValue.right));
   });
 }
 

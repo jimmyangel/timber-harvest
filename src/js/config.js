@@ -316,7 +316,7 @@ export var config = {
     url: 'http://localhost:9090/logging/{z}/{x}/{y}.png',
     options: {
       maxNativeZoom: 13,
-      opacity: 1,
+      opacity: 0.7,
       attribution: 'Oregon Wild, Hansen/UMD/Google/USGS/NASA',
       zIndex: 10,
       pane: 'mainpane'
@@ -415,10 +415,16 @@ export var config = {
   DATE_NA: '1900',
   defaultOpacity: 70,
   opacitySliderOptions: {
-      isDate: false,
-      isOneWay: true,
-      min: 0,
-      max: 100
+    isDate: false,
+    isOneWay: true,
+    min: 0,
+    max: 100
+  },
+  topOpacitySliderOptions: {
+    isDate: false,
+    isOneWay: true,
+    min: 0,
+    max: 100
   },
   areaBoundaryStyles: {
     nf: {
