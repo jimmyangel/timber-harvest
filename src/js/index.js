@@ -156,6 +156,7 @@ function setAreaBoundaryStyle(f) {
 
 function gotoTop(pushState) {
   $('.info').hide();
+  $('.topLabel').hide();
   $('.topInfo').show();
   if (pushState) {
     history.pushState('top', '', '.');
@@ -176,9 +177,7 @@ function gotoFed(pushState) {
   $('.topInfo').hide();
   removeOverlay(allClearcutsLayer);
 
-  areaShapes.addTo(map);
-  areaSignsLayerGroup.addTo(map);
-  setSignSize();
+  addFedLayer();
 
   if (pushState) {
     history.pushState('fed', '', '?a=fed');
@@ -207,14 +206,17 @@ function gotoArea(area, pushState) {
   if (timberHarvestPbfLayer) {
     timberHarvestPbfLayer.removeFrom(map);
   } else {
-    map.fitBounds(resetViewBounds);
+    if (area != 'private') {
+      map.fitBounds(resetViewBounds);
+    }
   }
-  areaShapes.setStyle(config.areaBoundaryStyle);
-  areaShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
 
   if (area === 'private') {
-    disableAllAreaShapesClick();
+    wipeFedLayer();
   } else {
+    addFedLayer();
+    areaShapes.setStyle(config.areaBoundaryStyle);
+    areaShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
     enableAllAreaShapesClick();
     disableAreaShapeClick(area);
   }
@@ -278,6 +280,14 @@ function wipeAreaLayer() {
   }
 }
 
+function addFedLayer() {
+  if (!map.hasLayer(areaShapes)) {
+    areaShapes.addTo(map);
+    areaSignsLayerGroup.addTo(map);
+    setSignSize();
+  }
+}
+
 function wipeFedLayer() {
   if (map.hasLayer(areaShapes)) {
     areaShapes.removeFrom(map);
@@ -303,13 +313,6 @@ function enableAllAreaShapesClick() {
         gotoArea(l.feature.properties.name, true);
       });
     }
-  });
-}
-
-function disableAllAreaShapesClick() {
-  areaShapes.eachLayer(function(l) {
-    l.setStyle({opacity: 0, fillOpacity: 0})
-    l.off('click');
   });
 }
 

@@ -304,7 +304,8 @@ export var config = {
     fill: true
   },
   allClearcutsLayer: {
-    url: 'http://localhost:9090/logging/{z}/{x}/{y}.png',
+    url: 'https:/tiles.oregonhowl.org/logging/{z}/{x}/{y}.png',
+    // url: 'http://localhost:9090/logging/{z}/{x}/{y}.png',
     options: {
       maxNativeZoom: 13,
       opacity: 0.7,
