@@ -45,6 +45,8 @@ var timberHarvestPbfLayer;
 var isFedcuts = false;
 var unharvestedLayer;
 var allClearcutsLayer = L.tileLayer(config.allClearcutsLayer.url, config.allClearcutsLayer.options);
+config.allFedcutsLayer.options.rendererFactory = L.canvas.tile;
+var allFedcutsLayer = L.vectorGrid.protobuf(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
 var lastLayerEventTimeStamp;
 var areaSignsLayerGroup = L.layerGroup(); //.addTo(map); // This is so getCenter works
 var areaShapes;
@@ -184,6 +186,12 @@ function gotoFed(pushState) {
   }
 
   resetViewBounds = config.oregonBbox;
+
+  if (!map.hasLayer(allFedcutsLayer)) {
+    //allClearcutsLayer.setOpacity($('#topOpacityLabel').text()/100);
+    map.addLayer(allFedcutsLayer);
+  }
+
   wipeAreaLayer();
 
   $('.info').hide();
@@ -195,6 +203,7 @@ function gotoFed(pushState) {
 function gotoArea(area, pushState) {
   $('.topInfo').hide();
   removeOverlay(allClearcutsLayer);
+  removeOverlay(allFedcutsLayer);
 
   if (pushState) {
     history.pushState(area, '', '?a=' + area);
@@ -292,6 +301,9 @@ function wipeFedLayer() {
   if (map.hasLayer(areaShapes)) {
     areaShapes.removeFrom(map);
     areaSignsLayerGroup.removeFrom(map);
+  }
+  if (map.hasLayer(allFedcutsLayer)) {
+    allFedcutsLayer.removeFrom(map);
   }
 }
 
