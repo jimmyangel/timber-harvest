@@ -477,6 +477,7 @@ function setUpInfoPanels() {
   $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
 
   $('#infoPanelTitle').click(function() {
+    NProgress.remove();
     gotoFed(true);
     return false;
   });
