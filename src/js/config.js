@@ -443,6 +443,12 @@ export var config = {
     min: 0,
     max: 100
   },
+  fedOpacitySliderOptions: {
+    isDate: false,
+    isOneWay: true,
+    min: 0,
+    max: 100
+  },
   areaBoundaryStyles: {
     nf: {
       fillColor: '#E5D499',

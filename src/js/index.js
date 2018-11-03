@@ -18,10 +18,10 @@ import * as utils from './utils.js';
 import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
 import topInfoContent from '../templates/topInfoContent.hbs';
+import fedInfoContent from '../templates/fedInfoContent.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
 import privatePopUp from '../templates/privatePopUp.hbs';
-import topLabel from '../templates/topLabel.hbs';
 
 var NProgress = require('nprogress');
 var esri = require('esri-leaflet');
@@ -36,9 +36,6 @@ var resetViewBounds = config.oregonBbox;
 
 map.fitBounds(resetViewBounds);
 
-L.DomUtil.create('div', 'topLabel', map.getContainer());
-$('.topLabel').html(topLabel);
-
 var highlightedFeatures = [];
 var timberHarvestSelectData;
 var timberHarvestPbfLayer;
@@ -46,6 +43,7 @@ var isFedcuts = false;
 var unharvestedLayer;
 var allClearcutsLayer = L.tileLayer(config.allClearcutsLayer.url, config.allClearcutsLayer.options);
 config.allFedcutsLayer.options.rendererFactory = L.canvas.tile;
+config.allFedcutsLayer.options.fillOpacity = config.defaultOpacity;
 var allFedcutsLayer = L.vectorGrid.protobuf(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
 var lastLayerEventTimeStamp;
 var areaSignsLayerGroup = L.layerGroup(); //.addTo(map); // This is so getCenter works
@@ -56,6 +54,7 @@ var layersControl;
 var dateRangeSlider;
 var opacitySlider;
 var topOpacitySlider;
+var fedOpacitySlider;
 
 var fromYear;
 var toYear;
@@ -158,7 +157,7 @@ function setAreaBoundaryStyle(f) {
 
 function gotoTop(pushState) {
   $('.info').hide();
-  $('.topLabel').hide();
+  $('.fedInfo').hide();
   $('.topInfo').show();
   if (pushState) {
     history.pushState('top', '', '.');
@@ -195,7 +194,7 @@ function gotoFed(pushState) {
   wipeAreaLayer();
 
   $('.info').hide();
-  $('.topLabel').show();
+  $('.fedInfo').show();
   // map.flyToBounds(resetViewBounds);
   $('.areaSign').show();
 }
@@ -268,7 +267,7 @@ function gotoArea(area, pushState) {
   addUnharvestedOverlay(area);
   $('#infoPanelSubTitle').text(config.areas[area].name);
 
-  $('.topLabel').hide();
+  $('.fedInfo').hide();
   $('.info').show();
 }
 
@@ -416,7 +415,28 @@ function setUpInfoPanels() {
     }
   });
 
-  //$('.topInfo').hide();
+  var fedInfo = L.control();
+
+  fedInfo.onAdd = function () {
+    this._div = L.DomUtil.create('div', 'fedInfo infoStyle');
+    this._div.innerHTML = fedInfoContent({
+      alternateLoggingColor: config.alternateLoggingColor
+    });
+    L.DomEvent.disableClickPropagation(this._div);
+    return this._div;
+  };
+
+  fedInfo.addTo(map);
+
+  config.fedOpacitySliderOptions.start = config.defaultOpacity;
+  fedOpacitySlider = new Slider($('#fedOpacitySlider')[0], config.fedOpacitySliderOptions);
+
+  $('#fedInfoPanelTitle').click(function() {
+    gotoTop(true);
+    return false;
+  });
+
+  $('.fedInfo').hide();
 
   var info = L.control();
 
@@ -457,7 +477,7 @@ function setUpInfoPanels() {
   $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
 
   $('#infoPanelTitle').click(function() {
-    gotoTop(true);
+    gotoFed(true);
     return false;
   });
 }
@@ -700,6 +720,16 @@ function setUpSlideHandlers() {
 
   topOpacitySlider.subscribe('moving', function(tValue) {
     $('#topOpacityLabel').text(Math.round(tValue.right));
+  });
+
+  fedOpacitySlider.subscribe('stop', function(tValue) {
+    config.allFedcutsLayer.options.vectorTileLayerStyles.fedcuts.fillOpacity = tValue.right/100;
+    allFedcutsLayer.redraw();
+    //allFedcutsLayer.setOpacity(tValue.right/100);
+  });
+
+  fedOpacitySlider.subscribe('moving', function(tValue) {
+    $('#fedOpacityLabel').text(Math.round(tValue.right));
   });
 }
 
