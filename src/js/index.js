@@ -389,18 +389,7 @@ function setUpCustomPanes() {
 
 function setUpInfoPanels() {
 
-  var topInfo = L.control();
-
-  topInfo.onAdd = function () {
-    this._div = L.DomUtil.create('div', 'topInfo infoStyle');
-    this._div.innerHTML = topInfoContent({
-      alternateLoggingColor: config.alternateLoggingColor
-    });
-    L.DomEvent.disableClickPropagation(this._div);
-    return this._div;
-  };
-
-  topInfo.addTo(map);
+  createInfoPanel('topInfo', topInfoContent, {alternateLoggingColor: config.alternateLoggingColor});
 
   config.topOpacitySliderOptions.start = config.defaultOpacity;
   topOpacitySlider = new Slider($('#topOpacitySlider')[0], config.topOpacitySliderOptions);
@@ -415,18 +404,7 @@ function setUpInfoPanels() {
     }
   });
 
-  var fedInfo = L.control();
-
-  fedInfo.onAdd = function () {
-    this._div = L.DomUtil.create('div', 'fedInfo infoStyle');
-    this._div.innerHTML = fedInfoContent({
-      alternateLoggingColor: config.alternateLoggingColor
-    });
-    L.DomEvent.disableClickPropagation(this._div);
-    return this._div;
-  };
-
-  fedInfo.addTo(map);
+  createInfoPanel('fedInfo', fedInfoContent, {alternateLoggingColor: config.alternateLoggingColor});
 
   config.fedOpacitySliderOptions.start = config.defaultOpacity;
   fedOpacitySlider = new Slider($('#fedOpacitySlider')[0], config.fedOpacitySliderOptions);
@@ -438,20 +416,11 @@ function setUpInfoPanels() {
 
   $('.fedInfo').hide();
 
-  var info = L.control();
-
-  info.onAdd = function () {
-    this._div = L.DomUtil.create('div', 'info infoStyle');
-    this._div.innerHTML = infoHeader({
-      loggingTypeLegend: config.loggingTypeLegend,
-      layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed(),
-      alternateLoggingColor: config.alternateLoggingColor
-    });
-    L.DomEvent.disableClickPropagation(this._div);
-    return this._div;
-  };
-
-  info.addTo(map);
+  createInfoPanel('info', infoHeader, {
+    loggingTypeLegend: config.loggingTypeLegend,
+    layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed(),
+    alternateLoggingColor: config.alternateLoggingColor
+  });
 
   dateRangeSlider = new Slider($('#dateRangeSlider')[0], config.dateRangeSliderOptions);
   // $('.handle').attr('tabindex', 0); Deal with keyboard later
@@ -485,6 +454,19 @@ function setUpInfoPanels() {
     }
     return false;
   });
+}
+
+function createInfoPanel(cssClass, template, templateParms) {
+  var infoPanel = L.control();
+
+  infoPanel.onAdd = function () {
+    this._div = L.DomUtil.create('div', cssClass + ' infoStyle');
+    this._div.innerHTML = template(templateParms);
+    L.DomEvent.disableClickPropagation(this._div);
+    return this._div;
+  };
+
+  infoPanel.addTo(map);
 }
 
 function setUpLayerControl() {
