@@ -152,7 +152,8 @@ export var config = {
     },
     'rogueriver-siskiyou': {
       name: 'Rogue River-Siskiyou National Forests',
-      type: 'nf'
+      type: 'nf',
+      overrideSignPosition: [42.5, -123.6]
     },
     siuslaw: {
       name: 'Siuslaw National Forest',
@@ -192,7 +193,7 @@ export var config = {
     medford: {
       name: 'BLM Medford District Office',
       type: 'blm',
-      overrideSignPosition: [42.6085, -122.8601]
+      overrideSignPosition: [42.76, -122.49]
     },
     lakeview: {
       name: 'BLM Lakeview District Office',
@@ -201,7 +202,8 @@ export var config = {
     },
     vale: {
       name: 'BLM Vale District Office',
-      type: 'blm'
+      type: 'blm',
+      overrideSignPosition: [43.5485, -117.5]
     },
     private: {
       name: 'Private and State Lands',
