@@ -478,7 +478,11 @@ function setUpInfoPanels() {
 
   $('#infoPanelTitle').click(function() {
     NProgress.remove();
-    gotoFed(true);
+    if (utils.getUrlVars().a === 'private') {
+      gotoTop(true);
+    } else {
+      gotoFed(true);
+    }
     return false;
   });
 }
