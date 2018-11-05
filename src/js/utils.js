@@ -125,6 +125,14 @@ export function getUrlVars() {
 	return urlVars;
 }
 
+export function inIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    return true;
+  }
+}
+
 // Handle binary content (only needed to deal with GeoTIFF, which we are not right now
 /*$.ajaxSetup({
   beforeSend:function(jqXHR,settings){

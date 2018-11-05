@@ -13,7 +13,7 @@
     </small>
     <div class="legend-scale">
       <ul class="legend-items">
-        <li><span class="legend-item" style='background: {{alternateLoggingColor}};'></span></li>
+        <li><span class="legend-item" style='background: {{alternateLoggingColor}};'></span>Clearcut</li>
       </ul>
     </div>
   </div>
@@ -32,14 +32,22 @@
     </small>
     <div class="legend-scale">
       <ul class="legend-items">
-        <li><span class="legend-item" style='background: {{alternateLoggingColor}};'></span></li>
+        <li><span class="legend-item" style='background: {{alternateLoggingColor}};'></span>Clearcut</li>
       </ul>
     </div>
   </div>
   <small id="tipToClick"><span>(Click on a shape to view details)</span></small>
 </div>
-<div id="legendWidget">
+<div id="legendWidget" style="text-align: center;">
   <hr>
+  <div class="legend-title">
+    <small>
+      Logging in federal public lands data<br>
+      obtained from the <a href="https://data.fs.usda.gov/geodata/edw/datasets.php?xmlKeyword=Timber+Harvests">US Forest Service</a> and<br>
+      <a href="https://www.blm.gov/or/gis/data-details.php?id=421">BLM</a> GIS public records<br>
+      <br>
+    </small>
+  </div>
   <div class="legend-entry" style="text-align: center;">
     <div class="legend-title">Logging Type</div>
     <div class="legend-scale">
@@ -52,7 +60,7 @@
   </div>
 </div>
 <hr>
-<div style="text-align: center; margin-bottom: 10px;" class="legend-title">Shape Opacity (<span id="opacityLabel">70</span>%)</div>
+<div style="text-align: center; margin-bottom: 10px;" class="legend-title">Shape Opacity (<span id="opacityLabel">{{layerOpacity}}</span>%)</div>
 <div style="width: 85%; margin: 0 auto;" id="opacitySlider" class="fly wrap"></div>
 <div style="text-align: center;  margin-top: 10px;" class="legend-explanation">Move the slider to adjust opacity</div>
 <div id="rangeWidgets">

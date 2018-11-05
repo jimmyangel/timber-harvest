@@ -17,10 +17,12 @@ import * as utils from './utils.js';
 
 import infoHeader from '../templates/infoHeader.hbs';
 import infoContentItem from '../templates/infoContentItem.hbs';
+import topInfoContent from '../templates/topInfoContent.hbs';
+import fedInfoContent from '../templates/fedInfoContent.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
+import welcomeModal from '../templates/welcomeModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
 import privatePopUp from '../templates/privatePopUp.hbs';
-import topLabel from '../templates/topLabel.hbs';
 
 var NProgress = require('nprogress');
 var esri = require('esri-leaflet');
@@ -35,30 +37,31 @@ var resetViewBounds = config.oregonBbox;
 
 map.fitBounds(resetViewBounds);
 
-L.DomUtil.create('div', 'topLabel', map.getContainer());
-$('.topLabel').html(topLabel);
-
-var info = L.control();
 var highlightedFeatures = [];
 var timberHarvestSelectData;
 var timberHarvestPbfLayer;
 var isFedcuts = false;
 var unharvestedLayer;
-var overviewLayer;
+var allClearcutsLayer = L.tileLayer(config.allClearcutsLayer.url, config.allClearcutsLayer.options);
+config.allFedcutsLayer.options.rendererFactory = L.canvas.tile;
+config.allFedcutsLayer.options.fillOpacity = config.defaultOpacity;
+var allFedcutsLayer = L.vectorGrid.protobuf(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
 var lastLayerEventTimeStamp;
-var areaSignsLayerGroup = L.layerGroup().addTo(map); // This is so getCenter works
+var areaSignsLayerGroup = L.layerGroup(); //.addTo(map); // This is so getCenter works
 var areaShapes;
 
 var layersControl;
 
 var dateRangeSlider;
 var opacitySlider;
+var topOpacitySlider;
+var fedOpacitySlider;
 
 var fromYear;
 var toYear;
 
 setUpCustomPanes();
-setUpInfoPanel();
+setUpInfoPanels();
 setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
@@ -67,10 +70,16 @@ initMap(function() {
   var f = utils.getUrlVars().a;
 
   window.onpopstate = function(e) {
-    if (e.state === 'top') {
-      gotoTop();
-    } else {
-      gotoArea(e.state);
+
+    switch (e.state) {
+      case 'fed':
+        gotoFed();
+        break;
+      case 'top':
+        gotoTop()
+        break;
+      default:
+        gotoArea(e.state);
     }
   };
 
@@ -78,9 +87,16 @@ initMap(function() {
     history.replaceState(f, '', '?a=' + f);
     gotoArea(f);
   } else {
-    history.replaceState('top', '', '.');
-    gotoTop();
+    if (f === 'fed') {
+      history.replaceState('fed', '', '?a=fed');
+      gotoFed();
+    } else {
+      history.replaceState('top', '', '.');
+      gotoTop();
+      displayWelcome();
+    }
   }
+
 });
 
 function initMap(callback) {
@@ -89,37 +105,65 @@ function initMap(callback) {
       style: setAreaBoundaryStyle,
       onEachFeature: function(f, l) {
         if (config.areas[l.feature.properties.name]) {
-          config.areas[l.feature.properties.name].bounds = (config.areas[l.feature.properties.name].type === 'private') ? config.oregonBbox : l.getBounds();
+          config.areas[l.feature.properties.name].bounds = l.getBounds();
         }
-        l.on('click', function(e) {
-          gotoArea(l.feature.properties.name, true, e.latlng);
+        l.on('click', function() {
+          gotoArea(l.feature.properties.name, true);
         });
       }
-    }).addTo(map);
+    });
+    config.areas['private'].bounds = config.oregonBbox;
 
     areaShapes.eachLayer(function(l) {
       var op = config.areas[l.feature.properties.name].overrideSignPosition;
-      var m = L.marker(op ? op : l.getCenter(), {
+      var m = L.marker(op ? op : getCenter(l.getBounds()), {
         icon: L.icon({
           iconUrl: config.topLevelDataPath.baseUrl + l.feature.properties.name + config.topLevelDataPath.areaIconSuffix,
           className: 'areaSign ' + l.feature.properties.name + '-sign'
         }
       )}).addTo(areaSignsLayerGroup);
-      m.on('click', function(e) {
-        gotoArea(l.feature.properties.name, true, e.latlng);
+      m.on('click', function() {
+        gotoArea(l.feature.properties.name, true);
       });
     });
 
-    var areaSignWidth = parseInt($('.areaSign').css('width'));
-    setSignSize(areaSignWidth);
-
-    map.on('zoomend', function() {setSignSize(areaSignWidth);});
+    map.on('zoomend', function() {setSignSize();});
 
     return callback();
   });
 }
 
-function setSignSize(areaSignWidth) {
+function displayWelcome() {
+  if (!utils.inIframe() && !localStorage.getItem('noWelcome') && !(sessionStorage.getItem('hasSeenWelcome'))) {
+
+    setTimeout(function() {
+      map.fire('modal', {
+        MODAL_CONTENT_CLS: 'welcome modal-content',
+        content: welcomeModal()
+      });
+      sessionStorage.setItem('hasSeenWelcome', true);
+    }, 1000);
+
+    setTimeout(function() {
+      map.closeModal()
+    }, 15000);
+
+    map.on('modal.hide', function() {
+      console.log('modal hide');
+      if ($('#welcome-optout').is(':checked')) {
+        localStorage.setItem('noWelcome', true);
+      }
+    });
+
+  }
+}
+
+function getCenter(b) {
+  return L.latLng((b.getNorth() - b.getSouth())/2 + b.getSouth(), (b.getEast() - b.getWest())/2 + b.getWest());
+}
+
+function setSignSize() {
+  var areaSignWidth = 110;
   var zoomThreshold = 8;
   var scalingFactor = 1.4;
   var z = map.getZoom();
@@ -139,8 +183,123 @@ function setAreaBoundaryStyle(f) {
   return config.areaBoundaryStyles[config.areas[f.properties.name].type];
 }
 
-function gotoTop() {
+function gotoTop(pushState) {
+  $('.info').hide();
+  $('.fedInfo').hide();
+  $('.topInfo').show();
+  if (pushState) {
+    history.pushState('top', '', '.');
+  }
+
   resetViewBounds = config.oregonBbox;
+
+  if (!map.hasLayer(allClearcutsLayer)) {
+    allClearcutsLayer.setOpacity($('#topOpacityLabel').text()/100);
+    map.addLayer(allClearcutsLayer);
+  }
+  wipeAreaLayer();
+  wipeFedLayer();
+}
+
+function gotoFed(pushState) {
+
+  $('.topInfo').hide();
+  removeOverlay(allClearcutsLayer);
+
+  addFedLayer();
+
+  if (pushState) {
+    history.pushState('fed', '', '?a=fed');
+  }
+
+  resetViewBounds = config.oregonBbox;
+
+  if (!map.hasLayer(allFedcutsLayer)) {
+    //allClearcutsLayer.setOpacity($('#topOpacityLabel').text()/100);
+    map.addLayer(allFedcutsLayer);
+  }
+
+  wipeAreaLayer();
+
+  $('.info').hide();
+  $('.fedInfo').show();
+  // map.flyToBounds(resetViewBounds);
+  $('.areaSign').show();
+}
+
+function gotoArea(area, pushState) {
+  $('.topInfo').hide();
+  removeOverlay(allClearcutsLayer);
+  removeOverlay(allFedcutsLayer);
+
+  if (pushState) {
+    history.pushState(area, '', '?a=' + area);
+  }
+  resetViewBounds = config.areas[area].bounds;
+  spinner.spin($('#spinner')[0]);
+  $('.areaSign').show();
+  $('.' + area + '-sign').hide();
+  if (timberHarvestPbfLayer) {
+    timberHarvestPbfLayer.removeFrom(map);
+  } else {
+    if (area != 'private') {
+      map.fitBounds(resetViewBounds);
+    }
+  }
+
+  if (area === 'private') {
+    wipeFedLayer();
+  } else {
+    addFedLayer();
+    areaShapes.setStyle(config.areaBoundaryStyle);
+    areaShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
+    enableAllAreaShapesClick();
+    disableAreaShapeClick(area);
+  }
+
+  utils.resetPlaybackControl();
+
+  isFedcuts = config.areas[area].underreported;
+  map.off('zoomend', zoomHandler);
+  $('#infoContent').empty();
+
+  if (isFedcuts) {
+    $('#legendWidget').hide();
+    $('#tipToClick').hide();
+    $('#forestLossAlert').hide();
+    $('#rangeWidgets').hide();
+    $('#zoomInForRangeWidgets').hide();
+    $('#dataQualityAlert').show();
+    displayFedcutsPbfLayer(area);
+  } else {
+    $('#dataQualityAlert').hide();
+    if (area === 'private') {
+      $('#forestLossAlert').show();
+      $('#legendWidget').hide();
+      $('#rangeWidgets').hide();
+      $('#zoomInForRangeWidgets').show();
+      zoomHandler();
+      map.on('zoomend', zoomHandler);
+    } else {
+      $('#forestLossAlert').hide();
+      $('#legendWidget').show();
+      $('#rangeWidgets').show();
+      $('#zoomInForRangeWidgets').hide();
+    }
+    $('#tipToClick').show();
+    displaytimberHarvestPbfLayer(area);
+  }
+  if (unharvestedLayer) {
+    removeOverlay(unharvestedLayer);
+  }
+  addUnharvestedOverlay(area);
+  $('#infoPanelSubTitle').text(config.areas[area].name);
+
+  $('.fedInfo').hide();
+  $('.info').show();
+}
+
+function wipeAreaLayer() {
   if (timberHarvestPbfLayer) {
     areaShapes.setStyle(setAreaBoundaryStyle);
     enableAllAreaShapesClick();
@@ -155,88 +314,28 @@ function gotoTop() {
       removeOverlay(unharvestedLayer);
     }
   }
-  addOverviewLayer();
-  $('.info').hide();
-  $('.topLabel').show();
-  map.flyToBounds(resetViewBounds);
-  $('.areaSign').show();
 }
 
-function gotoArea(area, pushState) {
-  if (overviewLayer) {
-    removeOverlay(overviewLayer);
+function addFedLayer() {
+  if (!map.hasLayer(areaShapes)) {
+    areaShapes.addTo(map);
+    areaSignsLayerGroup.addTo(map);
+    setSignSize();
   }
+}
 
-  if (config.areas[area]) {
-    if (pushState) {
-      history.pushState(area, '', '?a=' + area);
-    }
-    resetViewBounds = config.areas[area].bounds;
-    spinner.spin($('#spinner')[0]);
-    $('.areaSign').show();
-    $('.' + area + '-sign').hide();
-    if (timberHarvestPbfLayer) {
-      timberHarvestPbfLayer.removeFrom(map);
-    } else {
-      map.fitBounds(resetViewBounds);
-    }
-    areaShapes.setStyle(config.areaBoundaryStyle);
-    areaShapes.setStyle({opacity: 0, fillOpacity: 0.5, fillPattern: stripes});
-
-    if (area === 'private') {
-      disableAllAreaShapesClick();
-    } else {
-      enableAllAreaShapesClick();
-      disableAreaShapeClick(area);
-    }
-
-    utils.resetPlaybackControl();
-
-    isFedcuts = config.areas[area].underreported;
-    map.off('zoomend', zoomHandler);
-
-    if (isFedcuts) {
-      $('#infoContent').empty();
-      $('#legendWidget').hide();
-      $('#tipToClick').hide();
-      $('#forestLossAlert').hide();
-      $('#rangeWidgets').hide();
-      $('#zoomInForRangeWidgets').hide();
-      $('#dataQualityAlert').show();
-      displayFedcutsPbfLayer(area);
-    } else {
-      $('#dataQualityAlert').hide();
-      if (area === 'private') {
-        $('#forestLossAlert').show();
-        $('#legendWidget').hide();
-        $('#rangeWidgets').hide();
-        $('#zoomInForRangeWidgets').show();
-        zoomHandler();
-        map.on('zoomend', zoomHandler);
-      } else {
-        $('#forestLossAlert').hide();
-        $('#legendWidget').show();
-        $('#rangeWidgets').show();
-        $('#zoomInForRangeWidgets').hide();
-      }
-      $('#tipToClick').show();
-      displaytimberHarvestPbfLayer(area);
-    }
-    if (unharvestedLayer) {
-      removeOverlay(unharvestedLayer);
-    }
-    addUnharvestedOverlay(area);
-    $('#infoPanelSubTitle').text(config.areas[area].name);
-
-    $('.topLabel').hide();
-    $('.info').show();
-  } else {
-    displayFedcutsPbfLayer(area);
+function wipeFedLayer() {
+  if (map.hasLayer(areaShapes)) {
+    areaShapes.removeFrom(map);
+    areaSignsLayerGroup.removeFrom(map);
+  }
+  if (map.hasLayer(allFedcutsLayer)) {
+    allFedcutsLayer.removeFrom(map);
   }
 }
 
 function zoomHandler() {
-  if (map.getZoom() > 9) {
+  if (map.getZoom() > config.minZoomForPlayback) {
     $('#rangeWidgets').show();
     $('#zoomInForRangeWidgets').hide();
   } else {
@@ -249,17 +348,10 @@ function zoomHandler() {
 function enableAllAreaShapesClick() {
   areaShapes.eachLayer(function(l) {
     if (!l.listens('click')) {
-      l.on('click', function(e) {
-        gotoArea(l.feature.properties.name, true, e.latlng);
+      l.on('click', function() {
+        gotoArea(l.feature.properties.name, true);
       });
     }
-  });
-}
-
-function disableAllAreaShapesClick() {
-  areaShapes.eachLayer(function(l) {
-    l.setStyle({opacity: 0, fillOpacity: 0})
-    l.off('click');
   });
 }
 
@@ -286,14 +378,6 @@ function addUnharvestedOverlay(area){
 
     layersControl.addOverlay(unharvestedLayer, config.unharvestedOverlayLayer.name);
   }
-}
-
-function addOverviewLayer() {
-  //overviewLayer = L.tileLayerPixelFilter(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
-  config.allFedcutsLayer.options.rendererFactory = L.canvas.tile;
-  overviewLayer = L.vectorGrid.protobuf(config.allFedcutsLayer.url, config.allFedcutsLayer.options);
-  layersControl.addOverlay(overviewLayer, config.allFedcutsLayer.name);
-  map.addLayer(overviewLayer);
 }
 
 function removeOverlay(ol) {
@@ -331,23 +415,40 @@ function setUpCustomPanes() {
   });
 }
 
-function setUpInfoPanel() {
-  info.onAdd = function () {
-    this._div = L.DomUtil.create('div', 'info');
-    this._div.innerHTML = infoHeader({
-      loggingTypeLegend: config.loggingTypeLegend,
-      layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed(),
-      alternateLoggingColor: config.alternateLoggingColor
-    });
-    L.DomEvent.disableClickPropagation(this._div);
-    return this._div;
-  };
+function setUpInfoPanels() {
 
-  info.update = function () {
-    $('#infoContent').empty();
-  };
+  createInfoPanel('topInfo', topInfoContent, {alternateLoggingColor: config.alternateLoggingColor});
 
-  info.addTo(map);
+  config.topOpacitySliderOptions.start = config.defaultOpacity;
+  topOpacitySlider = new Slider($('#topOpacitySlider')[0], config.topOpacitySliderOptions);
+
+  $('.top-list-item').click(function() {
+    switch ($(this).attr('data-item-id')) {
+      case 'private':
+        gotoArea('private', true);
+        break;
+      default:
+        gotoFed(true);
+    }
+  });
+
+  createInfoPanel('fedInfo', fedInfoContent, {alternateLoggingColor: config.alternateLoggingColor});
+
+  config.fedOpacitySliderOptions.start = config.defaultOpacity;
+  fedOpacitySlider = new Slider($('#fedOpacitySlider')[0], config.fedOpacitySliderOptions);
+
+  $('#fedInfoPanelTitle').click(function() {
+    gotoTop(true);
+    return false;
+  });
+
+  $('.fedInfo').hide();
+
+  createInfoPanel('info', infoHeader, {
+    loggingTypeLegend: config.loggingTypeLegend,
+    layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed(),
+    alternateLoggingColor: config.alternateLoggingColor
+  });
 
   dateRangeSlider = new Slider($('#dateRangeSlider')[0], config.dateRangeSliderOptions);
   // $('.handle').attr('tabindex', 0); Deal with keyboard later
@@ -356,15 +457,14 @@ function setUpInfoPanel() {
   opacitySlider = new Slider($('#opacitySlider')[0], config.opacitySliderOptions);
   $('.info').hide();
 
-  // These tweaks are needed to allow for the info box to scroll and not run on top of other things
-  $('.info').css('max-height', $(window).height() - 50);
+  // These tweaks are needed to allow for info boxes to scroll and not run on top of other things
+  $('.infoStyle').css('max-height', $(window).height() - 50);
   $(window).on('resize', function() {
-    $('.info').css('max-height', $(window).height() - 50);
+    $('.infoStyle').css('max-height', $(window).height() - 50);
   });
-  $('.info').on('mousedown wheel scrollstart touchstart mousewheel DOMMouseScroll MozMousePixelScroll', function(e) {
+  $('.infoStyle').on('mousedown wheel scrollstart touchstart mousewheel DOMMouseScroll MozMousePixelScroll', function(e) {
     e.stopPropagation();
   });
-  info.update();
 
   setUpPlaybackControl();
   setUpSlideHandlers();
@@ -374,10 +474,27 @@ function setUpInfoPanel() {
   $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
 
   $('#infoPanelTitle').click(function() {
-    history.pushState('top', '', '.');
-    gotoTop();
+    NProgress.remove();
+    if (utils.getUrlVars().a === 'private') {
+      gotoTop(true);
+    } else {
+      gotoFed(true);
+    }
     return false;
   });
+}
+
+function createInfoPanel(cssClass, template, templateParms) {
+  var infoPanel = L.control();
+
+  infoPanel.onAdd = function () {
+    this._div = L.DomUtil.create('div', cssClass + ' infoStyle');
+    this._div.innerHTML = template(templateParms);
+    L.DomEvent.disableClickPropagation(this._div);
+    return this._div;
+  };
+
+  infoPanel.addTo(map);
 }
 
 function setUpLayerControl() {
@@ -409,8 +526,11 @@ function setUpLayerControl() {
           });
         })(oLayer, config.overlayLayers[k].style);
         break;
-      default:
+      case 'pixelfiltertile':
         oLayer = overlayLayers[config.overlayLayers[k].name] = L.tileLayerPixelFilter(config.overlayLayers[k].url, config.overlayLayers[k].options);
+        break;
+      default:
+        oLayer = overlayLayers[config.overlayLayers[k].name] = L.tileLayer(config.overlayLayers[k].url, config.overlayLayers[k].options);
       }
       if (config.overlayLayers[k].checked) {
         map.addLayer(oLayer);
@@ -607,6 +727,24 @@ function setUpSlideHandlers() {
 
   opacitySlider.subscribe('moving', function(tValue) {
     $('#opacityLabel').text(Math.round(tValue.right));
+  });
+
+  topOpacitySlider.subscribe('stop', function(tValue) {
+    allClearcutsLayer.setOpacity(tValue.right/100);
+  });
+
+  topOpacitySlider.subscribe('moving', function(tValue) {
+    $('#topOpacityLabel').text(Math.round(tValue.right));
+  });
+
+  fedOpacitySlider.subscribe('stop', function(tValue) {
+    config.allFedcutsLayer.options.vectorTileLayerStyles.fedcuts.fillOpacity = tValue.right/100;
+    allFedcutsLayer.redraw();
+    //allFedcutsLayer.setOpacity(tValue.right/100);
+  });
+
+  fedOpacitySlider.subscribe('moving', function(tValue) {
+    $('#fedOpacityLabel').text(Math.round(tValue.right));
   });
 }
 

@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.5.0<sup>Beta</sup>',
+  versionString: 'v0.6.0<sup>Beta</sup>',
   dataLastUpdated: 'September 28, 2018',
   baseMapLayers: [
     {
@@ -118,7 +118,7 @@ export var config = {
       get name () {
         return '<span class="overlay-legend-item" style="background: ' + this.color + ';"></span> BLM Land'
       },
-      type: 'tile'
+      type: 'pixelfiltertile'
     }
   ],
   oregonBbox: [
@@ -152,7 +152,8 @@ export var config = {
     },
     'rogueriver-siskiyou': {
       name: 'Rogue River-Siskiyou National Forests',
-      type: 'nf'
+      type: 'nf',
+      overrideSignPosition: [42.5, -123.6]
     },
     siuslaw: {
       name: 'Siuslaw National Forest',
@@ -192,26 +193,18 @@ export var config = {
     medford: {
       name: 'BLM Medford District Office',
       type: 'blm',
-      overrideSignPosition: [42.6085, -122.8601]
+      overrideSignPosition: [42.76, -122.49]
     },
     lakeview: {
       name: 'BLM Lakeview District Office',
       type: 'blm',
       overrideSignPosition: [43.2061, -120.1849]
-    },/*
-    burns: {
-      name: 'BLM Burns District Office',
-      type: 'blm'
-    },*/
+    },
     vale: {
       name: 'BLM Vale District Office',
-      type: 'blm'
-    },/*,
-    prineville: {
-      name: 'BLM Prineville District Office',
       type: 'blm',
-      overrideSignPosition: [44.9482, -120.5708]
-    }*/
+      overrideSignPosition: [43.5485, -117.5]
+    },
     private: {
       name: 'Private and State Lands',
       type: 'private'
@@ -241,7 +234,8 @@ export var config = {
     }
   },
   privateLayerUrl: 'https://forestloss.oregonhowl.org/hansen-private',
-  // privateLayerUrl: 'http://localhost:9090/hansen',
+  //privateLayerUrl: 'http://localhost:9191/hansen',
+  minZoomForPlayback: 8,
   attributionLabels: {
     nf: 'USDA National Forest Service',
     blm: 'Bureau of Land Management',
@@ -316,11 +310,11 @@ export var config = {
     options: {
       vectorTileLayerStyles: {
         fedcuts: {
-          weight: 0.5,
-          opacity: 0.9,
-          color: '#d55e00',
-          fillColor: '#d55e00',
-          fillOpacity: 0.9,
+          weight: 0,
+          opacity: 0,
+          color: '#9300d5',
+          fillColor: '#9300d5',
+          fillOpacity: 0.7,
           fill: true
         }
       },
@@ -336,25 +330,20 @@ export var config = {
     },
     type: 'vectorgrid'
   },
-  /*allFedcutsLayer:  {
-    url: 'https://tiles.oregonhowl.org/clearcuts/{z}/{x}/{y}.png',
+  allClearcutsLayer: {
+    url: 'https://tiles.oregonhowl.org/logging/{z}/{x}/{y}.png',
+    // url: 'http://localhost:9090/logging/{z}/{x}/{y}.png',
     options: {
-      pane: 'overlayPane',
-      maxZoom: 19,
-      maxNativeZoom: 12,
+      maxNativeZoom: 13,
       opacity: 0.7,
-      attribution: 'Oregon Wild',
-      matchRGBA: [ 186,  49,  0, 255 ],
-      missRGBA:  [ 186,  49,  0, 255 ]//,
-      //pixelCodes: [ [102, 102, 102] ]
+      attribution: 'Oregon Wild, Hansen/UMD/Google/USGS/NASA',
+      zIndex: 10,
+      pane: 'mainpane'
     },
-    color: 'rgba(186, 49, 0, 0.7)',
-    get name () {
-      return '<span id="clearCutsLabel" class="overlay-legend-item" style="background: ' + this.color + ';"></span> Clearcuts on Federal Lands'
-    },
+    name: 'State-wide Clearcuts',
     checked: true,
     type: 'tile'
-  },*/
+  },
   spinnerOpts: {
     color: '#939393',
     opacity: 0.1,
@@ -445,10 +434,22 @@ export var config = {
   DATE_NA: '1900',
   defaultOpacity: 70,
   opacitySliderOptions: {
-      isDate: false,
-      isOneWay: true,
-      min: 0,
-      max: 100
+    isDate: false,
+    isOneWay: true,
+    min: 0,
+    max: 100
+  },
+  topOpacitySliderOptions: {
+    isDate: false,
+    isOneWay: true,
+    min: 0,
+    max: 100
+  },
+  fedOpacitySliderOptions: {
+    isDate: false,
+    isOneWay: true,
+    min: 0,
+    max: 100
   },
   areaBoundaryStyles: {
     nf: {
