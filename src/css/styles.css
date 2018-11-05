@@ -15,6 +15,16 @@ html, body {
   height: 100%;
 }
 
+.leaflet-modal .welcome {
+  background-image: url('../images/message.jpg');
+  background-size:  cover;
+  background-color: rgba(255,255,255,0);
+  color: white;
+  text-align: center;
+  margin-top: 0%;
+  /*transition: margin 0s;*/
+}
+
 .infoStyle {
   padding: 6px 8px;
   max-width: 400px;

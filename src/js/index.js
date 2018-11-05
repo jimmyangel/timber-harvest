@@ -20,6 +20,7 @@ import infoContentItem from '../templates/infoContentItem.hbs';
 import topInfoContent from '../templates/topInfoContent.hbs';
 import fedInfoContent from '../templates/fedInfoContent.hbs';
 import aboutModal from '../templates/aboutModal.hbs';
+import welcomeModal from '../templates/welcomeModal.hbs';
 import standPopUp from '../templates/standPopUp.hbs';
 import privatePopUp from '../templates/privatePopUp.hbs';
 
@@ -64,6 +65,11 @@ setUpInfoPanels();
 setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
+
+map.fire('modal', {
+  MODAL_CONTENT_CLS: 'welcome modal-content',
+  content: welcomeModal()
+});
 
 initMap(function() {
   var f = utils.getUrlVars().a;
