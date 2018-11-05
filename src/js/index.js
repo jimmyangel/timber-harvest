@@ -135,11 +135,14 @@ function initMap(callback) {
 
 function displayWelcome() {
   if (!localStorage.getItem('noWelcome') && !(sessionStorage.getItem('hasSeenWelcome'))) {
-    map.fire('modal', {
-      MODAL_CONTENT_CLS: 'welcome modal-content',
-      content: welcomeModal()
-    });
-    sessionStorage.setItem('hasSeenWelcome', true);
+
+    setTimeout(function() {
+      map.fire('modal', {
+        MODAL_CONTENT_CLS: 'welcome modal-content',
+        content: welcomeModal()
+      });
+      sessionStorage.setItem('hasSeenWelcome', true);
+    }, 1000);
 
     setTimeout(function() {
       map.closeModal()
