@@ -66,10 +66,25 @@ setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
 
-map.fire('modal', {
-  MODAL_CONTENT_CLS: 'welcome modal-content',
-  content: welcomeModal()
-});
+if (!localStorage.getItem('noWelcome') && !(sessionStorage.getItem('hasSeenWelcome'))) {
+  map.fire('modal', {
+    MODAL_CONTENT_CLS: 'welcome modal-content',
+    content: welcomeModal()
+  });
+  sessionStorage.setItem('hasSeenWelcome', true);
+
+  setTimeout(function() {
+    map.closeModal()
+  }, 15000);
+
+  map.on('modal.hide', function() {
+    console.log('modal hide');
+    if ($('#welcome-optout').is(':checked')) {
+      localStorage.setItem('noWelcome', true);
+    }
+  });
+
+}
 
 initMap(function() {
   var f = utils.getUrlVars().a;

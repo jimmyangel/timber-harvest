@@ -19,7 +19,8 @@ html, body {
   background-image: url('../images/message.jpg');
   background-size:  cover;
   background-color: rgba(255,255,255,0);
-  color: white;
+  color: #fff5d0;
+  text-shadow: 1px 1px #000000;
   text-align: center;
   margin-top: 0%;
   /*transition: margin 0s;*/
