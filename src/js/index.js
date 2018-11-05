@@ -134,7 +134,7 @@ function initMap(callback) {
 }
 
 function displayWelcome() {
-  if (!localStorage.getItem('noWelcome') && !(sessionStorage.getItem('hasSeenWelcome'))) {
+  if (!utils.inIframe() && !localStorage.getItem('noWelcome') && !(sessionStorage.getItem('hasSeenWelcome'))) {
 
     setTimeout(function() {
       map.fire('modal', {
