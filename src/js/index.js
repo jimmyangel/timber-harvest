@@ -66,26 +66,6 @@ setUpResetControl();
 setUpLayerControl();
 setUpAboutControl();
 
-if (!localStorage.getItem('noWelcome') && !(sessionStorage.getItem('hasSeenWelcome'))) {
-  map.fire('modal', {
-    MODAL_CONTENT_CLS: 'welcome modal-content',
-    content: welcomeModal()
-  });
-  sessionStorage.setItem('hasSeenWelcome', true);
-
-  setTimeout(function() {
-    map.closeModal()
-  }, 15000);
-
-  map.on('modal.hide', function() {
-    console.log('modal hide');
-    if ($('#welcome-optout').is(':checked')) {
-      localStorage.setItem('noWelcome', true);
-    }
-  });
-
-}
-
 initMap(function() {
   var f = utils.getUrlVars().a;
 
@@ -113,8 +93,10 @@ initMap(function() {
     } else {
       history.replaceState('top', '', '.');
       gotoTop();
+      displayWelcome();
     }
   }
+
 });
 
 function initMap(callback) {
@@ -149,6 +131,28 @@ function initMap(callback) {
 
     return callback();
   });
+}
+
+function displayWelcome() {
+  if (!localStorage.getItem('noWelcome') && !(sessionStorage.getItem('hasSeenWelcome'))) {
+    map.fire('modal', {
+      MODAL_CONTENT_CLS: 'welcome modal-content',
+      content: welcomeModal()
+    });
+    sessionStorage.setItem('hasSeenWelcome', true);
+
+    setTimeout(function() {
+      map.closeModal()
+    }, 15000);
+
+    map.on('modal.hide', function() {
+      console.log('modal hide');
+      if ($('#welcome-optout').is(':checked')) {
+        localStorage.setItem('noWelcome', true);
+      }
+    });
+
+  }
 }
 
 function getCenter(b) {
