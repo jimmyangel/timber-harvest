@@ -241,10 +241,6 @@ function gotoArea(area, pushState) {
   $('.' + area + '-sign').hide();
   if (timberHarvestPbfLayer) {
     timberHarvestPbfLayer.removeFrom(map);
-  } else {
-    if (area != 'private') {
-      map.fitBounds(resetViewBounds);
-    }
   }
 
   if (area === 'private') {
