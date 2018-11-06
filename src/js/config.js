@@ -73,13 +73,15 @@ export var config = {
     {
       options: {
         url: 'https://gis.blm.gov/arcgis/rest/services/lands/BLM_Natl_SMA_Cached_without_PriUnk/MapServer/23',
+        minZoom: 9,
         style: function() {
           return {
-            weight: 0,
-            color: '#C8F10F',
+            weight: 1.5,
+            color: 'darkolivegreen',
+            //dashArray: '20,10',
             opacity: 1,
             fillColor: '#C8F10F',
-            fillOpacity: 0.25,
+            fillOpacity: 0,
             fill: true
           }
         },
@@ -102,6 +104,7 @@ export var config = {
         return '<span class="overlay-legend-item" style="background: ' + '#C8F10F' + ';"></span> National Forests'
       },
       checked: true,
+      isNF: true,
       type: 'esri'
     },
     {
@@ -456,12 +459,12 @@ export var config = {
       fillColor: '#E5D499',
       fillOpacity: 0,
       color: '#562700',
-      opacity: 1,
+      opacity: 0,
       weight: 3
     },
     blm: {
       fillOpacity: 0,
-      opacity: 0.6,
+      opacity: 0,
       color: 'grey',
       weight: 2,
       dashArray: '4'
