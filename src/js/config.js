@@ -104,7 +104,6 @@ export var config = {
         return '<span class="overlay-legend-line-item"></span> National Forest Boundaries'
       },
       checked: true,
-      isNF: true,
       type: 'esri'
     },
     {

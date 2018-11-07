@@ -532,9 +532,6 @@ function setUpLayerControl() {
       if (config.overlayLayers[k].checked) {
         map.addLayer(oLayer);
       }
-      if (config.overlayLayers[k].isNF) {
-        NFLayer = oLayer;
-      }
     }
 
   layersControl = L.control.layers(baseMaps, overlayLayers, {position: 'topleft', collapsed: true}).addTo(map);
