@@ -245,6 +245,13 @@ ul.legend-items li span {
   width: 14px;
 }
 
+.overlay-legend-line-item {
+  display: inline-block;
+  margin-bottom: 3px;
+  width: 14px;
+  border-bottom: 2px solid darkolivegreen;
+}
+
 .v-legend-items {
   padding: 0;
   margin: 0;

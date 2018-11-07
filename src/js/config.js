@@ -101,7 +101,7 @@ export var config = {
         interactive: false
       },
       get name () {
-        return '<span class="overlay-legend-item" style="background: ' + '#C8F10F' + ';"></span> National Forests'
+        return '<span class="overlay-legend-line-item"></span> National Forest Boundaries'
       },
       checked: true,
       isNF: true,
