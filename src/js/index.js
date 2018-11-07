@@ -51,7 +51,6 @@ var areaSignsLayerGroup = L.layerGroup(); //.addTo(map); // This is so getCenter
 var areaShapes;
 
 var layersControl;
-var NFLayer;
 
 var dateRangeSlider;
 var opacitySlider;
@@ -185,7 +184,7 @@ function setAreaBoundaryStyle(f) {
 }
 
 function gotoTop(pushState) {
-  
+
   $('.info').hide();
   $('.fedInfo').hide();
   $('.topInfo').show();
