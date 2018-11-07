@@ -76,7 +76,7 @@ export var config = {
         minZoom: 9,
         style: function() {
           return {
-            weight: 1.5,
+            weight: 1.2,
             color: 'darkolivegreen',
             //dashArray: '20,10',
             opacity: 1,
