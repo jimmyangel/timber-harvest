@@ -76,3 +76,10 @@ mapshaper hansen-warm-springs.json -each 'assignedId=this.id' -o format=geojson 
 tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=6 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --coalesce --maximum-tile-bytes=100000 --output-to-directory "warm-springs" hansen-warm-springs-i.json
 
 mapshaper hansen-warm-springs-i.json -each 'GIS_ACRES=Math.round(this.area*0.000247105)' -filter-fields assignedId,YEAR,GIS_ACRES -o format=json warm-springs/timber-or-s-info.json
+
+### Merged private + warm springs
+mapshaper hansen-private-state-tribal.json -each 'assignedId=this.id' -o format=geojson hansen-private-state-tribal-i.json
+
+tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=6 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --coalesce --maximum-tile-bytes=100000 --output-to-directory "hansen" hansen-private-state-tribal-i.json
+
+mapshaper hansen-private-polygons-i.json -each 'GIS_ACRES=Math.round(this.area*0.000247105)' -filter-fields assignedId,YEAR,GIS_ACRES -o format=json hansen/hansen-private-state-tribal.json
