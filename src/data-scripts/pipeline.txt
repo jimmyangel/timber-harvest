@@ -83,3 +83,13 @@ mapshaper hansen-private-state-tribal.json -each 'assignedId=this.id' -o format=
 tippecanoe --layer=timberharvest --name=timberharvest --no-tile-compression --minimum-zoom=6 --maximum-zoom=14 --include=assignedId --simplification=20 --simplify-only-low-zooms --coalesce --maximum-tile-bytes=100000 --output-to-directory "hansen" hansen-private-state-tribal-i.json
 
 mapshaper hansen-private-state-tribal-i.json -each 'GIS_ACRES=Math.round(this.area*0.000247105)' -filter-fields assignedId,YEAR,GIS_ACRES -o format=json hansen/timber-or-s-info.json
+
+### update fedcuts
+# Take the original fedcuts
+# Merge filtered NF and BLM data (see filter below to pick only clearcuts)
+  # National Forests filter
+  # "STATE_ABBR" = 'OR'  AND "FY_COMPLET" > '' AND "ACTIVITY_2" IN ('4101','4102','4111','4113','4121','4131','4132','4141','4142','4143','4145','4146','4162','4175','4177','4183','4193','4194','4196','4232')
+
+  # BLM filter
+  # "HARV_RX" IN ('Clearcut', 'Patch Cut', 'Regeneration')
+# Export and use mapshaper dissolve2 and explode to flatten shapes (remove overlapping polygons)
