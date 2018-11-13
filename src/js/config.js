@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.6.1<sup>Beta</sup>',
+  versionString: 'v0.7.0<sup>Beta</sup>',
   dataLastUpdated: 'September 28, 2018',
   baseMapLayers: [
     {
@@ -208,7 +208,7 @@ export var config = {
       overrideSignPosition: [43.5485, -117.5]
     },
     private: {
-      name: 'Private and State Lands',
+      name: 'Private, State and Tribal Lands',
       type: 'private'
     },
   },
@@ -236,7 +236,7 @@ export var config = {
     }
   },
   privateLayerUrl: 'https://forestloss.oregonhowl.org/hansen-private',
-  //privateLayerUrl: 'http://localhost:9191/hansen',
+  //privateLayerUrl: 'http://localhost:9090/hansen-private',
   minZoomForPlayback: 8,
   attributionLabels: {
     nf: 'USDA National Forest Service',
