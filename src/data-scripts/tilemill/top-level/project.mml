@@ -1,0 +1,88 @@
+{
+  "bounds": [
+    -124.5273,
+    41.9799,
+    -116.694,
+    46.2407
+  ],
+  "center": [
+    -120.8359,
+    44.0363,
+    8
+  ],
+  "format": "png8",
+  "interactivity": false,
+  "minzoom": 0,
+  "maxzoom": 13,
+  "srs": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over",
+  "Stylesheet": [
+    "style.mss"
+  ],
+  "Layer": [
+    {
+      "geometry": "raster",
+      "extent": [
+        -124.552460207,
+        41.992768033,
+        -116.46331021,
+        46.269918015
+      ],
+      "id": "hansen",
+      "class": "",
+      "Datasource": {
+        "file": "/Users/morin_ricardo/Projects/forestloss/hansenprivateclippedforestonlycompressed.tif",
+        "band": "1"
+      },
+      "layer": null,
+      "srs-name": "WGS84",
+      "srs": "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs",
+      "advanced": {
+        "band": "1"
+      },
+      "name": "hansen"
+    },
+    {
+      "geometry": "polygon",
+      "extent": [
+        -124.47802,
+        41.99504,
+        -116.71864,
+        46.16398
+      ],
+      "id": "fedcuts",
+      "class": "",
+      "Datasource": {
+        "file": "/Users/morin_ricardo/Projects/timber/merged-NF-BLM-fedcuts/merged-NF-BLM-fedcuts.shp"
+      },
+      "layer": null,
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "fedcuts"
+    },
+    {
+      "geometry": "polygon",
+      "extent": [
+        -121.78415,
+        44.56793,
+        -121.2939,
+        45.1535
+      ],
+      "id": "warmsprings",
+      "class": "",
+      "Datasource": {
+        "file": "/Users/morin_ricardo/Projects/forestloss/hansen-warm-springs-fixed/hansen-warm-springs.shp"
+      },
+      "layer": null,
+      "srs-name": "autodetect",
+      "srs": "",
+      "advanced": {},
+      "name": "warmsprings"
+    }
+  ],
+  "scale": 1,
+  "metatile": 2,
+  "name": "Logging top level",
+  "description": "",
+  "attribution": ""
+}
