@@ -2,6 +2,7 @@
 import '../CNAME';
 import '../_redirects';
 import '../favicon.ico';
+import '../images/logging.png';
 
 import L from 'leaflet';
 import 'leaflet-fullscreen';
