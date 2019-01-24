@@ -353,12 +353,13 @@ ul.legend-items li span {
 /* Dropdown styling */
 /* Dropdown Button */
 .dropbtn {
-  /* background-color: #3498DB;
-  color: white; */
+  background-color: white;
+  /* color: white; */
   padding: 4px;
   font-size: 90%;
   font-weight: bold;
   /*border: none; */
+  border: 1px solid #ccc;
   cursor: pointer;
   width: 100%;
 }
