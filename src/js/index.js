@@ -432,17 +432,6 @@ function setUpInfoPanels() {
 
   createInfoPanel('fedInfo', fedInfoContent, {alternateLoggingColor: config.alternateLoggingColor});
 
-  $('.dropbtn').click(function() {
-    $('.dropdown-content').toggle();
-  });
-
-  $(window).click(function(event) {
-    console.log(event.target.className);
-    if (!event.target.matches('.dropbtn')) {
-      $('.dropdown-content').hide();
-    }
-  });
-
   config.fedOpacitySliderOptions.start = config.defaultOpacity;
   fedOpacitySlider = new Slider($('#fedOpacitySlider')[0], config.fedOpacitySliderOptions);
 
@@ -457,6 +446,17 @@ function setUpInfoPanels() {
     loggingTypeLegend: config.loggingTypeLegend,
     layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed(),
     alternateLoggingColor: config.alternateLoggingColor
+  });
+
+  $('.dropbtn').click(function() {
+    $('.dropdown-content').toggle();
+  });
+
+  $(window).click(function(event) {
+    console.log(event.target.className);
+    if (!event.target.matches('.dropbtn')) {
+      $('.dropdown-content').hide();
+    }
   });
 
   dateRangeSlider = new Slider($('#dateRangeSlider')[0], config.dateRangeSliderOptions);
