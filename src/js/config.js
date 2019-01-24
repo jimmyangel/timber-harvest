@@ -1,7 +1,7 @@
 'use strict';
 
 export var config = {
-  versionString: 'v0.7.2<sup>Beta</sup>',
+  versionString: 'v0.8.0<sup>Beta</sup>',
   dataLastUpdated: 'September 28, 2018',
   baseMapLayers: [
     {
