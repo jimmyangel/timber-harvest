@@ -442,7 +442,7 @@ function setUpInfoPanels() {
   });
 
   $(window).click(function(event) {
-    if (!event.target.matches('.dropbtn')) {
+    if (!(event.target.matches('.dropbtn') || event.target.parentElement.matches('.dropbtn'))) {
       $('.dropdown-content').hide();
     }
   });
