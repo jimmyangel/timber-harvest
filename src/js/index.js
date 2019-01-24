@@ -457,7 +457,7 @@ function setUpInfoPanels() {
         gotoFed(true);
         break;
       default:
-        gotoTop();
+        gotoTop(true);
     }
     return false;
   });
