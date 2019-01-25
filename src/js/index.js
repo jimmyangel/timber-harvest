@@ -72,7 +72,7 @@ initMap(function() {
 
   window.onpopstate = function(e) {
 
-    switch (e.state) {
+    switch (e.state.current) {
       case 'fed':
         gotoFed();
         break;
@@ -80,19 +80,21 @@ initMap(function() {
         gotoTop()
         break;
       default:
-        gotoArea(e.state);
+        gotoArea(e.state.current);
     }
   };
 
+  var previous = history.state ? history.state.current : undefined;
+
   if (f && (config.areas[f])) {
-    history.replaceState(f, '', '?a=' + f);
+    history.replaceState({current: f, previous: previous}, '', '?a=' + f);
     gotoArea(f);
   } else {
     if (f === 'fed') {
-      history.replaceState('fed', '', '?a=fed');
+      history.replaceState({current: 'fed', previous: previous}, '', '?a=fed');
       gotoFed();
     } else {
-      history.replaceState('top', '', '.');
+      history.replaceState({current: 'top', previous: previous}, '', '.');
       gotoTop();
       displayWelcome();
     }
@@ -189,7 +191,7 @@ function gotoTop(pushState) {
   $('.fedInfo').hide();
   $('.topInfo').show();
   if (pushState) {
-    history.pushState('top', '', '.');
+    history.pushState({current: 'top', previous: history.state.current}, '', '.');
   }
 
   resetViewBounds = config.oregonBbox;
@@ -210,7 +212,7 @@ function gotoFed(pushState) {
   addFedLayer();
 
   if (pushState) {
-    history.pushState('fed', '', '?a=fed');
+    history.pushState({current: 'fed', previous: history.state.current}, '', '?a=fed');
   }
 
   resetViewBounds = config.oregonBbox;
@@ -234,7 +236,7 @@ function gotoArea(area, pushState) {
   removeOverlay(allFedcutsLayer);
 
   if (pushState) {
-    history.pushState(area, '', '?a=' + area);
+    history.pushState({current: area, previous: history.state.current}, '', '?a=' + area);
   }
   resetViewBounds = config.areas[area].bounds;
   spinner.spin($('#spinner')[0]);
@@ -448,23 +450,30 @@ function setUpInfoPanels() {
   });
 
   $('.explore-item').click(function() {
-    var state = history.state
+    NProgress.remove();
+
+    var current = history.state.current;
+    var previous = history.state ? history.state.previous : undefined;
 
     $('.dropdown-content').hide();
     switch ($(this).attr('data-item-id')) {
       case 'private':
-        if (state === 'private') {
+        if (current === 'private') {
           map.flyToBounds(config.oregonBbox);
         }
         gotoArea('private', true);
         break;
       case 'fed':
-        if (state != 'private' && state != 'top') {
-          if(state === 'fed' || state in config.areas) {
+        if (current !== 'private' && current !== 'top') {
+          if(current === 'fed' || current in config.areas) {
             map.flyToBounds(config.oregonBbox);
           }
         }
-        gotoFed(true);
+        if (previous !== 'private' && previous in config.areas) {
+          gotoArea(previous, true);
+        } else {
+          gotoFed(true);
+        }
         break;
       default:
         gotoTop(true);
