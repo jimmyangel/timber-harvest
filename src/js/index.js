@@ -448,12 +448,22 @@ function setUpInfoPanels() {
   });
 
   $('.explore-item').click(function() {
+    var state = history.state
+
     $('.dropdown-content').hide();
     switch ($(this).attr('data-item-id')) {
       case 'private':
+        if (state === 'private') {
+          map.flyToBounds(config.oregonBbox);
+        }
         gotoArea('private', true);
         break;
       case 'fed':
+        if (state != 'private' && state != 'top') {
+          if(state === 'fed' || state in config.areas) {
+            map.flyToBounds(config.oregonBbox);
+          }
+        }
         gotoFed(true);
         break;
       default:
