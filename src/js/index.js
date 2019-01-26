@@ -241,7 +241,6 @@ function gotoArea(area, pushState) {
   resetViewBounds = config.areas[area].bounds;
   spinner.spin($('#spinner')[0]);
   $('.areaSign').show();
-  $('.' + area + '-sign').hide();
   if (timberHarvestPbfLayer) {
     timberHarvestPbfLayer.removeFrom(map);
   }
@@ -296,6 +295,7 @@ function gotoArea(area, pushState) {
 
   $('.fedInfo').hide();
   $('.info').show();
+  $('.' + area + '-sign').hide();
 }
 
 function wipeAreaLayer() {
@@ -502,6 +502,7 @@ function setUpInfoPanels() {
   $('.info-panel-title').click(function() {
     NProgress.remove();
     map.flyToBounds(config.oregonBbox);
+    spinner.stop();
     gotoTop(true);
     return false;
   });
