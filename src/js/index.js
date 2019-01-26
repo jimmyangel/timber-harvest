@@ -426,11 +426,6 @@ function setUpInfoPanels() {
   config.fedOpacitySliderOptions.start = config.defaultOpacity;
   fedOpacitySlider = new Slider($('#fedOpacitySlider')[0], config.fedOpacitySliderOptions);
 
-  $('#fedInfoPanelTitle').click(function() {
-    gotoTop(true);
-    return false;
-  });
-
   $('.fedInfo').hide();
 
   createInfoPanel('info', infoHeader, {
@@ -504,13 +499,10 @@ function setUpInfoPanels() {
   $('#fromLabel').text(Math.round(dateRangeSlider.getInfo().left));
   $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
 
-  $('#infoPanelTitle').click(function() {
+  $('.info-panel-title').click(function() {
     NProgress.remove();
-    if (utils.getUrlVars().a === 'private') {
-      gotoTop(true);
-    } else {
-      gotoFed(true);
-    }
+    map.flyToBounds(config.oregonBbox);
+    gotoTop(true);
     return false;
   });
 }
