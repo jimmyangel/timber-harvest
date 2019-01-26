@@ -1,6 +1,6 @@
 {
   "name": "timber-harvest",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Interactive map to visualize logging in public lands in Oregon",
   "main": "index.js",
   "repository": {
