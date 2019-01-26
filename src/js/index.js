@@ -72,7 +72,7 @@ initMap(function() {
 
   window.onpopstate = function(e) {
 
-    switch (e.state) {
+    switch (e.state.current) {
       case 'fed':
         gotoFed();
         break;
@@ -80,19 +80,21 @@ initMap(function() {
         gotoTop()
         break;
       default:
-        gotoArea(e.state);
+        gotoArea(e.state.current);
     }
   };
 
+  var previous = history.state ? history.state.current : undefined;
+
   if (f && (config.areas[f])) {
-    history.replaceState(f, '', '?a=' + f);
+    history.replaceState({current: f, previous: previous}, '', '?a=' + f);
     gotoArea(f);
   } else {
     if (f === 'fed') {
-      history.replaceState('fed', '', '?a=fed');
+      history.replaceState({current: 'fed', previous: previous}, '', '?a=fed');
       gotoFed();
     } else {
-      history.replaceState('top', '', '.');
+      history.replaceState({current: 'top', previous: previous}, '', '.');
       gotoTop();
       displayWelcome();
     }
@@ -150,7 +152,6 @@ function displayWelcome() {
     }, 15000);
 
     map.on('modal.hide', function() {
-      console.log('modal hide');
       if ($('#welcome-optout').is(':checked')) {
         localStorage.setItem('noWelcome', true);
       }
@@ -184,13 +185,13 @@ function setAreaBoundaryStyle(f) {
   return config.areaBoundaryStyles[config.areas[f.properties.name].type];
 }
 
-function gotoTop(pushState) {
+function gotoTop(pushState, current) {
 
   $('.info').hide();
   $('.fedInfo').hide();
   $('.topInfo').show();
   if (pushState) {
-    history.pushState('top', '', '.');
+    history.pushState({current: 'top', previous: current ? current : history.state.current}, '', '.');
   }
 
   resetViewBounds = config.oregonBbox;
@@ -211,7 +212,7 @@ function gotoFed(pushState) {
   addFedLayer();
 
   if (pushState) {
-    history.pushState('fed', '', '?a=fed');
+    history.pushState({current: 'fed', previous: history.state.current}, '', '?a=fed');
   }
 
   resetViewBounds = config.oregonBbox;
@@ -235,12 +236,11 @@ function gotoArea(area, pushState) {
   removeOverlay(allFedcutsLayer);
 
   if (pushState) {
-    history.pushState(area, '', '?a=' + area);
+    history.pushState({current: area, previous: history.state.current}, '', '?a=' + area);
   }
   resetViewBounds = config.areas[area].bounds;
   spinner.spin($('#spinner')[0]);
   $('.areaSign').show();
-  $('.' + area + '-sign').hide();
   if (timberHarvestPbfLayer) {
     timberHarvestPbfLayer.removeFrom(map);
   }
@@ -295,6 +295,7 @@ function gotoArea(area, pushState) {
 
   $('.fedInfo').hide();
   $('.info').show();
+  $('.' + area + '-sign').hide();
 }
 
 function wipeAreaLayer() {
@@ -420,25 +421,10 @@ function setUpInfoPanels() {
   config.topOpacitySliderOptions.start = config.defaultOpacity;
   topOpacitySlider = new Slider($('#topOpacitySlider')[0], config.topOpacitySliderOptions);
 
-  $('.top-list-item').click(function() {
-    switch ($(this).attr('data-item-id')) {
-      case 'private':
-        gotoArea('private', true);
-        break;
-      default:
-        gotoFed(true);
-    }
-  });
-
   createInfoPanel('fedInfo', fedInfoContent, {alternateLoggingColor: config.alternateLoggingColor});
 
   config.fedOpacitySliderOptions.start = config.defaultOpacity;
   fedOpacitySlider = new Slider($('#fedOpacitySlider')[0], config.fedOpacitySliderOptions);
-
-  $('#fedInfoPanelTitle').click(function() {
-    gotoTop(true);
-    return false;
-  });
 
   $('.fedInfo').hide();
 
@@ -446,6 +432,48 @@ function setUpInfoPanels() {
     loggingTypeLegend: config.loggingTypeLegend,
     layerOpacity: (config.timberHarvestStyle.fillOpacity * 100).toFixed(),
     alternateLoggingColor: config.alternateLoggingColor
+  });
+
+  $('.dropbtn').click(function() {
+    $('.dropdown-content').toggle();
+  });
+
+  $(window).click(function(event) {
+    if (!(event.target.matches('.dropbtn') || event.target.parentElement.matches('.dropbtn'))) {
+      $('.dropdown-content').hide();
+    }
+  });
+
+  $('.explore-item').click(function() {
+    NProgress.remove();
+
+    var current = history.state.current;
+    var previous = history.state ? history.state.previous : undefined;
+
+    $('.dropdown-content').hide();
+    switch ($(this).attr('data-item-id')) {
+      case 'private':
+        if (current === 'private') {
+          map.flyToBounds(config.oregonBbox);
+        }
+        gotoArea('private', true);
+        break;
+      case 'fed':
+        if (current !== 'private' && current !== 'top') {
+          if(current === 'fed' || current in config.areas) {
+            map.flyToBounds(config.oregonBbox);
+          }
+        }
+        if (previous !== 'private' && previous in config.areas) {
+          gotoArea(previous, true);
+        } else {
+          gotoFed(true);
+        }
+        break;
+      default:
+        gotoTop(true);
+    }
+    return false;
   });
 
   dateRangeSlider = new Slider($('#dateRangeSlider')[0], config.dateRangeSliderOptions);
@@ -471,13 +499,11 @@ function setUpInfoPanels() {
   $('#fromLabel').text(Math.round(dateRangeSlider.getInfo().left));
   $('#toLabel').text(Math.round(dateRangeSlider.getInfo().right));
 
-  $('#infoPanelTitle').click(function() {
+  $('.info-panel-title').click(function() {
     NProgress.remove();
-    if (utils.getUrlVars().a === 'private') {
-      gotoTop(true);
-    } else {
-      gotoFed(true);
-    }
+    map.flyToBounds(config.oregonBbox);
+    spinner.stop();
+    gotoTop(true, 'top');
     return false;
   });
 }
