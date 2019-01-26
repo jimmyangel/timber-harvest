@@ -185,13 +185,13 @@ function setAreaBoundaryStyle(f) {
   return config.areaBoundaryStyles[config.areas[f.properties.name].type];
 }
 
-function gotoTop(pushState) {
+function gotoTop(pushState, current) {
 
   $('.info').hide();
   $('.fedInfo').hide();
   $('.topInfo').show();
   if (pushState) {
-    history.pushState({current: 'top', previous: history.state.current}, '', '.');
+    history.pushState({current: 'top', previous: current ? current : history.state.current}, '', '.');
   }
 
   resetViewBounds = config.oregonBbox;
@@ -503,7 +503,7 @@ function setUpInfoPanels() {
     NProgress.remove();
     map.flyToBounds(config.oregonBbox);
     spinner.stop();
-    gotoTop(true);
+    gotoTop(true, 'top');
     return false;
   });
 }
